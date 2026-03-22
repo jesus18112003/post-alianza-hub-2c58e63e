@@ -2,13 +2,24 @@ import { useAuth } from '@/hooks/useAuth';
 import { usePolicies } from '@/hooks/usePolicies';
 import { MetricCards } from '@/components/MetricCards';
 import { PolicyCard } from '@/components/PolicyCard';
+import { AdminDashboard } from '@/components/AdminDashboard';
 import { Button } from '@/components/ui/button';
 import { LogOut, Search, Filter } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { useState, useMemo } from 'react';
-import { StatusBadge, STATUS_CONFIG, PolicyStatus } from '@/components/StatusBadge';
+import { STATUS_CONFIG, PolicyStatus } from '@/components/StatusBadge';
 
 export default function Dashboard() {
+  const { role } = useAuth();
+
+  if (role === 'admin') {
+    return <AdminDashboard />;
+  }
+
+  return <AgentDashboard />;
+}
+
+function AgentDashboard() {
   const { profile, role, signOut } = useAuth();
   const { data: policies, isLoading } = usePolicies();
   const [search, setSearch] = useState('');
@@ -51,57 +62,35 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
       <header className="border-b border-border px-6 py-4 flex items-center justify-between sticky top-0 z-10 bg-background/95 backdrop-blur-sm">
         <div className="flex items-center gap-4">
-          <h1
-            className="text-xl text-accent tracking-tight"
-            style={{ fontFamily: "'Georgia', 'Times New Roman', serif" }}
-          >
+          <h1 className="text-xl text-accent tracking-tight" style={{ fontFamily: "'Georgia', 'Times New Roman', serif" }}>
             Post Alianza
           </h1>
           <span className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground border border-border rounded px-2 py-0.5">
             {role ?? 'agent'}
           </span>
         </div>
-
         <div className="flex items-center gap-4">
           <span className="text-sm text-muted-foreground hidden sm:block">
             {profile?.full_name || profile?.username}
           </span>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={signOut}
-            className="text-muted-foreground hover:text-foreground active:scale-95 transition-all"
-          >
+          <Button variant="ghost" size="icon" onClick={signOut} className="text-muted-foreground hover:text-foreground active:scale-95 transition-all">
             <LogOut className="h-4 w-4" />
           </Button>
         </div>
       </header>
 
       <main className="max-w-5xl mx-auto px-4 sm:px-6 py-8 space-y-8">
-        {/* Greeting */}
         <div>
-          <h2
-            className="text-2xl text-accent tracking-tight"
-            style={{ fontFamily: "'Georgia', 'Times New Roman', serif" }}
-          >
+          <h2 className="text-2xl text-accent tracking-tight" style={{ fontFamily: "'Georgia', 'Times New Roman', serif" }}>
             Bienvenido, {profile?.full_name || 'Agente'}
           </h2>
-          <p className="text-sm text-muted-foreground mt-1">
-            Resumen de tu actividad y pólizas
-          </p>
+          <p className="text-sm text-muted-foreground mt-1">Resumen de tu actividad y pólizas</p>
         </div>
 
-        {/* Metric Cards */}
-        <MetricCards
-          totalCommission={totalCommission}
-          policiesEmitted={policiesEmitted}
-          pendingCases={pendingCases}
-        />
+        <MetricCards totalCommission={totalCommission} policiesEmitted={policiesEmitted} pendingCases={pendingCases} />
 
-        {/* Filters */}
         <div className="flex flex-col sm:flex-row gap-3">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -112,7 +101,6 @@ export default function Dashboard() {
               className="pl-9 bg-secondary border-border text-foreground placeholder:text-muted-foreground/50"
             />
           </div>
-
           <div className="flex items-center gap-2 overflow-x-auto pb-1">
             <Filter className="h-4 w-4 text-muted-foreground shrink-0" />
             <button
@@ -141,15 +129,11 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Policy List */}
         <div className="space-y-2">
           {isLoading ? (
             <div className="space-y-2">
               {[...Array(4)].map((_, i) => (
-                <div
-                  key={i}
-                  className="rounded-lg border border-border bg-card h-14 animate-pulse"
-                />
+                <div key={i} className="rounded-lg border border-border bg-card h-14 animate-pulse" />
               ))}
             </div>
           ) : filtered.length === 0 ? (
@@ -161,13 +145,10 @@ export default function Dashboard() {
               </p>
             </div>
           ) : (
-            filtered.map((policy) => (
-              <PolicyCard key={policy.id} policy={policy} />
-            ))
+            filtered.map((policy) => <PolicyCard key={policy.id} policy={policy} />)
           )}
         </div>
 
-        {/* Count */}
         {!isLoading && filtered.length > 0 && (
           <p className="text-xs text-muted-foreground text-center">
             Mostrando {filtered.length} de {policies?.length ?? 0} pólizas
