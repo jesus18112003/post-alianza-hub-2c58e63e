@@ -14,6 +14,63 @@ export type Database = {
   }
   public: {
     Tables: {
+      policies: {
+        Row: {
+          agent_id: string
+          agent_premium: number | null
+          client_name: string
+          company: string
+          created_at: string
+          date: string
+          id: string
+          location: string | null
+          notes: string | null
+          payment_method: string | null
+          policy_number: string | null
+          policy_type: string | null
+          status: Database["public"]["Enums"]["policy_status"]
+          target_premium: number | null
+          total_commission: number | null
+          updated_at: string
+        }
+        Insert: {
+          agent_id: string
+          agent_premium?: number | null
+          client_name: string
+          company: string
+          created_at?: string
+          date?: string
+          id?: string
+          location?: string | null
+          notes?: string | null
+          payment_method?: string | null
+          policy_number?: string | null
+          policy_type?: string | null
+          status?: Database["public"]["Enums"]["policy_status"]
+          target_premium?: number | null
+          total_commission?: number | null
+          updated_at?: string
+        }
+        Update: {
+          agent_id?: string
+          agent_premium?: number | null
+          client_name?: string
+          company?: string
+          created_at?: string
+          date?: string
+          id?: string
+          location?: string | null
+          notes?: string | null
+          payment_method?: string | null
+          policy_number?: string | null
+          policy_type?: string | null
+          status?: Database["public"]["Enums"]["policy_status"]
+          target_premium?: number | null
+          total_commission?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -74,6 +131,14 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "agent"
+      policy_status:
+        | "emitido"
+        | "cobrado"
+        | "pendiente"
+        | "fondo_insuficiente"
+        | "descalificado"
+        | "cancelado"
+        | "chargeback"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -202,6 +267,15 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "agent"],
+      policy_status: [
+        "emitido",
+        "cobrado",
+        "pendiente",
+        "fondo_insuficiente",
+        "descalificado",
+        "cancelado",
+        "chargeback",
+      ],
     },
   },
 } as const
