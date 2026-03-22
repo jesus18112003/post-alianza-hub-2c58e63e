@@ -2,6 +2,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { usePolicies } from '@/hooks/usePolicies';
 import { MetricCards } from '@/components/MetricCards';
 import { PolicyCard } from '@/components/PolicyCard';
+import { AdminDashboard } from '@/components/AdminDashboard';
 import { Button } from '@/components/ui/button';
 import { LogOut, Search, Filter } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -10,7 +11,11 @@ import { StatusBadge, STATUS_CONFIG, PolicyStatus } from '@/components/StatusBad
 
 export default function Dashboard() {
   const { profile, role, signOut } = useAuth();
-  const { data: policies, isLoading } = usePolicies();
+
+  if (role === 'admin') {
+    return <AdminDashboard />;
+  }
+
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<PolicyStatus | 'all'>('all');
 
