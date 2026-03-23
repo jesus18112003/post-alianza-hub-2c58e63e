@@ -28,6 +28,15 @@ export function AdminDashboard() {
     return map;
   }, [agents]);
 
+  // Companies available for current agent filter
+  const availableCompanies = useMemo(() => {
+    const source = agentFilter === 'all' ? (policies ?? []) : (policies ?? []).filter((p) => p.agent_id === agentFilter);
+    return [...new Set(source.map((p) => p.company))].sort();
+  }, [policies, agentFilter]);
+
+  // Reset company filter when agent changes and company no longer available
+  const effectiveCompanyFilter = availableCompanies.includes(companyFilter) ? companyFilter : 'all';
+
   const filtered = useMemo(() => {
     if (!policies) return [];
     return policies.filter((p) => {
@@ -38,9 +47,10 @@ export function AdminDashboard() {
         (agentMap[p.agent_id] ?? '').toLowerCase().includes(search.toLowerCase());
       const matchStatus = statusFilter === 'all' || p.status === statusFilter;
       const matchAgent = agentFilter === 'all' || p.agent_id === agentFilter;
-      return matchSearch && matchStatus && matchAgent;
+      const matchCompany = effectiveCompanyFilter === 'all' || p.company === effectiveCompanyFilter;
+      return matchSearch && matchStatus && matchAgent && matchCompany;
     });
-  }, [policies, search, statusFilter, agentFilter, agentMap]);
+  }, [policies, search, statusFilter, agentFilter, effectiveCompanyFilter, agentMap]);
 
   const totalCommission = useMemo(
     () =>
