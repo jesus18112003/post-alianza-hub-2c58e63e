@@ -14,6 +14,90 @@ export type Database = {
   }
   public: {
     Tables: {
+      agent_details: {
+        Row: {
+          agent_id: string
+          created_at: string
+          date_of_birth: string | null
+          id: string
+          personal_email: string | null
+          secondary_email: string | null
+          ssn: string | null
+          updated_at: string
+        }
+        Insert: {
+          agent_id: string
+          created_at?: string
+          date_of_birth?: string | null
+          id?: string
+          personal_email?: string | null
+          secondary_email?: string | null
+          ssn?: string | null
+          updated_at?: string
+        }
+        Update: {
+          agent_id?: string
+          created_at?: string
+          date_of_birth?: string | null
+          id?: string
+          personal_email?: string | null
+          secondary_email?: string | null
+          ssn?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      agent_portal_credentials: {
+        Row: {
+          agent_id: string
+          created_at: string
+          id: string
+          portal_name: string
+          portal_password: string
+          portal_username: string
+        }
+        Insert: {
+          agent_id: string
+          created_at?: string
+          id?: string
+          portal_name: string
+          portal_password: string
+          portal_username: string
+        }
+        Update: {
+          agent_id?: string
+          created_at?: string
+          id?: string
+          portal_name?: string
+          portal_password?: string
+          portal_username?: string
+        }
+        Relationships: []
+      }
+      agent_producer_numbers: {
+        Row: {
+          agent_id: string
+          company: string
+          created_at: string
+          id: string
+          producer_number: string
+        }
+        Insert: {
+          agent_id: string
+          company: string
+          created_at?: string
+          id?: string
+          producer_number: string
+        }
+        Update: {
+          agent_id?: string
+          company?: string
+          created_at?: string
+          id?: string
+          producer_number?: string
+        }
+        Relationships: []
+      }
       policies: {
         Row: {
           agent_id: string

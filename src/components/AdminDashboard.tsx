@@ -3,10 +3,11 @@ import { useAuth } from '@/hooks/useAuth';
 import { useAllPolicies, useAgentProfiles } from '@/hooks/useAdminData';
 import { MetricCards } from '@/components/MetricCards';
 import { AdminPolicyRow } from '@/components/AdminPolicyRow';
+import { AgentDetailModal } from '@/components/AgentDetailModal';
 import { STATUS_CONFIG, PolicyStatus } from '@/components/StatusBadge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { LogOut, Search, Filter, Users, ChevronDown, Building2 } from 'lucide-react';
+import { LogOut, Search, Filter, Users, ChevronDown, Building2, Info } from 'lucide-react';
 
 export function AdminDashboard() {
   const { profile, signOut } = useAuth();
@@ -19,6 +20,7 @@ export function AdminDashboard() {
   const [companyFilter, setCompanyFilter] = useState<string>('all');
   const [agentDropdown, setAgentDropdown] = useState(false);
   const [companyDropdown, setCompanyDropdown] = useState(false);
+  const [agentModalId, setAgentModalId] = useState<string | null>(null);
 
   const agentMap = useMemo(() => {
     const map: Record<string, string> = {};
@@ -134,25 +136,39 @@ export function AdminDashboard() {
                   .reduce((sum, p) => sum + (p.total_commission ?? 0), 0);
                 if (agentPolicies.length === 0) return null;
                 return (
-                  <button
+                  <div
                     key={agent.id}
-                    onClick={() => setAgentFilter(agentFilter === agent.id ? 'all' : agent.id)}
-                    className={`rounded-lg border p-4 text-left transition-all active:scale-[0.97] ${
+                    className={`rounded-lg border p-4 text-left transition-all ${
                       agentFilter === agent.id
                         ? 'border-primary/40 bg-primary/5 shadow-md shadow-black/10'
                         : 'border-border bg-card hover:border-border/80 hover:shadow-sm'
                     }`}
                   >
-                    <p className="text-sm text-card-foreground truncate">
-                      {agent.full_name || agent.username}
-                    </p>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      {agentPolicies.length} póliza{agentPolicies.length !== 1 ? 's' : ''}
-                    </p>
-                    <p className="text-sm text-accent mt-2 tabular-nums">
-                      ${agentCommission.toLocaleString('en-US', { minimumFractionDigits: 2 })}
-                    </p>
-                  </button>
+                    <div className="flex items-start justify-between">
+                      <button
+                        onClick={() => setAgentFilter(agentFilter === agent.id ? 'all' : agent.id)}
+                        className="flex-1 text-left active:scale-[0.97] transition-transform"
+                      >
+                        <p className="text-sm text-card-foreground truncate">
+                          {agent.full_name || agent.username}
+                        </p>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          {agentPolicies.length} póliza{agentPolicies.length !== 1 ? 's' : ''}
+                        </p>
+                        <p className="text-sm text-accent mt-2 tabular-nums">
+                          ${agentCommission.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                        </p>
+                      </button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-7 w-7 text-muted-foreground hover:text-primary shrink-0 -mt-1 -mr-1"
+                        onClick={() => setAgentModalId(agent.id)}
+                      >
+                        <Info className="h-3.5 w-3.5" />
+                      </Button>
+                    </div>
+                  </div>
                 );
               })}
             </div>
@@ -317,6 +333,16 @@ export function AdminDashboard() {
           </p>
         )}
       </main>
+
+      {/* Agent detail modal */}
+      {agentModalId && (
+        <AgentDetailModal
+          open={!!agentModalId}
+          onOpenChange={(open) => { if (!open) setAgentModalId(null); }}
+          agentId={agentModalId}
+          agentName={agentMap[agentModalId] ?? 'Agente'}
+        />
+      )}
     </div>
   );
 }
