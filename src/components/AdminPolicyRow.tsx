@@ -4,8 +4,9 @@ import { StatusBadge, STATUS_CONFIG, PolicyStatus } from '@/components/StatusBad
 import { useUpdatePolicyStatus, useDeletePolicy } from '@/hooks/useAdminData';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { ChevronDown, Trash2, Check, X } from 'lucide-react';
+import { ChevronDown, Trash2, Check, X, Pencil } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { EditPolicyDialog } from '@/components/EditPolicyDialog';
 import { toast } from 'sonner';
 
 interface AdminPolicyRowProps {
@@ -17,6 +18,7 @@ export function AdminPolicyRow({ policy, agentName }: AdminPolicyRowProps) {
   const [open, setOpen] = useState(false);
   const [statusOpen, setStatusOpen] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
 
   const updateStatus = useUpdatePolicyStatus();
   const deletePolicy = useDeletePolicy();
@@ -134,6 +136,20 @@ export function AdminPolicyRow({ policy, agentName }: AdminPolicyRowProps) {
 
             {/* Delete */}
             <div className="flex items-center gap-2">
+              {/* Edit */}
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-7 w-7 text-muted-foreground hover:text-primary"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setEditOpen(true);
+                }}
+              >
+                <Pencil className="h-3.5 w-3.5" />
+              </Button>
+
+              {/* Delete */}
               {confirmDelete ? (
                 <>
                   <span className="text-xs text-destructive">¿Eliminar?</span>
@@ -217,6 +233,7 @@ export function AdminPolicyRow({ policy, agentName }: AdminPolicyRowProps) {
           </div>
         </div>
       </div>
+      <EditPolicyDialog policy={policy} open={editOpen} onOpenChange={setEditOpen} />
     </div>
   );
 }
