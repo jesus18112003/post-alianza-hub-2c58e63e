@@ -6,7 +6,7 @@ import { AdminPolicyRow } from '@/components/AdminPolicyRow';
 import { STATUS_CONFIG, PolicyStatus } from '@/components/StatusBadge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { LogOut, Search, Filter, Users, ChevronDown } from 'lucide-react';
+import { LogOut, Search, Filter, Users, ChevronDown, Building2 } from 'lucide-react';
 
 export function AdminDashboard() {
   const { profile, signOut } = useAuth();
@@ -16,7 +16,9 @@ export function AdminDashboard() {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<PolicyStatus | 'all'>('all');
   const [agentFilter, setAgentFilter] = useState<string>('all');
+  const [companyFilter, setCompanyFilter] = useState<string>('all');
   const [agentDropdown, setAgentDropdown] = useState(false);
+  const [companyDropdown, setCompanyDropdown] = useState(false);
 
   const agentMap = useMemo(() => {
     const map: Record<string, string> = {};
@@ -25,6 +27,15 @@ export function AdminDashboard() {
     });
     return map;
   }, [agents]);
+
+  // Companies available for current agent filter
+  const availableCompanies = useMemo(() => {
+    const source = agentFilter === 'all' ? (policies ?? []) : (policies ?? []).filter((p) => p.agent_id === agentFilter);
+    return [...new Set(source.map((p) => p.company))].sort();
+  }, [policies, agentFilter]);
+
+  // Reset company filter when agent changes and company no longer available
+  const effectiveCompanyFilter = availableCompanies.includes(companyFilter) ? companyFilter : 'all';
 
   const filtered = useMemo(() => {
     if (!policies) return [];
@@ -36,9 +47,10 @@ export function AdminDashboard() {
         (agentMap[p.agent_id] ?? '').toLowerCase().includes(search.toLowerCase());
       const matchStatus = statusFilter === 'all' || p.status === statusFilter;
       const matchAgent = agentFilter === 'all' || p.agent_id === agentFilter;
-      return matchSearch && matchStatus && matchAgent;
+      const matchCompany = effectiveCompanyFilter === 'all' || p.company === effectiveCompanyFilter;
+      return matchSearch && matchStatus && matchAgent && matchCompany;
     });
-  }, [policies, search, statusFilter, agentFilter, agentMap]);
+  }, [policies, search, statusFilter, agentFilter, effectiveCompanyFilter, agentMap]);
 
   const totalCommission = useMemo(
     () =>
@@ -194,6 +206,49 @@ export function AdminDashboard() {
                     }`}
                   >
                     {a.full_name || a.username}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Company filter dropdown */}
+          <div className="relative">
+            <button
+              onClick={() => setCompanyDropdown(!companyDropdown)}
+              className="flex items-center gap-2 text-xs px-3 py-2.5 rounded-md border border-border bg-secondary hover:bg-secondary/80 text-foreground transition-colors active:scale-95 min-w-[10rem]"
+            >
+              <Building2 className="h-3.5 w-3.5 text-muted-foreground" />
+              <span className="truncate flex-1 text-left">
+                {effectiveCompanyFilter === 'all' ? 'Todas las Compañías' : effectiveCompanyFilter}
+              </span>
+              <ChevronDown className="h-3 w-3 text-muted-foreground" />
+            </button>
+            {companyDropdown && (
+              <div className="absolute top-full right-0 mt-1 z-20 bg-popover border border-border rounded-lg shadow-xl shadow-black/20 p-1 min-w-[12rem] max-h-[16rem] overflow-y-auto">
+                <button
+                  onClick={() => {
+                    setCompanyFilter('all');
+                    setCompanyDropdown(false);
+                  }}
+                  className={`w-full text-left px-3 py-2 rounded-md text-xs transition-colors hover:bg-secondary/60 active:scale-95 ${
+                    effectiveCompanyFilter === 'all' ? 'bg-secondary/40 text-primary' : 'text-foreground'
+                  }`}
+                >
+                  Todas las Compañías
+                </button>
+                {availableCompanies.map((c) => (
+                  <button
+                    key={c}
+                    onClick={() => {
+                      setCompanyFilter(c);
+                      setCompanyDropdown(false);
+                    }}
+                    className={`w-full text-left px-3 py-2 rounded-md text-xs transition-colors hover:bg-secondary/60 active:scale-95 ${
+                      effectiveCompanyFilter === c ? 'bg-secondary/40 text-primary' : 'text-foreground'
+                    }`}
+                  >
+                    {c}
                   </button>
                 ))}
               </div>
