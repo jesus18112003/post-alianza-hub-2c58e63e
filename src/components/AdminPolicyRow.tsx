@@ -236,8 +236,8 @@ export function AdminPolicyRow({ policy, agentName }: AdminPolicyRowProps) {
       <EditPolicyDialog policy={policy} open={editOpen} onOpenChange={setEditOpen} />
     </div>
   );
+}
 
-function DetailItem({
   label,
   value,
   isCurrency,
