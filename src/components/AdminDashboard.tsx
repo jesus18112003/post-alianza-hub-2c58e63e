@@ -333,6 +333,16 @@ export function AdminDashboard() {
           </p>
         )}
       </main>
+
+      {/* Agent detail modal */}
+      {agentModalId && (
+        <AgentDetailModal
+          open={!!agentModalId}
+          onOpenChange={(open) => { if (!open) setAgentModalId(null); }}
+          agentId={agentModalId}
+          agentName={agentMap[agentModalId] ?? 'Agente'}
+        />
+      )}
     </div>
   );
 }
