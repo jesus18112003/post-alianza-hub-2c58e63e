@@ -16,7 +16,9 @@ export function AdminDashboard() {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<PolicyStatus | 'all'>('all');
   const [agentFilter, setAgentFilter] = useState<string>('all');
+  const [companyFilter, setCompanyFilter] = useState<string>('all');
   const [agentDropdown, setAgentDropdown] = useState(false);
+  const [companyDropdown, setCompanyDropdown] = useState(false);
 
   const agentMap = useMemo(() => {
     const map: Record<string, string> = {};
