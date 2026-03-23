@@ -238,6 +238,7 @@ export function AdminPolicyRow({ policy, agentName }: AdminPolicyRowProps) {
   );
 }
 
+function DetailItem({
   label,
   value,
   isCurrency,
