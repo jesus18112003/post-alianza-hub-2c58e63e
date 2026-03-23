@@ -211,6 +211,49 @@ export function AdminDashboard() {
               </div>
             )}
           </div>
+
+          {/* Company filter dropdown */}
+          <div className="relative">
+            <button
+              onClick={() => setCompanyDropdown(!companyDropdown)}
+              className="flex items-center gap-2 text-xs px-3 py-2.5 rounded-md border border-border bg-secondary hover:bg-secondary/80 text-foreground transition-colors active:scale-95 min-w-[10rem]"
+            >
+              <Building2 className="h-3.5 w-3.5 text-muted-foreground" />
+              <span className="truncate flex-1 text-left">
+                {effectiveCompanyFilter === 'all' ? 'Todas las Compañías' : effectiveCompanyFilter}
+              </span>
+              <ChevronDown className="h-3 w-3 text-muted-foreground" />
+            </button>
+            {companyDropdown && (
+              <div className="absolute top-full right-0 mt-1 z-20 bg-popover border border-border rounded-lg shadow-xl shadow-black/20 p-1 min-w-[12rem] max-h-[16rem] overflow-y-auto">
+                <button
+                  onClick={() => {
+                    setCompanyFilter('all');
+                    setCompanyDropdown(false);
+                  }}
+                  className={`w-full text-left px-3 py-2 rounded-md text-xs transition-colors hover:bg-secondary/60 active:scale-95 ${
+                    effectiveCompanyFilter === 'all' ? 'bg-secondary/40 text-primary' : 'text-foreground'
+                  }`}
+                >
+                  Todas las Compañías
+                </button>
+                {availableCompanies.map((c) => (
+                  <button
+                    key={c}
+                    onClick={() => {
+                      setCompanyFilter(c);
+                      setCompanyDropdown(false);
+                    }}
+                    className={`w-full text-left px-3 py-2 rounded-md text-xs transition-colors hover:bg-secondary/60 active:scale-95 ${
+                      effectiveCompanyFilter === c ? 'bg-secondary/40 text-primary' : 'text-foreground'
+                    }`}
+                  >
+                    {c}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Status filter pills */}
