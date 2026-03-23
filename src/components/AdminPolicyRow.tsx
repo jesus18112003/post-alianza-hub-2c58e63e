@@ -233,9 +233,9 @@ export function AdminPolicyRow({ policy, agentName }: AdminPolicyRowProps) {
           </div>
         </div>
       </div>
+      <EditPolicyDialog policy={policy} open={editOpen} onOpenChange={setEditOpen} />
     </div>
   );
-}
 
 function DetailItem({
   label,
