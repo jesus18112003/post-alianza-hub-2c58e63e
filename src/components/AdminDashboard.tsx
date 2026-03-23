@@ -6,7 +6,7 @@ import { AdminPolicyRow } from '@/components/AdminPolicyRow';
 import { STATUS_CONFIG, PolicyStatus } from '@/components/StatusBadge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { LogOut, Search, Filter, Users, ChevronDown } from 'lucide-react';
+import { LogOut, Search, Filter, Users, ChevronDown, Building2 } from 'lucide-react';
 
 export function AdminDashboard() {
   const { profile, signOut } = useAuth();
