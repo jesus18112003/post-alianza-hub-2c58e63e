@@ -5,6 +5,7 @@ import { MetricCards } from '@/components/MetricCards';
 import { AdminPolicyRow } from '@/components/AdminPolicyRow';
 import { AgentDetailModal } from '@/components/AgentDetailModal';
 import { STATUS_CONFIG, PolicyStatus } from '@/components/StatusBadge';
+import { ClosingAssignments } from '@/components/ClosingAssignments';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { LogOut, Search, Filter, Users, ChevronDown, Building2, Info } from 'lucide-react';
@@ -118,6 +119,9 @@ export function AdminDashboard() {
           policiesEmitted={policiesEmitted}
           pendingCases={pendingCases}
         />
+
+        {/* Closing Assignments from Discord */}
+        <ClosingAssignments />
 
         {/* Agent summary cards */}
         {agents && agents.length > 0 && (
