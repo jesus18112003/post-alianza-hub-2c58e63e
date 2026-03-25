@@ -98,6 +98,54 @@ export type Database = {
         }
         Relationships: []
       }
+      closing_assignments: {
+        Row: {
+          amount: number | null
+          assigned_agent_id: string | null
+          client_name: string | null
+          company: string | null
+          created_at: string
+          created_policy_id: string | null
+          discord_message_id: string
+          id: string
+          payment_method: string | null
+          policy_type: string | null
+          raw_message: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          amount?: number | null
+          assigned_agent_id?: string | null
+          client_name?: string | null
+          company?: string | null
+          created_at?: string
+          created_policy_id?: string | null
+          discord_message_id: string
+          id?: string
+          payment_method?: string | null
+          policy_type?: string | null
+          raw_message: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          amount?: number | null
+          assigned_agent_id?: string | null
+          client_name?: string | null
+          company?: string | null
+          created_at?: string
+          created_policy_id?: string | null
+          discord_message_id?: string
+          id?: string
+          payment_method?: string | null
+          policy_type?: string | null
+          raw_message?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       policies: {
         Row: {
           agent_id: string
