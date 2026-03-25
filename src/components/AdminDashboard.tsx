@@ -120,6 +120,9 @@ export function AdminDashboard() {
           pendingCases={pendingCases}
         />
 
+        {/* Closing Assignments from Discord */}
+        <ClosingAssignments />
+
         {/* Agent summary cards */}
         {agents && agents.length > 0 && (
           <div>
