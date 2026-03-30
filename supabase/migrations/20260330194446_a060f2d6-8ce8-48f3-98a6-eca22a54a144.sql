@@ -1,0 +1,1 @@
+UPDATE policies SET target_premium = ROUND(target_premium / 12, 2) WHERE target_premium IS NOT NULL;
