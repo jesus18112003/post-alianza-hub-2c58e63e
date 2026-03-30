@@ -64,6 +64,12 @@ function PersonalInfoSection({ agentId, details }: { agentId: string; details: a
   const [dob, setDob] = useState(details?.date_of_birth ?? '');
   const [email1, setEmail1] = useState(details?.personal_email ?? '');
   const [email2, setEmail2] = useState(details?.secondary_email ?? '');
+  useEffect(() => {
+    setSsn(details?.ssn ?? '');
+    setDob(details?.date_of_birth ?? '');
+    setEmail1(details?.personal_email ?? '');
+    setEmail2(details?.secondary_email ?? '');
+  }, [details]);
   const [showSsn, setShowSsn] = useState(false);
 
   const handleSave = () => {
