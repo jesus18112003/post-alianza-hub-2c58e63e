@@ -1,0 +1,1 @@
+UPDATE policies SET company = 'AMAM' WHERE company = 'AMAN';
