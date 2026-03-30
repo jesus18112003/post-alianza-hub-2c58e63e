@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -64,6 +64,12 @@ function PersonalInfoSection({ agentId, details }: { agentId: string; details: a
   const [dob, setDob] = useState(details?.date_of_birth ?? '');
   const [email1, setEmail1] = useState(details?.personal_email ?? '');
   const [email2, setEmail2] = useState(details?.secondary_email ?? '');
+  useEffect(() => {
+    setSsn(details?.ssn ?? '');
+    setDob(details?.date_of_birth ?? '');
+    setEmail1(details?.personal_email ?? '');
+    setEmail2(details?.secondary_email ?? '');
+  }, [details]);
   const [showSsn, setShowSsn] = useState(false);
 
   const handleSave = () => {
@@ -164,6 +170,7 @@ function ProducerNumbersSection({
   const upsert = useUpsertProducerNumber();
   const remove = useDeleteProducerNumber();
   const [rows, setRows] = useState(producers);
+  useEffect(() => { setRows(producers); }, [producers]);
   const [newCompany, setNewCompany] = useState('');
   const [newNumber, setNewNumber] = useState('');
 
@@ -268,6 +275,7 @@ function PortalCredentialsSection({
   const upsert = useUpsertPortalCredential();
   const remove = useDeletePortalCredential();
   const [rows, setRows] = useState(credentials);
+  useEffect(() => { setRows(credentials); }, [credentials]);
   const [newPortal, setNewPortal] = useState('');
   const [newUser, setNewUser] = useState('');
   const [newPass, setNewPass] = useState('');
