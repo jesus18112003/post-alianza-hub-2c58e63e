@@ -269,6 +269,7 @@ function PortalCredentialsSection({
   const upsert = useUpsertPortalCredential();
   const remove = useDeletePortalCredential();
   const [rows, setRows] = useState(credentials);
+  useEffect(() => { setRows(credentials); }, [credentials]);
   const [newPortal, setNewPortal] = useState('');
   const [newUser, setNewUser] = useState('');
   const [newPass, setNewPass] = useState('');
