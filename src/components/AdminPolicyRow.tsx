@@ -113,7 +113,7 @@ export function AdminPolicyRow({ policy, agentName }: AdminPolicyRowProps) {
                 </button>
 
                 {statusOpen && (
-                  <div className="absolute top-full left-0 mt-1 z-20 bg-popover border border-border rounded-lg shadow-xl shadow-black/20 p-1 min-w-[10rem]">
+                  <div className="absolute bottom-full left-0 mb-1 z-20 bg-popover border border-border rounded-lg shadow-xl shadow-black/20 p-1 min-w-[10rem] max-h-[14rem] overflow-y-auto">
                     {allStatuses.map((s) => (
                       <button
                         key={s}
