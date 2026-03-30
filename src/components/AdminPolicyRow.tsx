@@ -91,8 +91,8 @@ export function AdminPolicyRow({ policy, agentName }: AdminPolicyRowProps) {
 
       {/* Expanded detail */}
       <div
-        className={`overflow-hidden transition-all duration-300 ease-out ${
-          open ? 'max-h-[600px] opacity-100' : 'max-h-0 opacity-0'
+        className={`transition-all duration-300 ease-out ${
+          open ? 'max-h-[600px] opacity-100 overflow-visible' : 'max-h-0 opacity-0 overflow-hidden'
         }`}
       >
         <div className="px-4 pb-4 pt-1 border-t border-border/50">
