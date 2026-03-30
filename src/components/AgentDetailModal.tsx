@@ -164,6 +164,7 @@ function ProducerNumbersSection({
   const upsert = useUpsertProducerNumber();
   const remove = useDeleteProducerNumber();
   const [rows, setRows] = useState(producers);
+  useEffect(() => { setRows(producers); }, [producers]);
   const [newCompany, setNewCompany] = useState('');
   const [newNumber, setNewNumber] = useState('');
 
