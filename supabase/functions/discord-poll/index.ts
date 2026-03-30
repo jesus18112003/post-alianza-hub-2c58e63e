@@ -13,7 +13,8 @@ function parseMessage(raw: string) {
   );
   if (!match) return null;
   const amount = parseFloat(match[1].replace(/,/g, ""));
-  const company = match[2].toUpperCase();
+  let company = match[2].toUpperCase();
+  if (company === "AMAN") company = "AMAM";
   const policyType = match[3].toUpperCase();
   // Everything between policy_type and (client) is payment_method
   const paymentMethod = match[4].trim();

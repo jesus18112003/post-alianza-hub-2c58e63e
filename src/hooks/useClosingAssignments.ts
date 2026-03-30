@@ -72,7 +72,7 @@ export function useAssignClosing() {
           status: 'pendiente',
           policy_type: assignment.policy_type,
           payment_method: assignment.payment_method,
-          target_premium: assignment.amount,
+          target_premium: assignment.amount ? Math.round((assignment.amount / 12) * 100) / 100 : null,
         })
         .select('id')
         .single();
