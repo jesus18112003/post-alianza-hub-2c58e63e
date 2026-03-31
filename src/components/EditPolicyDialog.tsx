@@ -31,6 +31,7 @@ export function EditPolicyDialog({ policy, open, onOpenChange }: EditPolicyDialo
     agent_premium: policy.agent_premium?.toString() ?? '',
     total_commission: policy.total_commission?.toString() ?? '',
     notes: policy.notes ?? '',
+    phone_number: policy.phone_number ?? '',
   });
 
   const set = (key: string, value: string) => setForm((f) => ({ ...f, [key]: value }));
@@ -57,6 +58,7 @@ export function EditPolicyDialog({ policy, open, onOpenChange }: EditPolicyDialo
           agent_premium: form.agent_premium ? parseFloat(form.agent_premium) : null,
           total_commission: form.total_commission ? parseFloat(form.total_commission) : null,
           notes: form.notes.trim() || null,
+          phone_number: form.phone_number.trim() || null,
         },
       },
       {
@@ -121,6 +123,12 @@ export function EditPolicyDialog({ policy, open, onOpenChange }: EditPolicyDialo
               <Label className="text-xs text-muted-foreground">Nro. de Póliza</Label>
               <Input value={form.policy_number} onChange={(e) => set('policy_number', e.target.value)}
                 placeholder="Pendiente" className="bg-secondary border-border text-foreground text-sm" />
+            </div>
+
+            <div className="space-y-1.5">
+              <Label className="text-xs text-muted-foreground">Teléfono del Cliente</Label>
+              <Input value={form.phone_number} onChange={(e) => set('phone_number', e.target.value)}
+                placeholder="Ej: +1 (555) 123-4567" className="bg-secondary border-border text-foreground text-sm" />
             </div>
           </div>
 

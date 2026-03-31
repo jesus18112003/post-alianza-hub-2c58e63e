@@ -8,7 +8,7 @@ import { STATUS_CONFIG, PolicyStatus } from '@/components/StatusBadge';
 import { ClosingAssignments } from '@/components/ClosingAssignments';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { LogOut, Search, Filter, Users, ChevronDown, Building2, Info } from 'lucide-react';
+import { LogOut, Search, Filter, Users, ChevronDown, Building2, Info, Phone } from 'lucide-react';
 
 export function AdminDashboard() {
   const { profile, signOut } = useAuth();
@@ -22,6 +22,7 @@ export function AdminDashboard() {
   const [agentDropdown, setAgentDropdown] = useState(false);
   const [companyDropdown, setCompanyDropdown] = useState(false);
   const [agentModalId, setAgentModalId] = useState<string | null>(null);
+  const [phoneFilter, setPhoneFilter] = useState<'all' | 'with' | 'without'>('all');
 
   const agentMap = useMemo(() => {
     const map: Record<string, string> = {};
@@ -51,9 +52,12 @@ export function AdminDashboard() {
       const matchStatus = statusFilter === 'all' || p.status === statusFilter;
       const matchAgent = agentFilter === 'all' || p.agent_id === agentFilter;
       const matchCompany = effectiveCompanyFilter === 'all' || p.company === effectiveCompanyFilter;
-      return matchSearch && matchStatus && matchAgent && matchCompany;
+      const matchPhone =
+        phoneFilter === 'all' ||
+        (phoneFilter === 'with' ? !!p.phone_number : !p.phone_number);
+      return matchSearch && matchStatus && matchAgent && matchCompany && matchPhone;
     });
-  }, [policies, search, statusFilter, agentFilter, effectiveCompanyFilter, agentMap]);
+  }, [policies, search, statusFilter, agentFilter, effectiveCompanyFilter, agentMap, phoneFilter]);
 
   const totalCommission = useMemo(
     () =>
@@ -277,7 +281,7 @@ export function AdminDashboard() {
         </div>
 
         {/* Status filter pills */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-1">
+        <div className="flex flex-wrap items-center gap-2 pb-1">
           <Filter className="h-4 w-4 text-muted-foreground shrink-0" />
           <button
             onClick={() => setStatusFilter('all')}
@@ -302,6 +306,30 @@ export function AdminDashboard() {
               {STATUS_CONFIG[s].label}
             </button>
           ))}
+
+          <span className="w-px h-4 bg-border mx-1" />
+
+          <Phone className="h-4 w-4 text-muted-foreground shrink-0" />
+          <button
+            onClick={() => setPhoneFilter(phoneFilter === 'with' ? 'all' : 'with')}
+            className={`text-xs px-2.5 py-1 rounded-full border transition-all whitespace-nowrap active:scale-95 ${
+              phoneFilter === 'with'
+                ? 'border-primary/40 bg-primary/10 text-primary'
+                : 'border-border text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            Con Teléfono
+          </button>
+          <button
+            onClick={() => setPhoneFilter(phoneFilter === 'without' ? 'all' : 'without')}
+            className={`text-xs px-2.5 py-1 rounded-full border transition-all whitespace-nowrap active:scale-95 ${
+              phoneFilter === 'without'
+                ? 'border-primary/40 bg-primary/10 text-primary'
+                : 'border-border text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            Sin Teléfono
+          </button>
         </div>
 
         {/* Policy list */}

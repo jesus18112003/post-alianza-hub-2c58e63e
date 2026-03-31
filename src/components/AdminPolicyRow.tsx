@@ -4,7 +4,7 @@ import { StatusBadge, STATUS_CONFIG, PolicyStatus } from '@/components/StatusBad
 import { useUpdatePolicyStatus, useDeletePolicy } from '@/hooks/useAdminData';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { ChevronDown, Trash2, Check, X, Pencil } from 'lucide-react';
+import { ChevronDown, Trash2, Check, X, Pencil, Phone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { EditPolicyDialog } from '@/components/EditPolicyDialog';
 import { toast } from 'sonner';
@@ -74,6 +74,9 @@ export function AdminPolicyRow({ policy, agentName }: AdminPolicyRowProps) {
         <span className="text-sm text-card-foreground flex-1 truncate">
           {policy.client_name}
         </span>
+        {policy.phone_number && (
+          <Phone className="h-3.5 w-3.5 text-green-500 shrink-0" />
+        )}
         <StatusBadge status={policy.status} />
         <span className="text-xs w-[6rem] shrink-0 text-right tabular-nums">
           {policy.policy_number ? (
@@ -225,11 +228,17 @@ export function AdminPolicyRow({ policy, agentName }: AdminPolicyRowProps) {
             )}
           </div>
 
-          {/* Agent info */}
-          <div className="mt-4 pt-3 border-t border-border/30">
+          {/* Agent info & phone */}
+          <div className="mt-4 pt-3 border-t border-border/30 flex items-center justify-between">
             <span className="text-xs text-muted-foreground">
               Agente: <span className="text-primary/80">{agentName}</span>
             </span>
+            {policy.phone_number && (
+              <span className="text-xs text-muted-foreground flex items-center gap-1">
+                <Phone className="h-3 w-3 text-green-500" />
+                <span className="text-secondary-foreground">{policy.phone_number}</span>
+              </span>
+            )}
           </div>
         </div>
       </div>
