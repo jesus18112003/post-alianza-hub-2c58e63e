@@ -281,7 +281,7 @@ export function AdminDashboard() {
         </div>
 
         {/* Status filter pills */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-1">
+        <div className="flex flex-wrap items-center gap-2 pb-1">
           <Filter className="h-4 w-4 text-muted-foreground shrink-0" />
           <button
             onClick={() => setStatusFilter('all')}
@@ -306,6 +306,30 @@ export function AdminDashboard() {
               {STATUS_CONFIG[s].label}
             </button>
           ))}
+
+          <span className="w-px h-4 bg-border mx-1" />
+
+          <Phone className="h-4 w-4 text-muted-foreground shrink-0" />
+          <button
+            onClick={() => setPhoneFilter(phoneFilter === 'with' ? 'all' : 'with')}
+            className={`text-xs px-2.5 py-1 rounded-full border transition-all whitespace-nowrap active:scale-95 ${
+              phoneFilter === 'with'
+                ? 'border-primary/40 bg-primary/10 text-primary'
+                : 'border-border text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            Con Teléfono
+          </button>
+          <button
+            onClick={() => setPhoneFilter(phoneFilter === 'without' ? 'all' : 'without')}
+            className={`text-xs px-2.5 py-1 rounded-full border transition-all whitespace-nowrap active:scale-95 ${
+              phoneFilter === 'without'
+                ? 'border-primary/40 bg-primary/10 text-primary'
+                : 'border-border text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            Sin Teléfono
+          </button>
         </div>
 
         {/* Policy list */}
