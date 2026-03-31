@@ -22,6 +22,7 @@ export function AdminDashboard() {
   const [agentDropdown, setAgentDropdown] = useState(false);
   const [companyDropdown, setCompanyDropdown] = useState(false);
   const [agentModalId, setAgentModalId] = useState<string | null>(null);
+  const [phoneFilter, setPhoneFilter] = useState<'all' | 'with' | 'without'>('all');
 
   const agentMap = useMemo(() => {
     const map: Record<string, string> = {};
