@@ -124,6 +124,12 @@ export function EditPolicyDialog({ policy, open, onOpenChange }: EditPolicyDialo
               <Input value={form.policy_number} onChange={(e) => set('policy_number', e.target.value)}
                 placeholder="Pendiente" className="bg-secondary border-border text-foreground text-sm" />
             </div>
+
+            <div className="space-y-1.5">
+              <Label className="text-xs text-muted-foreground">Teléfono del Cliente</Label>
+              <Input value={form.phone_number} onChange={(e) => set('phone_number', e.target.value)}
+                placeholder="Ej: +1 (555) 123-4567" className="bg-secondary border-border text-foreground text-sm" />
+            </div>
           </div>
 
           {/* Financial */}
