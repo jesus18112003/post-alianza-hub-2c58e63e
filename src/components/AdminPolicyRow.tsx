@@ -78,11 +78,14 @@ export function AdminPolicyRow({ policy, agentName }: AdminPolicyRowProps) {
           <Phone className="h-3.5 w-3.5 text-green-500 shrink-0" />
         )}
         <StatusBadge status={policy.status} />
-        <span className="text-xs w-[6rem] shrink-0 text-right tabular-nums">
+        <span className="text-xs w-[7rem] shrink-0 text-right tabular-nums">
           {policy.policy_number ? (
             <span className="text-secondary-foreground">{policy.policy_number}</span>
           ) : (
-            <span className="text-muted-foreground italic">Pendiente</span>
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-destructive/15 text-destructive animate-pulse">
+              <AlertTriangle className="h-3 w-3" />
+              <span className="text-[10px] font-medium uppercase tracking-wide">Sin Nro.</span>
+            </span>
           )}
         </span>
         <ChevronDown
