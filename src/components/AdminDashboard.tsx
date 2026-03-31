@@ -8,7 +8,7 @@ import { STATUS_CONFIG, PolicyStatus } from '@/components/StatusBadge';
 import { ClosingAssignments } from '@/components/ClosingAssignments';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { LogOut, Search, Filter, Users, ChevronDown, Building2, Info } from 'lucide-react';
+import { LogOut, Search, Filter, Users, ChevronDown, Building2, Info, Phone } from 'lucide-react';
 
 export function AdminDashboard() {
   const { profile, signOut } = useAuth();
