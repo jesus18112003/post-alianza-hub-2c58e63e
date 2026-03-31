@@ -228,11 +228,17 @@ export function AdminPolicyRow({ policy, agentName }: AdminPolicyRowProps) {
             )}
           </div>
 
-          {/* Agent info */}
-          <div className="mt-4 pt-3 border-t border-border/30">
+          {/* Agent info & phone */}
+          <div className="mt-4 pt-3 border-t border-border/30 flex items-center justify-between">
             <span className="text-xs text-muted-foreground">
               Agente: <span className="text-primary/80">{agentName}</span>
             </span>
+            {policy.phone_number && (
+              <span className="text-xs text-muted-foreground flex items-center gap-1">
+                <Phone className="h-3 w-3 text-green-500" />
+                <span className="text-secondary-foreground">{policy.phone_number}</span>
+              </span>
+            )}
           </div>
         </div>
       </div>
