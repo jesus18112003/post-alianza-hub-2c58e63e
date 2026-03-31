@@ -1,0 +1,1 @@
+ALTER TABLE public.policies ADD COLUMN phone_number text DEFAULT NULL;

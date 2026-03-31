@@ -158,6 +158,7 @@ export type Database = {
           location: string | null
           notes: string | null
           payment_method: string | null
+          phone_number: string | null
           policy_number: string | null
           policy_type: string | null
           status: Database["public"]["Enums"]["policy_status"]
@@ -176,6 +177,7 @@ export type Database = {
           location?: string | null
           notes?: string | null
           payment_method?: string | null
+          phone_number?: string | null
           policy_number?: string | null
           policy_type?: string | null
           status?: Database["public"]["Enums"]["policy_status"]
@@ -194,6 +196,7 @@ export type Database = {
           location?: string | null
           notes?: string | null
           payment_method?: string | null
+          phone_number?: string | null
           policy_number?: string | null
           policy_type?: string | null
           status?: Database["public"]["Enums"]["policy_status"]
