@@ -4,7 +4,7 @@ import { StatusBadge, STATUS_CONFIG, PolicyStatus } from '@/components/StatusBad
 import { useUpdatePolicyStatus, useDeletePolicy } from '@/hooks/useAdminData';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { ChevronDown, Trash2, Check, X, Pencil } from 'lucide-react';
+import { ChevronDown, Trash2, Check, X, Pencil, Phone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { EditPolicyDialog } from '@/components/EditPolicyDialog';
 import { toast } from 'sonner';
