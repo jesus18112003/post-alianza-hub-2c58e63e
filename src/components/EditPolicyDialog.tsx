@@ -58,6 +58,7 @@ export function EditPolicyDialog({ policy, open, onOpenChange }: EditPolicyDialo
           agent_premium: form.agent_premium ? parseFloat(form.agent_premium) : null,
           total_commission: form.total_commission ? parseFloat(form.total_commission) : null,
           notes: form.notes.trim() || null,
+          phone_number: form.phone_number.trim() || null,
         },
       },
       {
