@@ -74,6 +74,9 @@ export function AdminPolicyRow({ policy, agentName }: AdminPolicyRowProps) {
         <span className="text-sm text-card-foreground flex-1 truncate">
           {policy.client_name}
         </span>
+        {policy.phone_number && (
+          <Phone className="h-3.5 w-3.5 text-green-500 shrink-0" />
+        )}
         <StatusBadge status={policy.status} />
         <span className="text-xs w-[6rem] shrink-0 text-right tabular-nums">
           {policy.policy_number ? (
