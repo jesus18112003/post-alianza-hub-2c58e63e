@@ -52,9 +52,12 @@ export function AdminDashboard() {
       const matchStatus = statusFilter === 'all' || p.status === statusFilter;
       const matchAgent = agentFilter === 'all' || p.agent_id === agentFilter;
       const matchCompany = effectiveCompanyFilter === 'all' || p.company === effectiveCompanyFilter;
-      return matchSearch && matchStatus && matchAgent && matchCompany;
+      const matchPhone =
+        phoneFilter === 'all' ||
+        (phoneFilter === 'with' ? !!p.phone_number : !p.phone_number);
+      return matchSearch && matchStatus && matchAgent && matchCompany && matchPhone;
     });
-  }, [policies, search, statusFilter, agentFilter, effectiveCompanyFilter, agentMap]);
+  }, [policies, search, statusFilter, agentFilter, effectiveCompanyFilter, agentMap, phoneFilter]);
 
   const totalCommission = useMemo(
     () =>
