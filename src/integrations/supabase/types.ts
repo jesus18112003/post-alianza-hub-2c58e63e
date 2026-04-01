@@ -254,6 +254,33 @@ export type Database = {
         }
         Relationships: []
       }
+      welcome_templates: {
+        Row: {
+          agent_id: string | null
+          created_at: string
+          id: string
+          name: string
+          template_text: string
+          updated_at: string
+        }
+        Insert: {
+          agent_id?: string | null
+          created_at?: string
+          id?: string
+          name?: string
+          template_text?: string
+          updated_at?: string
+        }
+        Update: {
+          agent_id?: string | null
+          created_at?: string
+          id?: string
+          name?: string
+          template_text?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

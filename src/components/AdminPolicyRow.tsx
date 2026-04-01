@@ -4,9 +4,10 @@ import { StatusBadge, STATUS_CONFIG, PolicyStatus } from '@/components/StatusBad
 import { useUpdatePolicyStatus, useDeletePolicy } from '@/hooks/useAdminData';
 import { format, differenceInDays, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { ChevronDown, Trash2, Check, X, Pencil, Phone, AlertTriangle, Clock } from 'lucide-react';
+import { ChevronDown, Trash2, Check, X, Pencil, Phone, AlertTriangle, Clock, MessageSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { EditPolicyDialog } from '@/components/EditPolicyDialog';
+import { WelcomeMessageDialog } from '@/components/WelcomeMessageDialog';
 import { toast } from 'sonner';
 
 interface AdminPolicyRowProps {
@@ -19,6 +20,7 @@ export function AdminPolicyRow({ policy, agentName }: AdminPolicyRowProps) {
   const [statusOpen, setStatusOpen] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
+  const [welcomeOpen, setWelcomeOpen] = useState(false);
 
   const updateStatus = useUpdatePolicyStatus();
   const deletePolicy = useDeletePolicy();
@@ -173,9 +175,22 @@ export function AdminPolicyRow({ policy, agentName }: AdminPolicyRowProps) {
 
             {/* Delete */}
             <div className="flex items-center gap-2">
-              {/* Edit */}
+              {/* Welcome message */}
               <Button
                 variant="ghost"
+                size="icon"
+                className="h-7 w-7 text-muted-foreground hover:text-green-500"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setWelcomeOpen(true);
+                }}
+                title="Mensaje de bienvenida"
+              >
+                <MessageSquare className="h-3.5 w-3.5" />
+              </Button>
+
+              {/* Edit */}
+              <Button
                 size="icon"
                 className="h-7 w-7 text-muted-foreground hover:text-primary"
                 onClick={(e) => {
@@ -290,6 +305,7 @@ export function AdminPolicyRow({ policy, agentName }: AdminPolicyRowProps) {
         </div>
       </div>
       <EditPolicyDialog policy={policy} open={editOpen} onOpenChange={setEditOpen} />
+      <WelcomeMessageDialog policy={policy} agentName={agentName} open={welcomeOpen} onOpenChange={setWelcomeOpen} />
     </div>
   );
 }
