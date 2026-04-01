@@ -256,23 +256,31 @@ export function AdminPolicyRow({ policy, agentName }: AdminPolicyRowProps) {
             )}
           </div>
 
-          {/* Agent info & phone */}
-          <div className="mt-4 pt-3 border-t border-border/30 flex items-center justify-between">
+          {/* Agent info, phone & collection date */}
+          <div className="mt-4 pt-3 border-t border-border/30 flex items-center justify-between flex-wrap gap-2">
             <span className="text-xs text-muted-foreground">
               Agente: <span className="text-primary/80">{agentName}</span>
             </span>
-            {policy.phone_number && (
-              <span className="text-xs text-muted-foreground flex items-center gap-1">
-                <Phone className="h-3 w-3 text-green-500" />
-                <span className="text-secondary-foreground">{policy.phone_number}</span>
-              </span>
-            )}
+            <div className="flex items-center gap-4">
+              {policy.collection_date && (
+                <span className="text-xs text-muted-foreground flex items-center gap-1">
+                  <Clock className="h-3 w-3 text-amber-500" />
+                  Cobro: <span className="text-secondary-foreground">{format(parseISO(policy.collection_date), 'dd MMM yyyy', { locale: es })}</span>
+                  {collectionCountdown && (
+                    <span className={`ml-1 font-semibold ${collectionCountdown.urgent ? 'text-destructive' : 'text-amber-500'}`}>
+                      ({collectionCountdown.days < 0 ? 'Vencido' : collectionCountdown.days === 0 ? 'Hoy' : `en ${collectionCountdown.days} días`})
+                    </span>
+                  )}
+                </span>
+              )}
+              {policy.phone_number && (
+                <span className="text-xs text-muted-foreground flex items-center gap-1">
+                  <Phone className="h-3 w-3 text-green-500" />
+                  <span className="text-secondary-foreground">{policy.phone_number}</span>
+                </span>
+              )}
+            </div>
           </div>
-        </div>
-      </div>
-      <EditPolicyDialog policy={policy} open={editOpen} onOpenChange={setEditOpen} />
-    </div>
-  );
 }
 
 function DetailItem({
