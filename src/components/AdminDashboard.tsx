@@ -6,6 +6,7 @@ import { AdminPolicyRow } from '@/components/AdminPolicyRow';
 import { AgentDetailModal } from '@/components/AgentDetailModal';
 import { STATUS_CONFIG, PolicyStatus } from '@/components/StatusBadge';
 import { ClosingAssignments } from '@/components/ClosingAssignments';
+import { WelcomeTemplateManager } from '@/components/WelcomeTemplateManager';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { LogOut, Search, Filter, Users, ChevronDown, Building2, Info, Phone } from 'lucide-react';
