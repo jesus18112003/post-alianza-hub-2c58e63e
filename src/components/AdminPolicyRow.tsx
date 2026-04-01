@@ -4,9 +4,10 @@ import { StatusBadge, STATUS_CONFIG, PolicyStatus } from '@/components/StatusBad
 import { useUpdatePolicyStatus, useDeletePolicy } from '@/hooks/useAdminData';
 import { format, differenceInDays, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { ChevronDown, Trash2, Check, X, Pencil, Phone, AlertTriangle, Clock } from 'lucide-react';
+import { ChevronDown, Trash2, Check, X, Pencil, Phone, AlertTriangle, Clock, MessageSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { EditPolicyDialog } from '@/components/EditPolicyDialog';
+import { WelcomeMessageDialog } from '@/components/WelcomeMessageDialog';
 import { toast } from 'sonner';
 
 interface AdminPolicyRowProps {
