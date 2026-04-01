@@ -49,6 +49,19 @@ export function AdminPolicyRow({ policy, agentName }: AdminPolicyRowProps) {
   const hasFinancials = policy.target_premium || policy.agent_premium || policy.total_commission;
   const hasTechnical = policy.policy_type || policy.payment_method || policy.location;
 
+  // Collection date countdown
+  const collectionCountdown = (() => {
+    if (!policy.collection_date) return null;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const collDate = parseISO(policy.collection_date);
+    const days = differenceInDays(collDate, today);
+    if (days < 0) return { days, label: 'Vencido', urgent: true };
+    if (days === 0) return { days: 0, label: 'Hoy', urgent: true };
+    if (days <= 5) return { days, label: `${days}d`, urgent: days <= 3 };
+    return { days, label: `${days}d`, urgent: false };
+  })();
+
   return (
     <div
       className={`rounded-lg border transition-all duration-200 ${
