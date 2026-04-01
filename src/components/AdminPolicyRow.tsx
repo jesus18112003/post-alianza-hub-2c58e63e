@@ -90,6 +90,18 @@ export function AdminPolicyRow({ policy, agentName }: AdminPolicyRowProps) {
         {policy.phone_number && (
           <Phone className="h-3.5 w-3.5 text-green-500 shrink-0" />
         )}
+        {collectionCountdown && collectionCountdown.days <= 5 && (
+          <span
+            className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-semibold uppercase tracking-wide shrink-0 ${
+              collectionCountdown.urgent
+                ? 'bg-destructive/15 text-destructive animate-pulse'
+                : 'bg-amber-500/15 text-amber-500'
+            }`}
+          >
+            <Clock className="h-3 w-3" />
+            {collectionCountdown.label}
+          </span>
+        )}
         <StatusBadge status={policy.status} />
         <span className="text-xs w-[7rem] shrink-0 text-right tabular-nums">
           {policy.policy_number ? (
