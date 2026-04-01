@@ -20,6 +20,7 @@ export function AdminPolicyRow({ policy, agentName }: AdminPolicyRowProps) {
   const [statusOpen, setStatusOpen] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
+  const [welcomeOpen, setWelcomeOpen] = useState(false);
 
   const updateStatus = useUpdatePolicyStatus();
   const deletePolicy = useDeletePolicy();
