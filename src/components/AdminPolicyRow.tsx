@@ -190,7 +190,7 @@ export function AdminPolicyRow({ policy, agentName }: AdminPolicyRowProps) {
               </Button>
 
               {/* Edit */}
-                variant="ghost"
+              <Button
                 size="icon"
                 className="h-7 w-7 text-muted-foreground hover:text-primary"
                 onClick={(e) => {
