@@ -102,6 +102,12 @@ export function AdminPolicyRow({ policy, agentName }: AdminPolicyRowProps) {
             {collectionCountdown.label}
           </span>
         )}
+        {policy.status === 'pendiente' && !policy.notes?.trim() && (
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-500/15 text-amber-500 shrink-0" title="Pendiente sin notas">
+            <AlertTriangle className="h-3 w-3" />
+            <span className="text-[10px] font-medium uppercase tracking-wide">Sin Nota</span>
+          </span>
+        )}
         <StatusBadge status={policy.status} />
         <span className="text-xs w-[7rem] shrink-0 text-right tabular-nums">
           {policy.policy_number ? (
