@@ -128,6 +128,9 @@ export function AdminDashboard() {
         {/* Closing Assignments from Discord */}
         <ClosingAssignments />
 
+        {/* Welcome Templates */}
+        <WelcomeTemplateManager />
+
         {/* Agent summary cards */}
         {agents && agents.length > 0 && (
           <div>

@@ -305,6 +305,7 @@ export function AdminPolicyRow({ policy, agentName }: AdminPolicyRowProps) {
         </div>
       </div>
       <EditPolicyDialog policy={policy} open={editOpen} onOpenChange={setEditOpen} />
+      <WelcomeMessageDialog policy={policy} agentName={agentName} open={welcomeOpen} onOpenChange={setWelcomeOpen} />
     </div>
   );
 }
