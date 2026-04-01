@@ -175,8 +175,21 @@ export function AdminPolicyRow({ policy, agentName }: AdminPolicyRowProps) {
 
             {/* Delete */}
             <div className="flex items-center gap-2">
-              {/* Edit */}
+              {/* Welcome message */}
               <Button
+                variant="ghost"
+                size="icon"
+                className="h-7 w-7 text-muted-foreground hover:text-green-500"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setWelcomeOpen(true);
+                }}
+                title="Mensaje de bienvenida"
+              >
+                <MessageSquare className="h-3.5 w-3.5" />
+              </Button>
+
+              {/* Edit */}
                 variant="ghost"
                 size="icon"
                 className="h-7 w-7 text-muted-foreground hover:text-primary"
