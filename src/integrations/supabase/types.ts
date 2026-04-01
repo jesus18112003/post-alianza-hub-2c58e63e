@@ -151,6 +151,7 @@ export type Database = {
           agent_id: string
           agent_premium: number | null
           client_name: string
+          collection_date: string | null
           company: string
           created_at: string
           date: string
@@ -170,6 +171,7 @@ export type Database = {
           agent_id: string
           agent_premium?: number | null
           client_name: string
+          collection_date?: string | null
           company: string
           created_at?: string
           date?: string
@@ -189,6 +191,7 @@ export type Database = {
           agent_id?: string
           agent_premium?: number | null
           client_name?: string
+          collection_date?: string | null
           company?: string
           created_at?: string
           date?: string

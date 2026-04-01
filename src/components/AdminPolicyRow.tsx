@@ -2,9 +2,9 @@ import { useState } from 'react';
 import { Policy } from '@/types/policy';
 import { StatusBadge, STATUS_CONFIG, PolicyStatus } from '@/components/StatusBadge';
 import { useUpdatePolicyStatus, useDeletePolicy } from '@/hooks/useAdminData';
-import { format } from 'date-fns';
+import { format, differenceInDays, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { ChevronDown, Trash2, Check, X, Pencil, Phone, AlertTriangle } from 'lucide-react';
+import { ChevronDown, Trash2, Check, X, Pencil, Phone, AlertTriangle, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { EditPolicyDialog } from '@/components/EditPolicyDialog';
 import { toast } from 'sonner';
@@ -49,6 +49,19 @@ export function AdminPolicyRow({ policy, agentName }: AdminPolicyRowProps) {
   const hasFinancials = policy.target_premium || policy.agent_premium || policy.total_commission;
   const hasTechnical = policy.policy_type || policy.payment_method || policy.location;
 
+  // Collection date countdown
+  const collectionCountdown = (() => {
+    if (!policy.collection_date) return null;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const collDate = parseISO(policy.collection_date);
+    const days = differenceInDays(collDate, today);
+    if (days < 0) return { days, label: 'Vencido', urgent: true };
+    if (days === 0) return { days: 0, label: 'Hoy', urgent: true };
+    if (days <= 5) return { days, label: `${days}d`, urgent: days <= 3 };
+    return { days, label: `${days}d`, urgent: false };
+  })();
+
   return (
     <div
       className={`rounded-lg border transition-all duration-200 ${
@@ -76,6 +89,18 @@ export function AdminPolicyRow({ policy, agentName }: AdminPolicyRowProps) {
         </span>
         {policy.phone_number && (
           <Phone className="h-3.5 w-3.5 text-green-500 shrink-0" />
+        )}
+        {collectionCountdown && collectionCountdown.days <= 5 && (
+          <span
+            className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-semibold uppercase tracking-wide shrink-0 ${
+              collectionCountdown.urgent
+                ? 'bg-destructive/15 text-destructive animate-pulse'
+                : 'bg-amber-500/15 text-amber-500'
+            }`}
+          >
+            <Clock className="h-3 w-3" />
+            {collectionCountdown.label}
+          </span>
         )}
         <StatusBadge status={policy.status} />
         <span className="text-xs w-[7rem] shrink-0 text-right tabular-nums">
@@ -231,17 +256,30 @@ export function AdminPolicyRow({ policy, agentName }: AdminPolicyRowProps) {
             )}
           </div>
 
-          {/* Agent info & phone */}
-          <div className="mt-4 pt-3 border-t border-border/30 flex items-center justify-between">
+          {/* Agent info, phone & collection date */}
+          <div className="mt-4 pt-3 border-t border-border/30 flex items-center justify-between flex-wrap gap-2">
             <span className="text-xs text-muted-foreground">
               Agente: <span className="text-primary/80">{agentName}</span>
             </span>
-            {policy.phone_number && (
-              <span className="text-xs text-muted-foreground flex items-center gap-1">
-                <Phone className="h-3 w-3 text-green-500" />
-                <span className="text-secondary-foreground">{policy.phone_number}</span>
-              </span>
-            )}
+            <div className="flex items-center gap-4">
+              {policy.collection_date && (
+                <span className="text-xs text-muted-foreground flex items-center gap-1">
+                  <Clock className="h-3 w-3 text-amber-500" />
+                  Cobro: <span className="text-secondary-foreground">{format(parseISO(policy.collection_date), 'dd MMM yyyy', { locale: es })}</span>
+                  {collectionCountdown && (
+                    <span className={`ml-1 font-semibold ${collectionCountdown.urgent ? 'text-destructive' : 'text-amber-500'}`}>
+                      ({collectionCountdown.days < 0 ? 'Vencido' : collectionCountdown.days === 0 ? 'Hoy' : `en ${collectionCountdown.days} días`})
+                    </span>
+                  )}
+                </span>
+              )}
+              {policy.phone_number && (
+                <span className="text-xs text-muted-foreground flex items-center gap-1">
+                  <Phone className="h-3 w-3 text-green-500" />
+                  <span className="text-secondary-foreground">{policy.phone_number}</span>
+                </span>
+              )}
+            </div>
           </div>
         </div>
       </div>

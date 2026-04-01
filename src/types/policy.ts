@@ -14,6 +14,7 @@ export interface Policy {
   total_commission: number | null;
   notes: string | null;
   phone_number: string | null;
+  collection_date: string | null;
   created_at: string;
   updated_at: string;
 }

@@ -1,0 +1,1 @@
+ALTER TABLE public.policies ADD COLUMN collection_date date DEFAULT NULL;
