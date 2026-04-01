@@ -32,6 +32,7 @@ export function EditPolicyDialog({ policy, open, onOpenChange }: EditPolicyDialo
     total_commission: policy.total_commission?.toString() ?? '',
     notes: policy.notes ?? '',
     phone_number: policy.phone_number ?? '',
+    collection_date: policy.collection_date ?? '',
   });
 
   const set = (key: string, value: string) => setForm((f) => ({ ...f, [key]: value }));
