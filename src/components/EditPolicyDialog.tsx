@@ -60,6 +60,7 @@ export function EditPolicyDialog({ policy, open, onOpenChange }: EditPolicyDialo
           total_commission: form.total_commission ? parseFloat(form.total_commission) : null,
           notes: form.notes.trim() || null,
           phone_number: form.phone_number.trim() || null,
+          collection_date: form.collection_date || null,
         },
       },
       {
