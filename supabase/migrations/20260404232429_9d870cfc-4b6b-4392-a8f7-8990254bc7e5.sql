@@ -1,0 +1,1 @@
+ALTER TABLE public.policies ADD COLUMN notes_updated_at timestamp with time zone DEFAULT NULL;

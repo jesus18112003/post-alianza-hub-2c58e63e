@@ -273,6 +273,11 @@ export function AdminPolicyRow({ policy, agentName }: AdminPolicyRowProps) {
                   Notas
                 </h4>
                 <p className="text-sm text-muted-foreground leading-relaxed">{policy.notes}</p>
+                {policy.notes_updated_at && (
+                  <p className="text-[10px] text-muted-foreground/60 mt-1">
+                    Nota actualizada: {format(new Date(policy.notes_updated_at), 'dd MMM yyyy, HH:mm', { locale: es })}
+                  </p>
+                )}
               </div>
             )}
           </div>

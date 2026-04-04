@@ -158,6 +158,7 @@ export type Database = {
           id: string
           location: string | null
           notes: string | null
+          notes_updated_at: string | null
           payment_method: string | null
           phone_number: string | null
           policy_number: string | null
@@ -178,6 +179,7 @@ export type Database = {
           id?: string
           location?: string | null
           notes?: string | null
+          notes_updated_at?: string | null
           payment_method?: string | null
           phone_number?: string | null
           policy_number?: string | null
@@ -198,6 +200,7 @@ export type Database = {
           id?: string
           location?: string | null
           notes?: string | null
+          notes_updated_at?: string | null
           payment_method?: string | null
           phone_number?: string | null
           policy_number?: string | null
