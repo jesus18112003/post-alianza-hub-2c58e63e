@@ -70,9 +70,14 @@ export function useUpdatePolicy() {
       policyId: string;
       updates: Partial<Omit<Policy, 'id' | 'created_at' | 'updated_at'>>;
     }) => {
+      // Auto-set notes_updated_at when notes change
+      const finalUpdates: Record<string, unknown> = { ...updates };
+      if ('notes' in updates && updates.notes?.trim()) {
+        finalUpdates.notes_updated_at = new Date().toISOString();
+      }
       const { error } = await supabase
         .from('policies')
-        .update(updates)
+        .update(finalUpdates)
         .eq('id', policyId);
       if (error) throw error;
     },

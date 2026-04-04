@@ -13,6 +13,7 @@ export interface Policy {
   agent_premium: number | null;
   total_commission: number | null;
   notes: string | null;
+  notes_updated_at: string | null;
   phone_number: string | null;
   collection_date: string | null;
   created_at: string;
