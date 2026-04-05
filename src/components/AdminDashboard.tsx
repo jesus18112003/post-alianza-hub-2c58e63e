@@ -9,7 +9,8 @@ import { ClosingAssignments } from '@/components/ClosingAssignments';
 import { WelcomeTemplateManager } from '@/components/WelcomeTemplateManager';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { LogOut, Search, Filter, Users, ChevronDown, Building2, Info, Phone } from 'lucide-react';
+import { LogOut, Search, Filter, Users, ChevronDown, Building2, Info, Phone, UserPlus } from 'lucide-react';
+import { AddAgentDialog } from '@/components/AddAgentDialog';
 
 export function AdminDashboard() {
   const { profile, signOut } = useAuth();
