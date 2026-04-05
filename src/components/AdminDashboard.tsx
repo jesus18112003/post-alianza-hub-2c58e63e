@@ -407,6 +407,14 @@ export function AdminDashboard() {
         />
       )}
       <AddAgentDialog open={addAgentOpen} onOpenChange={setAddAgentOpen} />
+      {importAgentId && (
+        <ImportPoliciesDialog
+          open={!!importAgentId}
+          onOpenChange={(open) => { if (!open) setImportAgentId(null); }}
+          agentId={importAgentId}
+          agentName={agentMap[importAgentId] ?? 'Agente'}
+        />
+      )}
     </div>
   );
 }
