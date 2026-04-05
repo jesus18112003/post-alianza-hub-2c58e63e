@@ -392,6 +392,7 @@ export function AdminDashboard() {
           agentName={agentMap[agentModalId] ?? 'Agente'}
         />
       )}
+      <AddAgentDialog open={addAgentOpen} onOpenChange={setAddAgentOpen} />
     </div>
   );
 }
