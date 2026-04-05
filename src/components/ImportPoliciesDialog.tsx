@@ -77,7 +77,7 @@ function parseSheet(workbook: XLSX.WorkBook): ParsedRow[] {
   if (!sheetName) throw new Error('No se encontró la hoja "Aplicaciones BASE"');
 
   const ws = workbook.Sheets[sheetName];
-  const rows = XLSX.utils.sheet_to_json<Record<string, unknown>>(ws, { header: 1, raw: true, defval: null });
+  const rows = XLSX.utils.sheet_to_json<unknown[]>(ws, { header: 1, raw: true, defval: null }) as unknown[][];
 
   // Find header row (look for "Fecha de cierre")
   let headerIdx = -1;
