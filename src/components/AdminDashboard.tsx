@@ -136,11 +136,22 @@ export function AdminDashboard() {
         {/* Agent summary cards */}
         {agents && agents.length > 0 && (
           <div>
-            <div className="flex items-center gap-2 mb-3">
-              <Users className="h-4 w-4 text-primary/70" />
-              <h3 className="text-sm text-primary tracking-wide" style={{ fontFamily: "'Georgia', serif" }}>
-                Agentes
-              </h3>
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <Users className="h-4 w-4 text-primary/70" />
+                <h3 className="text-sm text-primary tracking-wide" style={{ fontFamily: "'Georgia', serif" }}>
+                  Agentes
+                </h3>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                className="text-xs gap-1.5"
+                onClick={() => setAddAgentOpen(true)}
+              >
+                <UserPlus className="h-3.5 w-3.5" />
+                Agregar Agente
+              </Button>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
               {agents.map((agent) => {
