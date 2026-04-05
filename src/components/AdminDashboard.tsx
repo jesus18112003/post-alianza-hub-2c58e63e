@@ -186,14 +186,26 @@ export function AdminDashboard() {
                           ${agentCommission.toLocaleString('en-US', { minimumFractionDigits: 2 })}
                         </p>
                       </button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-7 w-7 text-muted-foreground hover:text-primary shrink-0 -mt-1 -mr-1"
-                        onClick={() => setAgentModalId(agent.id)}
-                      >
-                        <Info className="h-3.5 w-3.5" />
-                      </Button>
+                      <div className="flex flex-col gap-1 shrink-0 -mt-1 -mr-1">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-7 w-7 text-muted-foreground hover:text-primary"
+                          onClick={() => setImportAgentId(agent.id)}
+                          title="Importar Excel"
+                        >
+                          <FileSpreadsheet className="h-3.5 w-3.5" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-7 w-7 text-muted-foreground hover:text-primary"
+                          onClick={() => setAgentModalId(agent.id)}
+                          title="Detalles"
+                        >
+                          <Info className="h-3.5 w-3.5" />
+                        </Button>
+                      </div>
                     </div>
                   </div>
                 );
