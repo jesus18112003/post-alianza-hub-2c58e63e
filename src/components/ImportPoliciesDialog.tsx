@@ -82,8 +82,8 @@ function parseSheet(workbook: XLSX.WorkBook): ParsedRow[] {
   // Find header row (look for "Fecha de cierre")
   let headerIdx = -1;
   for (let i = 0; i < Math.min(10, rows.length); i++) {
-    const row = rows[i] as unknown[];
-    if (row?.some((c) => typeof c === 'string' && c.toLowerCase().includes('fecha de cierre'))) {
+    const row = rows[i];
+    if (!row) continue;
       headerIdx = i;
       break;
     }
