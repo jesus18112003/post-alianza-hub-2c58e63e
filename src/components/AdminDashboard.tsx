@@ -27,6 +27,7 @@ export function AdminDashboard() {
   const [agentModalId, setAgentModalId] = useState<string | null>(null);
   const [phoneFilter, setPhoneFilter] = useState<'all' | 'with' | 'without'>('all');
   const [addAgentOpen, setAddAgentOpen] = useState(false);
+  const [importAgentId, setImportAgentId] = useState<string | null>(null);
 
   const agentMap = useMemo(() => {
     const map: Record<string, string> = {};
