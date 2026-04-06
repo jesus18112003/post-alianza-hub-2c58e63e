@@ -41,7 +41,38 @@ const STATUS_MAP: Record<string, string> = {
   'chargeback': 'chargeback',
 };
 
-function parseExcelDate(val: unknown): string | null {
+type DateFormat = 'auto' | 'us' | 'international';
+
+/**
+ * Detect date format by scanning all string dates in the dataset.
+ * If any first-position value > 12 → DD/MM (international).
+ * If any second-position value > 12 → MM/DD (US).
+ * If ambiguous, returns 'auto' (defaults to US parsing via Date).
+ */
+function detectDateFormat(rows: unknown[][], dateColIndices: number[]): 'us' | 'international' | 'ambiguous' {
+  let hasFirstGt12 = false;
+  let hasSecondGt12 = false;
+
+  for (const row of rows) {
+    if (!row) continue;
+    for (const idx of dateColIndices) {
+      const val = row[idx];
+      if (typeof val !== 'string') continue;
+      const match = String(val).match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{2,4})$/);
+      if (!match) continue;
+      const first = parseInt(match[1], 10);
+      const second = parseInt(match[2], 10);
+      if (first > 12) hasFirstGt12 = true;
+      if (second > 12) hasSecondGt12 = true;
+    }
+  }
+
+  if (hasFirstGt12 && !hasSecondGt12) return 'international';
+  if (hasSecondGt12 && !hasFirstGt12) return 'us';
+  return 'ambiguous';
+}
+
+function parseExcelDate(val: unknown, format: DateFormat): string | null {
   if (!val) return null;
   if (val instanceof Date) {
     return val.toISOString().split('T')[0];
@@ -51,6 +82,24 @@ function parseExcelDate(val: unknown): string | null {
     if (d) return `${d.y}-${String(d.m).padStart(2, '0')}-${String(d.d).padStart(2, '0')}`;
   }
   if (typeof val === 'string') {
+    const match = String(val).match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{2,4})$/);
+    if (match) {
+      let month: number, day: number, year: number;
+      const a = parseInt(match[1], 10);
+      const b = parseInt(match[2], 10);
+      let y = parseInt(match[3], 10);
+      if (y < 100) y += 2000;
+
+      if (format === 'international' || (format === 'auto' && a > 12)) {
+        day = a; month = b;
+      } else {
+        month = a; day = b;
+      }
+
+      if (month >= 1 && month <= 12 && day >= 1 && day <= 31) {
+        return `${y}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+      }
+    }
     const parsed = new Date(val);
     if (!isNaN(parsed.getTime())) return parsed.toISOString().split('T')[0];
   }
