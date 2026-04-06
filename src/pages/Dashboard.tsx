@@ -26,6 +26,10 @@ function AgentDashboard() {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<PolicyStatus | 'all'>('all');
 
+  // Realtime subscription for agent's own policies
+  useRealtimeSubscription('policies', [['policies']]);
+  const [statusFilter, setStatusFilter] = useState<PolicyStatus | 'all'>('all');
+
   const filtered = useMemo(() => {
     if (!policies) return [];
     return policies.filter((p) => {
