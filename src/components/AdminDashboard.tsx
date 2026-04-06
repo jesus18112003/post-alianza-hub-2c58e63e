@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useAllPolicies, useAgentProfiles } from '@/hooks/useAdminData';
+import { useRealtimeSubscription } from '@/hooks/useRealtimeSubscription';
 import { MetricCards } from '@/components/MetricCards';
 import { AdminPolicyRow } from '@/components/AdminPolicyRow';
 import { AgentDetailModal } from '@/components/AgentDetailModal';
@@ -28,6 +29,10 @@ export function AdminDashboard() {
   const [phoneFilter, setPhoneFilter] = useState<'all' | 'with' | 'without'>('all');
   const [addAgentOpen, setAddAgentOpen] = useState(false);
   const [importAgentId, setImportAgentId] = useState<string | null>(null);
+
+  // Realtime subscriptions
+  useRealtimeSubscription('policies', [['admin-policies']]);
+  useRealtimeSubscription('profiles', [['agent-profiles']]);
 
   const agentMap = useMemo(() => {
     const map: Record<string, string> = {};

@@ -1,5 +1,6 @@
 import { useAuth } from '@/hooks/useAuth';
 import { usePolicies } from '@/hooks/usePolicies';
+import { useRealtimeSubscription } from '@/hooks/useRealtimeSubscription';
 import { MetricCards } from '@/components/MetricCards';
 import { PolicyCard } from '@/components/PolicyCard';
 import { AdminDashboard } from '@/components/AdminDashboard';
@@ -24,6 +25,9 @@ function AgentDashboard() {
   const { data: policies, isLoading } = usePolicies();
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<PolicyStatus | 'all'>('all');
+
+  // Realtime subscription for agent's own policies
+  useRealtimeSubscription('policies', [['policies']]);
 
   const filtered = useMemo(() => {
     if (!policies) return [];
