@@ -1,5 +1,6 @@
 import { useAuth } from '@/hooks/useAuth';
 import { usePolicies } from '@/hooks/usePolicies';
+import { useRealtimeSubscription } from '@/hooks/useRealtimeSubscription';
 import { MetricCards } from '@/components/MetricCards';
 import { PolicyCard } from '@/components/PolicyCard';
 import { AdminDashboard } from '@/components/AdminDashboard';

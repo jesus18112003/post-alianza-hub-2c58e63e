@@ -30,6 +30,10 @@ export function AdminDashboard() {
   const [addAgentOpen, setAddAgentOpen] = useState(false);
   const [importAgentId, setImportAgentId] = useState<string | null>(null);
 
+  // Realtime subscriptions
+  useRealtimeSubscription('policies', [['admin-policies']]);
+  useRealtimeSubscription('profiles', [['agent-profiles']]);
+
   const agentMap = useMemo(() => {
     const map: Record<string, string> = {};
     (agents ?? []).forEach((a) => {
