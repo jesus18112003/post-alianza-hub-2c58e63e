@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useAllPolicies, useAgentProfiles } from '@/hooks/useAdminData';
+import { useRealtimeSubscription } from '@/hooks/useRealtimeSubscription';
 import { MetricCards } from '@/components/MetricCards';
 import { AdminPolicyRow } from '@/components/AdminPolicyRow';
 import { AgentDetailModal } from '@/components/AgentDetailModal';
