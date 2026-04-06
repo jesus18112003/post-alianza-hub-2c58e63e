@@ -314,6 +314,44 @@ export function ImportPoliciesDialog({ open, onOpenChange, agentId, agentName }:
             </p>
           </div>
 
+          {/* Date format selector */}
+          {preview && !result && (
+            <div className="rounded-md border border-border bg-secondary/30 p-3 space-y-2">
+              <p className="text-xs font-medium text-foreground">Formato de fecha</p>
+              {detectedFormat && detectedFormat !== 'ambiguous' && (
+                <p className="text-xs text-muted-foreground">
+                  Formato detectado: {detectedFormat === 'us' ? 'Estadounidense (MM/DD)' : 'Internacional (DD/MM)'}
+                </p>
+              )}
+              {detectedFormat === 'ambiguous' && (
+                <p className="text-xs text-amber-500 flex items-center gap-1">
+                  <AlertTriangle className="h-3 w-3" />
+                  No se pudo detectar automáticamente. Selecciona el formato correcto.
+                </p>
+              )}
+              <div className="flex gap-2">
+                {(['auto', 'us', 'international'] as DateFormat[]).map((fmt) => (
+                  <button
+                    key={fmt}
+                    onClick={() => {
+                      setDateFormat(fmt);
+                      if (workbookData) {
+                        processWorkbook(workbookData, fmt);
+                      }
+                    }}
+                    className={`text-xs px-2.5 py-1 rounded-full border transition-all active:scale-95 ${
+                      dateFormat === fmt
+                        ? 'border-primary/40 bg-primary/10 text-primary'
+                        : 'border-border text-muted-foreground hover:text-foreground'
+                    }`}
+                  >
+                    {fmt === 'auto' ? 'Auto' : fmt === 'us' ? 'MM/DD (US)' : 'DD/MM (Internacional)'}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Preview */}
           {preview && preview.length > 0 && !result && (
             <div className="space-y-3">
