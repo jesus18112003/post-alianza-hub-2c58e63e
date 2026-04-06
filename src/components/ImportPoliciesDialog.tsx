@@ -41,7 +41,38 @@ const STATUS_MAP: Record<string, string> = {
   'chargeback': 'chargeback',
 };
 
-function parseExcelDate(val: unknown): string | null {
+type DateFormat = 'auto' | 'us' | 'international';
+
+/**
+ * Detect date format by scanning all string dates in the dataset.
+ * If any first-position value > 12 → DD/MM (international).
+ * If any second-position value > 12 → MM/DD (US).
+ * If ambiguous, returns 'auto' (defaults to US parsing via Date).
+ */
+function detectDateFormat(rows: unknown[][], dateColIndices: number[]): 'us' | 'international' | 'ambiguous' {
+  let hasFirstGt12 = false;
+  let hasSecondGt12 = false;
+
+  for (const row of rows) {
+    if (!row) continue;
+    for (const idx of dateColIndices) {
+      const val = row[idx];
+      if (typeof val !== 'string') continue;
+      const match = String(val).match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{2,4})$/);
+      if (!match) continue;
+      const first = parseInt(match[1], 10);
+      const second = parseInt(match[2], 10);
+      if (first > 12) hasFirstGt12 = true;
+      if (second > 12) hasSecondGt12 = true;
+    }
+  }
+
+  if (hasFirstGt12 && !hasSecondGt12) return 'international';
+  if (hasSecondGt12 && !hasFirstGt12) return 'us';
+  return 'ambiguous';
+}
+
+function parseExcelDate(val: unknown, format: DateFormat): string | null {
   if (!val) return null;
   if (val instanceof Date) {
     return val.toISOString().split('T')[0];
@@ -51,6 +82,24 @@ function parseExcelDate(val: unknown): string | null {
     if (d) return `${d.y}-${String(d.m).padStart(2, '0')}-${String(d.d).padStart(2, '0')}`;
   }
   if (typeof val === 'string') {
+    const match = String(val).match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{2,4})$/);
+    if (match) {
+      let month: number, day: number, year: number;
+      const a = parseInt(match[1], 10);
+      const b = parseInt(match[2], 10);
+      let y = parseInt(match[3], 10);
+      if (y < 100) y += 2000;
+
+      if (format === 'international' || (format === 'auto' && a > 12)) {
+        day = a; month = b;
+      } else {
+        month = a; day = b;
+      }
+
+      if (month >= 1 && month <= 12 && day >= 1 && day <= 31) {
+        return `${y}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+      }
+    }
     const parsed = new Date(val);
     if (!isNaN(parsed.getTime())) return parsed.toISOString().split('T')[0];
   }
@@ -69,20 +118,18 @@ function mapStatus(val: unknown): string {
   return STATUS_MAP[key] || 'pendiente';
 }
 
-function parseSheet(workbook: XLSX.WorkBook): ParsedRow[] {
-  // Find sheet
+function parseSheet(workbook: XLSX.WorkBook, dateFormat: DateFormat): { rows: ParsedRow[]; detectedFormat: 'us' | 'international' | 'ambiguous' } {
   const sheetName = workbook.SheetNames.find(
     (n) => n.toLowerCase().includes('aplicacion') && n.toLowerCase().includes('base')
   );
   if (!sheetName) throw new Error('No se encontró la hoja "Aplicaciones BASE"');
 
   const ws = workbook.Sheets[sheetName];
-  const rows = XLSX.utils.sheet_to_json<unknown[]>(ws, { header: 1, raw: true, defval: null }) as unknown[][];
+  const allRows = XLSX.utils.sheet_to_json<unknown[]>(ws, { header: 1, raw: true, defval: null }) as unknown[][];
 
-  // Find header row (look for "Fecha de cierre")
   let headerIdx = -1;
-  for (let i = 0; i < Math.min(10, rows.length); i++) {
-    const row = rows[i];
+  for (let i = 0; i < Math.min(10, allRows.length); i++) {
+    const row = allRows[i];
     if (!row) continue;
     if (row.some((c) => typeof c === 'string' && c.toLowerCase().includes('fecha de cierre'))) {
       headerIdx = i;
@@ -91,24 +138,24 @@ function parseSheet(workbook: XLSX.WorkBook): ParsedRow[] {
   }
   if (headerIdx === -1) throw new Error('No se encontró la fila de encabezados');
 
-  const parsed: ParsedRow[] = [];
-  for (let i = headerIdx + 1; i < rows.length; i++) {
-    const r = rows[i] as unknown[];
-    if (!r) continue;
+  const dataRows = allRows.slice(headerIdx + 1);
+  const detectedFormat = detectDateFormat(dataRows, [1, 4]);
+  const effectiveFormat = dateFormat === 'auto' ? (detectedFormat === 'ambiguous' ? 'us' : detectedFormat) : dateFormat;
 
+  const parsed: ParsedRow[] = [];
+  for (const r of dataRows) {
+    if (!r) continue;
     const clientName = r[5] ? String(r[5]).trim() : '';
     if (!clientName) continue;
-
-    const dateVal = parseExcelDate(r[1]);
+    const dateVal = parseExcelDate(r[1], effectiveFormat);
     if (!dateVal) continue;
-
     const company = r[3] ? String(r[3]).trim() : '';
     if (!company) continue;
 
     parsed.push({
       date: dateVal,
       company,
-      collection_date: parseExcelDate(r[4]),
+      collection_date: parseExcelDate(r[4], effectiveFormat),
       client_name: clientName,
       phone_number: cleanPhone(r[6]),
       status: mapStatus(r[7]),
@@ -122,22 +169,40 @@ function parseSheet(workbook: XLSX.WorkBook): ParsedRow[] {
     });
   }
 
-  return parsed;
+  return { rows: parsed, detectedFormat };
 }
 
 export function ImportPoliciesDialog({ open, onOpenChange, agentId, agentName }: ImportPoliciesDialogProps) {
   const queryClient = useQueryClient();
   const fileRef = useRef<HTMLInputElement>(null);
   const [file, setFile] = useState<File | null>(null);
+  const [workbookData, setWorkbookData] = useState<XLSX.WorkBook | null>(null);
   const [preview, setPreview] = useState<ParsedRow[] | null>(null);
   const [loading, setLoading] = useState(false);
   const [importing, setImporting] = useState(false);
   const [result, setResult] = useState<{ inserted: number; skipped: number } | null>(null);
+  const [dateFormat, setDateFormat] = useState<DateFormat>('auto');
+  const [detectedFormat, setDetectedFormat] = useState<'us' | 'international' | 'ambiguous' | null>(null);
 
   const resetState = () => {
     setFile(null);
+    setWorkbookData(null);
     setPreview(null);
     setResult(null);
+    setDateFormat('auto');
+    setDetectedFormat(null);
+  };
+
+  const processWorkbook = (wb: XLSX.WorkBook, fmt: DateFormat) => {
+    const { rows, detectedFormat: df } = parseSheet(wb, fmt);
+    setDetectedFormat(df);
+    if (rows.length === 0) {
+      toast.error('No se encontraron registros válidos en la hoja "Aplicaciones BASE"');
+      setPreview(null);
+    } else {
+      setPreview(rows);
+      toast.success(`Se encontraron ${rows.length} registros para importar`);
+    }
   };
 
   const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -149,14 +214,8 @@ export function ImportPoliciesDialog({ open, onOpenChange, agentId, agentName }:
     try {
       const buf = await f.arrayBuffer();
       const wb = XLSX.read(buf, { type: 'array', cellDates: true });
-      const rows = parseSheet(wb);
-      if (rows.length === 0) {
-        toast.error('No se encontraron registros válidos en la hoja "Aplicaciones BASE"');
-        setPreview(null);
-      } else {
-        setPreview(rows);
-        toast.success(`Se encontraron ${rows.length} registros para importar`);
-      }
+      setWorkbookData(wb);
+      processWorkbook(wb, 'auto');
     } catch (err: any) {
       toast.error(err.message || 'Error al leer el archivo');
       setPreview(null);
@@ -254,6 +313,44 @@ export function ImportPoliciesDialog({ open, onOpenChange, agentId, agentName }:
               Se leerá la hoja "Aplicaciones BASE" automáticamente
             </p>
           </div>
+
+          {/* Date format selector */}
+          {preview && !result && (
+            <div className="rounded-md border border-border bg-secondary/30 p-3 space-y-2">
+              <p className="text-xs font-medium text-foreground">Formato de fecha</p>
+              {detectedFormat && detectedFormat !== 'ambiguous' && (
+                <p className="text-xs text-muted-foreground">
+                  Formato detectado: {detectedFormat === 'us' ? 'Estadounidense (MM/DD)' : 'Internacional (DD/MM)'}
+                </p>
+              )}
+              {detectedFormat === 'ambiguous' && (
+                <p className="text-xs text-amber-500 flex items-center gap-1">
+                  <AlertTriangle className="h-3 w-3" />
+                  No se pudo detectar automáticamente. Selecciona el formato correcto.
+                </p>
+              )}
+              <div className="flex gap-2">
+                {(['auto', 'us', 'international'] as DateFormat[]).map((fmt) => (
+                  <button
+                    key={fmt}
+                    onClick={() => {
+                      setDateFormat(fmt);
+                      if (workbookData) {
+                        processWorkbook(workbookData, fmt);
+                      }
+                    }}
+                    className={`text-xs px-2.5 py-1 rounded-full border transition-all active:scale-95 ${
+                      dateFormat === fmt
+                        ? 'border-primary/40 bg-primary/10 text-primary'
+                        : 'border-border text-muted-foreground hover:text-foreground'
+                    }`}
+                  >
+                    {fmt === 'auto' ? 'Auto' : fmt === 'us' ? 'MM/DD (US)' : 'DD/MM (Internacional)'}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Preview */}
           {preview && preview.length > 0 && !result && (
