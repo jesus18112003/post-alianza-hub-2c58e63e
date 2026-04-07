@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import { Upload, Loader2, FileSpreadsheet, CheckCircle2, Settings2, Eye } from 'lucide-react';
+import { Upload, Loader2, FileSpreadsheet, CheckCircle2, Settings2, Eye, AlertCircle } from 'lucide-react';
 import * as XLSX from 'xlsx';
 
 interface ImportPoliciesDialogProps {
@@ -41,12 +41,16 @@ const STATUS_MAP: Record<string, string> = {
   'chargeback': 'chargeback',
 };
 
-type DateFormat = 'auto' | 'us' | 'international';
+const getColumnLetter = (n: number) => {
+  let letter = "";
+  while (n >= 0) {
+    letter = String.fromCharCode((n % 26) + 65) + letter;
+    n = Math.floor(n / 26) - 1;
+  }
+  return letter;
+};
 
-// Convierte índice 0 -> A, 1 -> B, etc.
-const getColumnLetter = (n: number) => String.fromCharCode(65 + n);
-
-function parseExcelDate(val: unknown, format: DateFormat): string | null {
+function parseExcelDate(val: unknown): string | null {
   if (!val) return null;
   if (val instanceof Date) return val.toISOString().split('T')[0];
   if (typeof val === 'number') {
@@ -54,32 +58,21 @@ function parseExcelDate(val: unknown, format: DateFormat): string | null {
     if (d) return `${d.y}-${String(d.m).padStart(2, '0')}-${String(d.d).padStart(2, '0')}`;
   }
   if (typeof val === 'string') {
-    const match = String(val).match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{2,4})$/);
-    if (match) {
-      let month: number, day: number, year: number;
-      const a = parseInt(match[1], 10);
-      const b = parseInt(match[2], 10);
-      let y = parseInt(match[3], 10);
-      if (y < 100) y += 2000;
-      if (format === 'international' || (format === 'auto' && a > 12)) {
-        day = a; month = b;
-      } else {
-        month = a; day = b;
-      }
-      if (month >= 1 && month <= 12 && day >= 1 && day <= 31) {
-        return `${y}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-      }
-    }
     const parsed = new Date(val);
     if (!isNaN(parsed.getTime())) return parsed.toISOString().split('T')[0];
+    
+    // Intento manual para formatos DD/MM/YYYY o MM/DD/YYYY
+    const parts = val.split(/[\/\-.]/);
+    if (parts.length === 3) {
+      let d = parseInt(parts[0]), m = parseInt(parts[1]), y = parseInt(parts[2]);
+      if (y < 100) y += 2000;
+      // Si el primer número es > 12, asumimos DD/MM
+      if (d > 12) return `${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+      // Por defecto intentamos MM/DD si es ambiguo o según Date
+      return `${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+    }
   }
   return null;
-}
-
-function mapStatus(val: unknown): string {
-  if (!val) return 'pendiente';
-  const key = String(val).trim().toLowerCase();
-  return STATUS_MAP[key] || 'pendiente';
 }
 
 export function ImportPoliciesDialog({ open, onOpenChange, agentId, agentName }: ImportPoliciesDialogProps) {
@@ -116,10 +109,11 @@ export function ImportPoliciesDialog({ open, onOpenChange, agentId, agentName }:
       setWorkbookData(wb);
       
       const ws = wb.Sheets[wb.SheetNames[0]];
-      const range = XLSX.utils.decode_range(ws['!ref'] || 'A1:Z1');
-      setAvailableCols(range.e.c + 1);
+      const range = XLSX.utils.decode_range(ws['!ref'] || 'A1:ZZ500');
+      // Forzamos al menos 26 columnas (A-Z) si el archivo reporta pocas
+      setAvailableCols(Math.max(range.e.c + 1, 26));
     } catch (err) {
-      toast.error('Error al leer el archivo Excel');
+      toast.error('Error al leer el archivo');
     } finally {
       setLoading(false);
     }
@@ -128,26 +122,29 @@ export function ImportPoliciesDialog({ open, onOpenChange, agentId, agentName }:
   const onProcess = () => {
     if (!workbookData) return;
     const ws = workbookData.Sheets[workbookData.SheetNames[0]];
-    const data = XLSX.utils.sheet_to_json<unknown[]>(ws, { header: 1, raw: true, defval: null }) as unknown[][];
+    // Leemos TODA la hoja como matriz, incluyendo filas vacías al inicio
+    const data = XLSX.utils.sheet_to_json<unknown[]>(ws, { header: 1, raw: true, defval: null }) as any[][];
 
     const rows: ParsedRow[] = [];
-    for (const r of data) {
-      if (!r || r.length === 0) continue;
+    
+    data.forEach((r, index) => {
+      if (!r || r.length === 0) return;
 
       const clientName = r[columnMapping['client_name']] ? String(r[columnMapping['client_name']]).trim() : '';
-      const dateVal = parseExcelDate(r[columnMapping['date']], 'auto');
+      const dateVal = parseExcelDate(r[columnMapping['date']]);
       const company = r[columnMapping['company']] ? String(r[columnMapping['company']]).trim() : '';
 
-      // Saltamos encabezados o filas incompletas
-      if (!clientName || !dateVal || !company || clientName.toLowerCase().includes('cliente')) continue;
+      // Filtro dinámico: Saltamos si no hay nombre o fecha válida
+      // También saltamos si el nombre contiene la palabra "cliente" (probablemente el encabezado)
+      if (!clientName || !dateVal || clientName.toLowerCase() === 'cliente' || clientName.toLowerCase() === 'nombre') return;
 
       rows.push({
         date: dateVal,
-        company,
+        company: company || 'N/A',
         client_name: clientName,
-        collection_date: parseExcelDate(r[columnMapping['collection_date']], 'auto'),
+        collection_date: parseExcelDate(r[columnMapping['collection_date']]),
         phone_number: r[columnMapping['phone']] ? String(r[columnMapping['phone']]) : null,
-        status: mapStatus(r[columnMapping['status']]),
+        status: STATUS_MAP[String(r[columnMapping['status']]).toLowerCase().trim()] || 'pendiente',
         policy_number: r[columnMapping['policy']] ? String(r[columnMapping['policy']]) : null,
         notes: r[columnMapping['notes']] ? String(r[columnMapping['notes']]) : null,
         location: r[columnMapping['location']] ? String(r[columnMapping['location']]) : null,
@@ -156,13 +153,13 @@ export function ImportPoliciesDialog({ open, onOpenChange, agentId, agentName }:
         total_commission: typeof r[columnMapping['commission']] === 'number' ? r[columnMapping['commission']] : null,
         payment_method: typeof r[columnMapping['premium']] === 'number' ? `$${r[columnMapping['premium']]}/mes` : null,
       });
-    }
+    });
 
     if (rows.length === 0) {
-      toast.error('No se detectaron datos. Verifica si las letras de las columnas coinciden con tu Excel.');
+      toast.error('No se encontraron datos. Asegúrate de elegir las letras correctas donde están los nombres y fechas.');
     } else {
       setPreview(rows);
-      toast.success(`${rows.length} pólizas listas para procesar.`);
+      toast.success(`${rows.length} filas detectadas correctamente.`);
     }
   };
 
@@ -189,7 +186,6 @@ export function ImportPoliciesDialog({ open, onOpenChange, agentId, agentName }:
 
       setResult({ inserted: toInsert.length, skipped: preview.length - toInsert.length });
       queryClient.invalidateQueries({ queryKey: ['admin-policies'] });
-      toast.success('¡Importación completada!');
     } catch (err: any) {
       toast.error(err.message);
     } finally {
@@ -199,39 +195,39 @@ export function ImportPoliciesDialog({ open, onOpenChange, agentId, agentName }:
 
   return (
     <Dialog open={open} onOpenChange={(o) => { if (!o) resetState(); onOpenChange(o); }}>
-      <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto border-none shadow-2xl">
+      <DialogContent className="sm:max-w-xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 text-xl font-bold">
-            <FileSpreadsheet className="h-6 w-6 text-primary" />
-            Importador Inteligente — {agentName}
+          <DialogTitle className="flex items-center gap-2 font-bold">
+            <FileSpreadsheet className="h-6 w-6 text-green-600" />
+            Importación Manual — {agentName}
           </DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4">
           <input ref={fileRef} type="file" accept=".xlsx,.xls" onChange={handleFile} className="hidden" />
-          <Button variant="outline" className="w-full h-12 border-dashed border-2" onClick={() => fileRef.current?.click()} disabled={loading}>
-            {loading ? <Loader2 className="animate-spin h-5 w-5 mr-2" /> : <Upload className="h-5 w-5 mr-2" />}
-            {file ? file.name : 'Cargar archivo de Excel'}
+          <Button variant="outline" className="w-full h-16 border-dashed" onClick={() => fileRef.current?.click()} disabled={loading}>
+            {loading ? <Loader2 className="animate-spin mr-2" /> : <Upload className="mr-2" />}
+            {file ? `Archivo: ${file.name}` : 'Haz clic para subir el Excel'}
           </Button>
 
           {availableCols > 0 && !preview && !result && (
-            <div className="bg-secondary/30 p-4 rounded-xl border border-primary/10 space-y-4 animate-in slide-in-from-top-2">
-              <div className="flex items-center gap-2 text-sm font-bold text-primary uppercase tracking-wider">
-                <Settings2 className="h-4 w-4" /> Asignar Columnas del Excel
+            <div className="bg-muted/50 p-4 rounded-lg border space-y-4 animate-in fade-in">
+              <div className="flex items-center gap-2 text-sm font-bold text-muted-foreground">
+                <Settings2 className="h-4 w-4" /> CONFIGURA LAS LETRAS DE TU EXCEL
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                 {[
                   { id: 'client_name', label: 'Nombre Cliente' },
                   { id: 'date', label: 'Fecha Cierre' },
                   { id: 'company', label: 'Compañía' },
                   { id: 'status', label: 'Estatus' },
                   { id: 'policy', label: 'Nro Póliza' },
-                  { id: 'premium', label: 'Prima/Premium' }
+                  { id: 'premium', label: 'Prima/Monto' }
                 ].map(field => (
                   <div key={field.id} className="space-y-1">
-                    <label className="text-[10px] font-black text-muted-foreground uppercase">{field.label}</label>
+                    <p className="text-[10px] font-bold text-primary">{field.label}</p>
                     <select 
-                      className="w-full text-xs p-2 rounded-lg border bg-background focus:ring-2 ring-primary/20 outline-none"
+                      className="w-full text-[11px] p-2 rounded border bg-background"
                       onChange={(e) => setColumnMapping(prev => ({ ...prev, [field.id]: parseInt(e.target.value) }))}
                     >
                       <option value="">Columna...</option>
@@ -243,57 +239,52 @@ export function ImportPoliciesDialog({ open, onOpenChange, agentId, agentName }:
                 ))}
               </div>
               <Button 
-                className="w-full font-bold h-10" 
-                disabled={columnMapping.client_name === undefined || columnMapping.date === undefined || columnMapping.company === undefined}
+                className="w-full font-bold" 
+                disabled={columnMapping.client_name === undefined || columnMapping.date === undefined}
                 onClick={onProcess}
               >
-                <Eye className="h-4 w-4 mr-2" /> Procesar Datos
+                <Eye className="h-4 w-4 mr-2" /> Analizar Columnas Seleccionadas
               </Button>
             </div>
           )}
 
           {preview && !result && (
-            <div className="space-y-4 animate-in fade-in zoom-in-95">
-              <div className="rounded-xl border border-primary/20 overflow-hidden">
-                <div className="bg-primary/10 px-4 py-2 text-xs font-bold flex justify-between">
-                  <span>VISTA PREVIA DE DATOS</span>
-                  <span>{preview.length} filas encontradas</span>
-                </div>
-                <div className="max-h-48 overflow-y-auto divide-y bg-background/50">
-                  {preview.slice(0, 5).map((r, i) => (
-                    <div key={i} className="p-3 text-[11px] flex justify-between items-center">
-                      <div className="flex flex-col">
-                        <span className="font-bold">{r.client_name}</span>
-                        <span className="text-muted-foreground">{r.company}</span>
-                      </div>
-                      <span className="bg-secondary px-2 py-1 rounded text-muted-foreground">{r.date}</span>
+            <div className="space-y-4 animate-in zoom-in-95">
+              <div className="bg-amber-50 border border-amber-200 p-3 rounded-md flex gap-2 items-start">
+                <AlertCircle className="h-4 w-4 text-amber-600 mt-0.5" />
+                <p className="text-[11px] text-amber-800">
+                  Verifica que los datos coincidan. Si ves nombres donde deberían ir fechas, dale a "Corregir" y cambia las letras.
+                </p>
+              </div>
+              <div className="border rounded-md overflow-hidden">
+                <div className="bg-muted px-3 py-1.5 text-[10px] font-bold uppercase">Vista previa de datos</div>
+                <div className="max-h-40 overflow-y-auto text-xs divide-y bg-white">
+                  {preview.slice(0, 10).map((r, i) => (
+                    <div key={i} className="p-2 flex justify-between">
+                      <span className="font-medium">{r.client_name}</span>
+                      <span className="text-muted-foreground">{r.date} | {r.company}</span>
                     </div>
                   ))}
                 </div>
               </div>
               <div className="flex gap-2">
-                <Button variant="ghost" className="flex-1 text-xs" onClick={() => setPreview(null)}>Corregir Columnas</Button>
-                <Button className="flex-[2]" onClick={handleImport} disabled={importing}>
+                <Button variant="outline" className="flex-1" onClick={() => setPreview(null)}>Corregir</Button>
+                <Button className="flex-[2] bg-green-600 hover:bg-green-700" onClick={handleImport} disabled={importing}>
                   {importing ? <Loader2 className="animate-spin h-4 w-4 mr-2" /> : <CheckCircle2 className="h-4 w-4 mr-2" />}
-                  Confirmar e Importar
+                  Importar {preview.length} pólizas
                 </Button>
               </div>
             </div>
           )}
 
           {result && (
-            <div className="p-6 bg-green-500/10 border border-green-500/20 rounded-2xl text-center space-y-3">
-              <div className="h-12 w-12 bg-green-500 rounded-full flex items-center justify-center mx-auto shadow-lg shadow-green-500/20">
-                <CheckCircle2 className="h-7 w-7 text-white" />
+            <div className="p-6 bg-green-50 border border-green-200 rounded-xl text-center space-y-3">
+              <CheckCircle2 className="h-10 w-10 text-green-600 mx-auto" />
+              <div>
+                <p className="font-bold text-green-800 text-lg">¡Importación Exitosa!</p>
+                <p className="text-xs text-green-700">Se agregaron {result.inserted} pólizas nuevas y se saltaron {result.skipped} duplicados.</p>
               </div>
-              <div className="space-y-1">
-                <p className="text-lg font-bold text-green-700">¡Importación Exitosa!</p>
-                <p className="text-sm text-green-600/80">
-                  Nuevas pólizas: <strong>{result.inserted}</strong> <br/> 
-                  Duplicadas omitidas: <strong>{result.skipped}</strong>
-                </p>
-              </div>
-              <Button variant="outline" className="w-full mt-2" onClick={resetState}>Cargar otro archivo</Button>
+              <Button variant="outline" size="sm" onClick={resetState}>Cargar otro Excel</Button>
             </div>
           )}
         </div>
