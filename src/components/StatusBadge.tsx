@@ -3,6 +3,7 @@ import { Policy } from '@/types/policy';
 export type PolicyStatus = Policy['status'];
 
 export const STATUS_CONFIG: Record<PolicyStatus, { label: string; className: string }> = {
+  // ... (tus estados anteriores)
   emitido: {
     label: 'Emitido',
     className: 'bg-[hsl(var(--status-emitido))] text-white',
@@ -30,6 +31,11 @@ export const STATUS_CONFIG: Record<PolicyStatus, { label: string; className: str
   chargeback: {
     label: 'Chargeback',
     className: 'bg-[hsl(var(--status-chargeback))] text-white',
+  },
+  // NUEVO ESTADO AGREGADO
+  aprobado: {
+    label: 'Aprobado',
+    className: 'bg-[hsl(var(--status-aprobado,142_70%_45%))] text-white', 
   },
 };
 
