@@ -204,19 +204,35 @@ export function ImportPoliciesDialog({ open, onOpenChange, agentId, agentName }:
     setLoading(true);
     setResult(null);
     setPreview(null);
+    setColumnMapping({}); // Limpiamos mapeos anteriores
+    
     try {
       const buf = await f.arrayBuffer();
       const wb = XLSX.read(buf, { type: 'array', cellDates: true });
       setWorkbookData(wb);
       
+      // Buscamos cualquier hoja que contenga "aplicacion" (más flexible)
       const sheetName = wb.SheetNames.find(n => n.toLowerCase().includes('aplicacion'));
+      
       if (sheetName) {
         const ws = wb.Sheets[sheetName];
-        const headers = XLSX.utils.sheet_to_json<string[]>(ws, { header: 1 })[0];
-        setExcelColumns(headers ? (headers as any).filter((h: any) => h) : []);
+        // Obtenemos las cabeceras de la primera fila
+        const jsonData = XLSX.utils.sheet_to_json<string[]>(ws, { header: 1 });
+        const headers = jsonData[0]; 
+        
+        if (headers && Array.isArray(headers)) {
+          const cleanHeaders = headers.filter(h => h != null && h !== "").map(String);
+          console.log("Columnas detectadas:", cleanHeaders); // Revisa esto en F12
+          setExcelColumns(cleanHeaders);
+        } else {
+          toast.error('No se detectaron encabezados en la primera fila');
+        }
+      } else {
+        toast.error('No se encontró una hoja con el nombre "Aplicaciones"');
       }
     } catch (err: any) {
-      toast.error(err.message || 'Error al leer el archivo');
+      console.error("Error al leer:", err);
+      toast.error('Error al leer el archivo');
     } finally {
       setLoading(false);
     }
