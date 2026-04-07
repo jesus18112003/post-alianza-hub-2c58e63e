@@ -43,19 +43,28 @@ const STATUS_MAP: Record<string, string> = {
 
 type DateFormat = 'auto' | 'us' | 'international';
 
-function detectDateFormat(rows: any[], dateColName: string): 'us' | 'international' | 'ambiguous' {
+/**
+ * Detect date format by scanning all string dates in the dataset.
+ * If any first-position value > 12 → DD/MM (international).
+ * If any second-position value > 12 → MM/DD (US).
+ * If ambiguous, returns 'auto' (defaults to US parsing via Date).
+ */
+function detectDateFormat(rows: unknown[][], dateColIndices: number[]): 'us' | 'international' | 'ambiguous' {
   let hasFirstGt12 = false;
   let hasSecondGt12 = false;
 
   for (const row of rows) {
-    const val = row[dateColName];
-    if (typeof val !== 'string') continue;
-    const match = String(val).match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{2,4})$/);
-    if (!match) continue;
-    const first = parseInt(match[1], 10);
-    const second = parseInt(match[2], 10);
-    if (first > 12) hasFirstGt12 = true;
-    if (second > 12) hasSecondGt12 = true;
+    if (!row) continue;
+    for (const idx of dateColIndices) {
+      const val = row[idx];
+      if (typeof val !== 'string') continue;
+      const match = String(val).match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{2,4})$/);
+      if (!match) continue;
+      const first = parseInt(match[1], 10);
+      const second = parseInt(match[2], 10);
+      if (first > 12) hasFirstGt12 = true;
+      if (second > 12) hasSecondGt12 = true;
+    }
   }
 
   if (hasFirstGt12 && !hasSecondGt12) return 'international';
@@ -109,47 +118,54 @@ function mapStatus(val: unknown): string {
   return STATUS_MAP[key] || 'pendiente';
 }
 
-function parseSheet(
-  workbook: XLSX.WorkBook, 
-  dateFormat: DateFormat, 
-  mapping: Record<string, string>
-): { rows: ParsedRow[]; detectedFormat: 'us' | 'international' | 'ambiguous' } {
-  
+function parseSheet(workbook: XLSX.WorkBook, dateFormat: DateFormat): { rows: ParsedRow[]; detectedFormat: 'us' | 'international' | 'ambiguous' } {
   const sheetName = workbook.SheetNames.find(
     (n) => n.toLowerCase().includes('aplicacion') && n.toLowerCase().includes('base')
   );
   if (!sheetName) throw new Error('No se encontró la hoja "Aplicaciones BASE"');
 
   const ws = workbook.Sheets[sheetName];
-  const allRows = XLSX.utils.sheet_to_json<any>(ws, { raw: true, defval: null });
+  const allRows = XLSX.utils.sheet_to_json<unknown[]>(ws, { header: 1, raw: true, defval: null }) as unknown[][];
 
-  if (allRows.length === 0) throw new Error('El archivo está vacío');
+  let headerIdx = -1;
+  for (let i = 0; i < Math.min(10, allRows.length); i++) {
+    const row = allRows[i];
+    if (!row) continue;
+    if (row.some((c) => typeof c === 'string' && c.toLowerCase().includes('fecha de cierre'))) {
+      headerIdx = i;
+      break;
+    }
+  }
+  if (headerIdx === -1) throw new Error('No se encontró la fila de encabezados');
 
-  const detectedFormat = detectDateFormat(allRows, mapping['date']);
+  const dataRows = allRows.slice(headerIdx + 1);
+  const detectedFormat = detectDateFormat(dataRows, [1, 4]);
   const effectiveFormat = dateFormat === 'auto' ? (detectedFormat === 'ambiguous' ? 'us' : detectedFormat) : dateFormat;
 
   const parsed: ParsedRow[] = [];
-  for (const r of allRows) {
-    const clientName = r[mapping['client_name']] ? String(r[mapping['client_name']]).trim() : '';
-    const dateVal = parseExcelDate(r[mapping['date']], effectiveFormat);
-    const company = r[mapping['company']] ? String(r[mapping['company']]).trim() : '';
-
-    if (!clientName || !dateVal || !company) continue;
+  for (const r of dataRows) {
+    if (!r) continue;
+    const clientName = r[5] ? String(r[5]).trim() : '';
+    if (!clientName) continue;
+    const dateVal = parseExcelDate(r[1], effectiveFormat);
+    if (!dateVal) continue;
+    const company = r[3] ? String(r[3]).trim() : '';
+    if (!company) continue;
 
     parsed.push({
       date: dateVal,
       company,
+      collection_date: parseExcelDate(r[4], effectiveFormat),
       client_name: clientName,
-      collection_date: parseExcelDate(r[mapping['collection_date']], effectiveFormat),
-      phone_number: cleanPhone(r[mapping['phone_number']]),
-      status: mapStatus(r[mapping['status']]),
-      policy_number: r[mapping['policy_number']] ? String(r[mapping['policy_number']]).trim() : null,
-      notes: r[mapping['notes']] ? String(r[mapping['notes']]).trim() : null,
-      location: r[mapping['location']] ? String(r[mapping['location']]).trim() : null,
-      agent_premium: typeof r[mapping['agent_premium']] === 'number' ? r[mapping['agent_premium']] : null,
-      target_premium: typeof r[mapping['target_premium']] === 'number' ? r[mapping['target_premium']] : null,
-      total_commission: typeof r[mapping['total_commission']] === 'number' ? r[mapping['total_commission']] : null,
-      payment_method: typeof r[mapping['agent_premium']] === 'number' ? `$${r[mapping['agent_premium']]}/mes` : null,
+      phone_number: cleanPhone(r[6]),
+      status: mapStatus(r[7]),
+      policy_number: r[8] ? String(r[8]).trim() : null,
+      notes: r[9] ? String(r[9]).trim() : null,
+      location: r[12] ? String(r[12]).trim() : null,
+      agent_premium: typeof r[13] === 'number' ? r[13] : null,
+      target_premium: typeof r[16] === 'number' ? r[16] : null,
+      total_commission: typeof r[18] === 'number' ? r[18] : null,
+      payment_method: typeof r[13] === 'number' ? `$${r[13]}/mes` : null,
     });
   }
 
@@ -167,8 +183,6 @@ export function ImportPoliciesDialog({ open, onOpenChange, agentId, agentName }:
   const [result, setResult] = useState<{ inserted: number; skipped: number } | null>(null);
   const [dateFormat, setDateFormat] = useState<DateFormat>('auto');
   const [detectedFormat, setDetectedFormat] = useState<'us' | 'international' | 'ambiguous' | null>(null);
-  const [columnMapping, setColumnMapping] = useState<Record<string, string>>({});
-  const [excelColumns, setExcelColumns] = useState<string[]>([]);
 
   const resetState = () => {
     setFile(null);
@@ -177,23 +191,17 @@ export function ImportPoliciesDialog({ open, onOpenChange, agentId, agentName }:
     setResult(null);
     setDateFormat('auto');
     setDetectedFormat(null);
-    setColumnMapping({});
-    setExcelColumns([]);
   };
 
   const processWorkbook = (wb: XLSX.WorkBook, fmt: DateFormat) => {
-    try {
-      const { rows, detectedFormat: df } = parseSheet(wb, fmt, columnMapping);
-      setDetectedFormat(df);
-      if (rows.length === 0) {
-        toast.error('No se encontraron registros válidos con las columnas seleccionadas');
-        setPreview(null);
-      } else {
-        setPreview(rows);
-        toast.success(`Se encontraron ${rows.length} registros para importar`);
-      }
-    } catch (error: any) {
-      toast.error(error.message);
+    const { rows, detectedFormat: df } = parseSheet(wb, fmt);
+    setDetectedFormat(df);
+    if (rows.length === 0) {
+      toast.error('No se encontraron registros válidos en la hoja "Aplicaciones BASE"');
+      setPreview(null);
+    } else {
+      setPreview(rows);
+      toast.success(`Se encontraron ${rows.length} registros para importar`);
     }
   };
 
@@ -203,20 +211,14 @@ export function ImportPoliciesDialog({ open, onOpenChange, agentId, agentName }:
     setFile(f);
     setLoading(true);
     setResult(null);
-    setPreview(null);
     try {
       const buf = await f.arrayBuffer();
       const wb = XLSX.read(buf, { type: 'array', cellDates: true });
       setWorkbookData(wb);
-      
-      const sheetName = wb.SheetNames.find(n => n.toLowerCase().includes('aplicacion'));
-      if (sheetName) {
-        const ws = wb.Sheets[sheetName];
-        const headers = XLSX.utils.sheet_to_json<string[]>(ws, { header: 1 })[0];
-        setExcelColumns(headers ? (headers as any).filter((h: any) => h) : []);
-      }
+      processWorkbook(wb, 'auto');
     } catch (err: any) {
       toast.error(err.message || 'Error al leer el archivo');
+      setPreview(null);
     } finally {
       setLoading(false);
     }
@@ -227,6 +229,7 @@ export function ImportPoliciesDialog({ open, onOpenChange, agentId, agentName }:
     setImporting(true);
 
     try {
+      // Fetch existing policies for this agent to avoid duplicates
       const { data: existing } = await supabase
         .from('policies')
         .select('client_name, date, company')
@@ -259,6 +262,7 @@ export function ImportPoliciesDialog({ open, onOpenChange, agentId, agentName }:
       const skipped = preview.length - toInsert.length;
 
       if (toInsert.length > 0) {
+        // Insert in batches of 50
         for (let i = 0; i < toInsert.length; i += 50) {
           const batch = toInsert.slice(i, i + 50);
           const { error } = await supabase.from('policies').insert(batch);
@@ -268,7 +272,7 @@ export function ImportPoliciesDialog({ open, onOpenChange, agentId, agentName }:
 
       setResult({ inserted: toInsert.length, skipped });
       queryClient.invalidateQueries({ queryKey: ['admin-policies'] });
-      toast.success(`${toInsert.length} pólizas importadas`);
+      toast.success(`${toInsert.length} pólizas importadas${skipped > 0 ? `, ${skipped} duplicados omitidos` : ''}`);
     } catch (err: any) {
       toast.error(err.message || 'Error al importar');
     } finally {
@@ -287,6 +291,7 @@ export function ImportPoliciesDialog({ open, onOpenChange, agentId, agentName }:
         </DialogHeader>
 
         <div className="space-y-4 mt-2">
+          {/* File input */}
           <div>
             <input
               ref={fileRef}
@@ -309,103 +314,99 @@ export function ImportPoliciesDialog({ open, onOpenChange, agentId, agentName }:
             </p>
           </div>
 
-          {excelColumns.length > 0 && !preview && !result && (
-            <div className="space-y-4 p-4 border rounded-lg bg-secondary/20 mt-2">
-              <p className="text-xs font-bold flex items-center gap-1">
-                <AlertTriangle className="h-3 w-3 text-amber-500" /> 
-                Relacionar Columnas
-              </p>
-              <div className="grid grid-cols-1 gap-3">
-                {[
-                  { id: 'client_name', label: 'Nombre del Cliente' },
-                  { id: 'date', label: 'Fecha de Cierre' },
-                  { id: 'company', label: 'Compañía' },
-                  { id: 'policy_number', label: 'Número de Póliza' },
-                  { id: 'status', label: 'Estatus/Estado' }
-                ].map((field) => (
-                  <div key={field.id} className="flex flex-col gap-1">
-                    <label className="text-[10px] uppercase font-bold text-muted-foreground">{field.label}</label>
-                    <select 
-                      className="text-sm p-2 rounded border bg-background"
-                      onChange={(e) => setColumnMapping(prev => ({ ...prev, [field.id]: e.target.value }))}
-                      value={columnMapping[field.id] || ''}
-                    >
-                      <option value="">-- Seleccionar columna --</option>
-                      {excelColumns.map(col => <option key={col} value={col}>{col}</option>)}
-                    </select>
-                  </div>
-                ))}
-              </div>
-              <Button 
-                className="w-full mt-2" 
-                onClick={() => { if (workbookData) processWorkbook(workbookData, dateFormat); }}
-                disabled={!columnMapping.client_name || !columnMapping.date || !columnMapping.company}
-              >
-                Confirmar y Ver Vista Previa
-              </Button>
-            </div>
-          )}
-
+          {/* Date format selector */}
           {preview && !result && (
             <div className="rounded-md border border-border bg-secondary/30 p-3 space-y-2">
               <p className="text-xs font-medium text-foreground">Formato de fecha</p>
+              {detectedFormat && detectedFormat !== 'ambiguous' && (
+                <p className="text-xs text-muted-foreground">
+                  Formato detectado: {detectedFormat === 'us' ? 'Estadounidense (MM/DD)' : 'Internacional (DD/MM)'}
+                </p>
+              )}
+              {detectedFormat === 'ambiguous' && (
+                <p className="text-xs text-amber-500 flex items-center gap-1">
+                  <AlertTriangle className="h-3 w-3" />
+                  No se pudo detectar automáticamente. Selecciona el formato correcto.
+                </p>
+              )}
               <div className="flex gap-2">
                 {(['auto', 'us', 'international'] as DateFormat[]).map((fmt) => (
                   <button
                     key={fmt}
                     onClick={() => {
                       setDateFormat(fmt);
-                      if (workbookData) processWorkbook(workbookData, fmt);
+                      if (workbookData) {
+                        processWorkbook(workbookData, fmt);
+                      }
                     }}
-                    className={`text-xs px-2.5 py-1 rounded-full border ${
+                    className={`text-xs px-2.5 py-1 rounded-full border transition-all active:scale-95 ${
                       dateFormat === fmt
                         ? 'border-primary/40 bg-primary/10 text-primary'
-                        : 'border-border text-muted-foreground'
+                        : 'border-border text-muted-foreground hover:text-foreground'
                     }`}
                   >
-                    {fmt === 'auto' ? 'Auto' : fmt === 'us' ? 'MM/DD (US)' : 'DD/MM (Int)'}
+                    {fmt === 'auto' ? 'Auto' : fmt === 'us' ? 'MM/DD (US)' : 'DD/MM (Internacional)'}
                   </button>
                 ))}
               </div>
             </div>
           )}
 
+          {/* Preview */}
           {preview && preview.length > 0 && !result && (
             <div className="space-y-3">
               <div className="rounded-md border border-border bg-secondary/30 p-3">
-                <p className="text-sm font-medium">{preview.length} registros encontrados</p>
+                <p className="text-sm font-medium text-foreground">
+                  {preview.length} registros encontrados
+                </p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Rango de fechas: {preview[preview.length - 1]?.date} — {preview[0]?.date}
+                </p>
               </div>
 
+              {/* Sample rows */}
               <div className="border border-border rounded-md overflow-hidden">
-                <div className="bg-secondary/50 px-3 py-1.5 text-xs font-medium">Vista previa (primeros 5)</div>
+                <div className="bg-secondary/50 px-3 py-1.5 text-xs font-medium text-muted-foreground">
+                  Vista previa (primeros 5)
+                </div>
                 <div className="divide-y divide-border">
                   {preview.slice(0, 5).map((r, i) => (
                     <div key={i} className="px-3 py-2 text-xs space-y-0.5">
                       <div className="flex justify-between">
-                        <span className="font-medium">{r.client_name}</span>
+                        <span className="font-medium text-foreground">{r.client_name}</span>
                         <span className="text-muted-foreground">{r.date}</span>
                       </div>
-                      <div className="text-muted-foreground">{r.company} • {r.status}</div>
+                      <div className="flex gap-3 text-muted-foreground">
+                        <span>{r.company}</span>
+                        <span className="capitalize">{r.status}</span>
+                        {r.total_commission && <span>${r.total_commission.toFixed(2)}</span>}
+                      </div>
                     </div>
                   ))}
                 </div>
               </div>
 
-              <Button className="w-full gap-2" onClick={handleImport} disabled={importing}>
+              <Button
+                className="w-full gap-2"
+                onClick={handleImport}
+                disabled={importing}
+              >
                 {importing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
                 {importing ? 'Importando...' : `Importar ${preview.length} pólizas`}
               </Button>
             </div>
           )}
 
+          {/* Result */}
           {result && (
             <div className="rounded-md border border-primary/30 bg-primary/5 p-4 space-y-2">
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="h-5 w-5 text-primary" />
-                <p className="text-sm font-medium">Importación completada</p>
+                <p className="text-sm font-medium text-foreground">Importación completada</p>
               </div>
               <p className="text-xs text-muted-foreground">
-                {result.inserted} pólizas importadas {result.skipped > 0 && `, ${result.skipped} omitidos`}
+                {result.inserted} pólizas importadas
+                {result.skipped > 0 && `, ${result.skipped} duplicados omitidos`}
               </p>
               <Button variant="outline" size="sm" onClick={resetState} className="mt-2">
                 Importar otro archivo
