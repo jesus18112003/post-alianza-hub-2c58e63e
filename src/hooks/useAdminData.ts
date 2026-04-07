@@ -71,7 +71,7 @@ export function useUpdatePolicy() {
       updates: Partial<Omit<Policy, 'id' | 'created_at' | 'updated_at'>>;
     }) => {
       // Auto-set notes_updated_at when notes change
-      const finalUpdates = { ...updates } as typeof updates & { notes_updated_at?: string };
+      const finalUpdates: Record<string, unknown> = { ...updates };
       if ('notes' in updates && updates.notes?.trim()) {
         finalUpdates.notes_updated_at = new Date().toISOString();
       }
