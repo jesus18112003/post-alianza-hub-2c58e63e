@@ -118,40 +118,39 @@ function mapStatus(val: unknown): string {
   return STATUS_MAP[key] || 'pendiente';
 }
 
-Para que la lógica de importación utilice las columnas que seleccionaste manualmente en el desplegable, debemos modificar la función parseSheet para que acepte el objeto columnMapping.
-
-Aquí tienes la versión actualizada. Fíjate que ahora la función recibe columnMapping como tercer parámetro:
-
-TypeScript
-function parseSheet(
-  workbook: XLSX.WorkBook, 
-  dateFormat: DateFormat, 
-  mapping: Record<string, string> // <--- Nuevo parámetro
-): { rows: ParsedRow[]; detectedFormat: 'us' | 'international' | 'ambiguous' } {
-  
+function parseSheet(workbook: XLSX.WorkBook, dateFormat: DateFormat): { rows: ParsedRow[]; detectedFormat: 'us' | 'international' | 'ambiguous' } {
   const sheetName = workbook.SheetNames.find(
     (n) => n.toLowerCase().includes('aplicacion') && n.toLowerCase().includes('base')
   );
   if (!sheetName) throw new Error('No se encontró la hoja "Aplicaciones BASE"');
 
   const ws = workbook.Sheets[sheetName];
+  // Obtenemos los datos con los nombres de las columnas reales
   const allRows = XLSX.utils.sheet_to_json<any>(ws, { defval: null });
 
   if (allRows.length === 0) throw new Error('El archivo está vacío');
 
+  // Función para buscar el valor en varias posibles columnas
+  const getValue = (row: any, aliases: string[]) => {
+    const foundKey = Object.keys(row).find(key => 
+      aliases.some(alias => key.toLowerCase().trim().includes(alias.toLowerCase()))
+    );
+    return foundKey ? row[foundKey] : null;
+  };
+
   const dataRows = allRows;
+  // Para la detección de fecha, tomamos una muestra de la columna de fecha
   const detectedFormat = detectDateFormat(dataRows.map(r => Object.values(r)), [0]); 
   const effectiveFormat = dateFormat === 'auto' ? (detectedFormat === 'ambiguous' ? 'us' : detectedFormat) : dateFormat;
 
   const parsed: ParsedRow[] = [];
   
   for (const r of dataRows) {
-    // Ahora usamos el nombre de columna que seleccionaste en el dropdown (mapping)
-    const clientName = r[mapping['client_name']];
-    const dateRaw = r[mapping['date']];
-    const company = r[mapping['company']];
+    // MAPEADOR INTELIGENTE POR ALIAS
+    const clientName = getValue(r, ['cliente', 'nombre', 'nombre del cliente', 'asegurado', 'titular']);
+    const dateRaw = getValue(r, ['fecha', 'fecha de cierre', 'date', 'emision']);
+    const company = getValue(r, ['compañía', 'compania', 'company', 'carrier', 'aseguradora']);
     
-    // Si no hay datos en las columnas obligatorias, saltamos la fila
     if (!clientName || !dateRaw || !company) continue;
 
     const dateVal = parseExcelDate(dateRaw, effectiveFormat);
@@ -160,18 +159,17 @@ function parseSheet(
     parsed.push({
       date: dateVal,
       company: String(company).trim(),
+      collection_date: parseExcelDate(getValue(r, ['cobro', 'collection', 'fecha cobro']), effectiveFormat),
       client_name: String(clientName).trim(),
-      // Para los campos opcionales, usamos el mapeo si existe
-      collection_date: mapping['collection_date'] ? parseExcelDate(r[mapping['collection_date']], effectiveFormat) : null,
-      phone_number: mapping['phone_number'] ? cleanPhone(r[mapping['phone_number']]) : null,
-      status: mapping['status'] ? mapStatus(r[mapping['status']]) : 'pendiente',
-      policy_number: mapping['policy_number'] ? String(r[mapping['policy_number']]).trim() : null,
-      notes: mapping['notes'] ? String(r[mapping['notes']]).trim() : null,
-      location: mapping['location'] ? String(r[mapping['location']]).trim() : null,
-      agent_premium: mapping['agent_premium'] ? Number(r[mapping['agent_premium']]) : null,
-      target_premium: mapping['target_premium'] ? Number(r[mapping['target_premium']]) : null,
-      total_commission: mapping['total_commission'] ? Number(r[mapping['total_commission']]) : null,
-      payment_method: mapping['agent_premium'] ? `$${r[mapping['agent_premium']]}/mes` : null,
+      phone_number: cleanPhone(getValue(r, ['telefono', 'phone', 'celular', 'contacto'])),
+      status: mapStatus(getValue(r, ['estatus', 'status', 'estado'])),
+      policy_number: getValue(r, ['poliza', 'policy', 'nro']),
+      notes: getValue(r, ['notas', 'observaciones', 'notes']),
+      location: getValue(r, ['ubicacion', 'location', 'estado', 'ciudad']),
+      agent_premium: getValue(r, ['premium', 'prima', 'monto']),
+      target_premium: getValue(r, ['target', 'objetivo']),
+      total_commission: getValue(r, ['comision', 'commission']),
+      payment_method: getValue(r, ['pago', 'payment']) || (getValue(r, ['premium']) ? `$${getValue(r, ['premium'])}/mes` : null),
     });
   }
 
@@ -189,8 +187,6 @@ export function ImportPoliciesDialog({ open, onOpenChange, agentId, agentName }:
   const [result, setResult] = useState<{ inserted: number; skipped: number } | null>(null);
   const [dateFormat, setDateFormat] = useState<DateFormat>('auto');
   const [detectedFormat, setDetectedFormat] = useState<'us' | 'international' | 'ambiguous' | null>(null);
-  const [columnMapping, setColumnMapping] = useState<Record<string, string>>({});
-  const [excelColumns, setExcelColumns] = useState<string[]>([]);
 
   const resetState = () => {
     setFile(null);
@@ -214,29 +210,23 @@ export function ImportPoliciesDialog({ open, onOpenChange, agentId, agentName }:
   };
 
   const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
-  const f = e.target.files?.[0];
-  if (!f) return;
-  setFile(f);
-  setLoading(true);
-  try {
-    const buf = await f.arrayBuffer();
-    const wb = XLSX.read(buf, { type: 'array' });
-    setWorkbookData(wb);
-    
-    const sheetName = wb.SheetNames.find(n => n.toLowerCase().includes('aplicacion'));
-    if (sheetName) {
-      const ws = wb.Sheets[sheetName];
-      const json = XLSX.utils.sheet_to_json<any>(ws, { header: 1 });
-      const headers = json[0] as string[]; // Asume que la primera fila son los encabezados
-      setExcelColumns(headers.filter(h => h)); // Guarda las columnas encontradas
+    const f = e.target.files?.[0];
+    if (!f) return;
+    setFile(f);
+    setLoading(true);
+    setResult(null);
+    try {
+      const buf = await f.arrayBuffer();
+      const wb = XLSX.read(buf, { type: 'array', cellDates: true });
+      setWorkbookData(wb);
+      processWorkbook(wb, 'auto');
+    } catch (err: any) {
+      toast.error(err.message || 'Error al leer el archivo');
+      setPreview(null);
+    } finally {
+      setLoading(false);
     }
-    setPreview(null); // Limpiamos preview hasta que confirmes el mapeo
-  } catch (err: any) {
-    toast.error('Error al leer el archivo');
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
   const handleImport = async () => {
     if (!preview || preview.length === 0) return;
@@ -328,39 +318,6 @@ export function ImportPoliciesDialog({ open, onOpenChange, agentId, agentName }:
             </p>
           </div>
 
-          {/* === PEGA AQUÍ EL BLOQUE DE RELACIONAR COLUMNAS === */}
-        {excelColumns.length > 0 && !preview && (
-          <div className="space-y-4 p-4 border rounded-lg bg-secondary/20">
-            <h3 className="text-sm font-bold border-b pb-2">Relacionar Columnas</h3>
-            <div className="grid grid-cols-1 gap-3">
-              {[
-                { id: 'client_name', label: 'Nombre del Cliente' },
-                { id: 'date', label: 'Fecha de Cierre' },
-                { id: 'company', label: 'Compañía' }
-              ].map((field) => (
-                <div key={field.id} className="flex flex-col gap-1">
-                  <label className="text-[10px] uppercase font-bold text-muted-foreground">{field.label}</label>
-                  <select 
-                    className="text-sm p-2 rounded border bg-background"
-                    onChange={(e) => setColumnMapping(prev => ({ ...prev, [field.id]: e.target.value }))}
-                    value={columnMapping[field.id] || ''}
-                  >
-                    <option value="">-- Seleccionar columna --</option>
-                    {excelColumns.map(col => <option key={col} value={col}>{col}</option>)}
-                  </select>
-                </div>
-              ))}
-            </div>
-            <Button 
-              className="w-full mt-2" 
-              onClick={() => { if (workbookData) processWorkbook(workbookData, dateFormat); }}
-              disabled={!columnMapping.client_name || !columnMapping.date || !columnMapping.company}
-            >
-              Confirmar y Ver Vista Previa
-            </Button>
-          </div>
-        )}
-        {/* === FIN DEL BLOQUE === */}
           {/* Date format selector */}
           {preview && !result && (
             <div className="rounded-md border border-border bg-secondary/30 p-3 space-y-2">
