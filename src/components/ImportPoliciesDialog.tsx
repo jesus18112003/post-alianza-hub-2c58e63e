@@ -125,51 +125,47 @@ function parseSheet(workbook: XLSX.WorkBook, dateFormat: DateFormat): { rows: Pa
   if (!sheetName) throw new Error('No se encontró la hoja "Aplicaciones BASE"');
 
   const ws = workbook.Sheets[sheetName];
-  // Obtenemos los datos con los nombres de las columnas reales
-  const allRows = XLSX.utils.sheet_to_json<any>(ws, { defval: null });
+  const allRows = XLSX.utils.sheet_to_json<unknown[]>(ws, { header: 1, raw: true, defval: null }) as unknown[][];
 
-  if (allRows.length === 0) throw new Error('El archivo está vacío');
+  let headerIdx = -1;
+  for (let i = 0; i < Math.min(10, allRows.length); i++) {
+    const row = allRows[i];
+    if (!row) continue;
+    if (row.some((c) => typeof c === 'string' && c.toLowerCase().includes('fecha de cierre'))) {
+      headerIdx = i;
+      break;
+    }
+  }
+  if (headerIdx === -1) throw new Error('No se encontró la fila de encabezados');
 
-  // Función para buscar el valor en varias posibles columnas
-  const getValue = (row: any, aliases: string[]) => {
-    const foundKey = Object.keys(row).find(key => 
-      aliases.some(alias => key.toLowerCase().trim().includes(alias.toLowerCase()))
-    );
-    return foundKey ? row[foundKey] : null;
-  };
-
-  const dataRows = allRows;
-  // Para la detección de fecha, tomamos una muestra de la columna de fecha
-  const detectedFormat = detectDateFormat(dataRows.map(r => Object.values(r)), [0]); 
+  const dataRows = allRows.slice(headerIdx + 1);
+  const detectedFormat = detectDateFormat(dataRows, [1, 4]);
   const effectiveFormat = dateFormat === 'auto' ? (detectedFormat === 'ambiguous' ? 'us' : detectedFormat) : dateFormat;
 
   const parsed: ParsedRow[] = [];
-  
   for (const r of dataRows) {
-    // MAPEADOR INTELIGENTE POR ALIAS
-    const clientName = getValue(r, ['cliente', 'nombre', 'nombre del cliente', 'asegurado', 'titular']);
-    const dateRaw = getValue(r, ['fecha', 'fecha de cierre', 'date', 'emision']);
-    const company = getValue(r, ['compañía', 'compania', 'company', 'carrier', 'aseguradora']);
-    
-    if (!clientName || !dateRaw || !company) continue;
-
-    const dateVal = parseExcelDate(dateRaw, effectiveFormat);
+    if (!r) continue;
+    const clientName = r[5] ? String(r[5]).trim() : '';
+    if (!clientName) continue;
+    const dateVal = parseExcelDate(r[1], effectiveFormat);
     if (!dateVal) continue;
+    const company = r[3] ? String(r[3]).trim() : '';
+    if (!company) continue;
 
     parsed.push({
       date: dateVal,
-      company: String(company).trim(),
-      collection_date: parseExcelDate(getValue(r, ['cobro', 'collection', 'fecha cobro']), effectiveFormat),
-      client_name: String(clientName).trim(),
-      phone_number: cleanPhone(getValue(r, ['telefono', 'phone', 'celular', 'contacto'])),
-      status: mapStatus(getValue(r, ['estatus', 'status', 'estado'])),
-      policy_number: getValue(r, ['poliza', 'policy', 'nro']),
-      notes: getValue(r, ['notas', 'observaciones', 'notes']),
-      location: getValue(r, ['ubicacion', 'location', 'estado', 'ciudad']),
-      agent_premium: getValue(r, ['premium', 'prima', 'monto']),
-      target_premium: getValue(r, ['target', 'objetivo']),
-      total_commission: getValue(r, ['comision', 'commission']),
-      payment_method: getValue(r, ['pago', 'payment']) || (getValue(r, ['premium']) ? `$${getValue(r, ['premium'])}/mes` : null),
+      company,
+      collection_date: parseExcelDate(r[4], effectiveFormat),
+      client_name: clientName,
+      phone_number: cleanPhone(r[6]),
+      status: mapStatus(r[7]),
+      policy_number: r[8] ? String(r[8]).trim() : null,
+      notes: r[9] ? String(r[9]).trim() : null,
+      location: r[12] ? String(r[12]).trim() : null,
+      agent_premium: typeof r[13] === 'number' ? r[13] : null,
+      target_premium: typeof r[16] === 'number' ? r[16] : null,
+      total_commission: typeof r[18] === 'number' ? r[18] : null,
+      payment_method: typeof r[13] === 'number' ? `$${r[13]}/mes` : null,
     });
   }
 
