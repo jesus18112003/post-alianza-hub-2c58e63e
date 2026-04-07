@@ -202,10 +202,12 @@ export function ImportPoliciesDialog({ open, onOpenChange, agentId, agentName }:
   };
 
   const processWorkbook = (wb: XLSX.WorkBook, fmt: DateFormat) => {
-    const { rows, detectedFormat: df } = parseSheet(wb, fmt);
+    // AQUÍ ES DONDE ACTUALIZAS LA LLAMADA:
+    const { rows, detectedFormat: df } = parseSheet(wb, fmt, columnMapping); 
+    
     setDetectedFormat(df);
     if (rows.length === 0) {
-      toast.error('No se encontraron registros válidos en la hoja "Aplicaciones BASE"');
+      toast.error('No se encontraron registros válidos con las columnas seleccionadas');
       setPreview(null);
     } else {
       setPreview(rows);
