@@ -45,11 +45,11 @@ export function useUpdatePolicyStatus() {
       status,
     }: {
       policyId: string;
-      status: Policy['status'];
+      status: string;
     }) => {
       const { error } = await supabase
         .from('policies')
-        .update({ status })
+        .update({ status } as any)
         .eq('id', policyId);
       if (error) throw error;
     },
@@ -77,7 +77,7 @@ export function useUpdatePolicy() {
       }
       const { error } = await supabase
         .from('policies')
-        .update(finalUpdates)
+        .update(finalUpdates as any)
         .eq('id', policyId);
       if (error) throw error;
     },
