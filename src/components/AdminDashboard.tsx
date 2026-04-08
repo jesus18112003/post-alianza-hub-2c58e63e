@@ -20,6 +20,7 @@ export function AdminDashboard() {
   const { profile, signOut } = useAuth();
   const { data: policies, isLoading: loadingPolicies } = useAllPolicies();
   const { data: agents } = useAgentProfiles();
+  const deleteAgent = useDeleteAgent();
 
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<PolicyStatus | 'all'>('all');
@@ -31,6 +32,7 @@ export function AdminDashboard() {
   const [phoneFilter, setPhoneFilter] = useState<'all' | 'with' | 'without'>('all');
   const [addAgentOpen, setAddAgentOpen] = useState(false);
   const [importAgentId, setImportAgentId] = useState<string | null>(null);
+  const [deleteAgentId, setDeleteAgentId] = useState<string | null>(null);
 
   // Realtime subscriptions
   useRealtimeSubscription('policies', [['admin-policies']]);
