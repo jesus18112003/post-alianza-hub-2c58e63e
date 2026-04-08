@@ -434,6 +434,41 @@ export function AdminDashboard() {
           agentName={agentMap[importAgentId] ?? 'Agente'}
         />
       )}
+
+      {/* Delete agent confirmation */}
+      <AlertDialog open={!!deleteAgentId} onOpenChange={(open) => { if (!open) setDeleteAgentId(null); }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Eliminar agente?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Se eliminará permanentemente a <strong>{deleteAgentId ? (agentMap[deleteAgentId] ?? 'este agente') : ''}</strong> junto con todas sus pólizas, credenciales y datos asociados. Esta acción no se puede deshacer.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={() => {
+                if (!deleteAgentId) return;
+                const name = agentMap[deleteAgentId] ?? 'Agente';
+                deleteAgent.mutate(deleteAgentId, {
+                  onSuccess: () => {
+                    toast.success(`Agente "${name}" eliminado`);
+                    if (agentFilter === deleteAgentId) setAgentFilter('all');
+                    setDeleteAgentId(null);
+                  },
+                  onError: (err: any) => {
+                    toast.error(err?.message || 'Error al eliminar el agente');
+                  },
+                });
+              }}
+              disabled={deleteAgent.isPending}
+            >
+              {deleteAgent.isPending ? 'Eliminando...' : 'Eliminar'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
