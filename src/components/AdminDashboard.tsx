@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import { useAllPolicies, useAgentProfiles } from '@/hooks/useAdminData';
+import { useAllPolicies, useAgentProfiles, useDeleteAgent } from '@/hooks/useAdminData';
 import { useRealtimeSubscription } from '@/hooks/useRealtimeSubscription';
 import { MetricCards } from '@/components/MetricCards';
 import { AdminPolicyRow } from '@/components/AdminPolicyRow';
@@ -10,14 +10,17 @@ import { ClosingAssignments } from '@/components/ClosingAssignments';
 import { WelcomeTemplateManager } from '@/components/WelcomeTemplateManager';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { LogOut, Search, Filter, Users, ChevronDown, Building2, Info, Phone, UserPlus, FileSpreadsheet } from 'lucide-react';
+import { LogOut, Search, Filter, Users, ChevronDown, Building2, Info, Phone, UserPlus, FileSpreadsheet, Trash2 } from 'lucide-react';
 import { AddAgentDialog } from '@/components/AddAgentDialog';
 import { ImportPoliciesDialog } from '@/components/ImportPoliciesDialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+import { toast } from 'sonner';
 
 export function AdminDashboard() {
   const { profile, signOut } = useAuth();
   const { data: policies, isLoading: loadingPolicies } = useAllPolicies();
   const { data: agents } = useAgentProfiles();
+  const deleteAgent = useDeleteAgent();
 
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<PolicyStatus | 'all'>('all');
@@ -29,6 +32,7 @@ export function AdminDashboard() {
   const [phoneFilter, setPhoneFilter] = useState<'all' | 'with' | 'without'>('all');
   const [addAgentOpen, setAddAgentOpen] = useState(false);
   const [importAgentId, setImportAgentId] = useState<string | null>(null);
+  const [deleteAgentId, setDeleteAgentId] = useState<string | null>(null);
 
   // Realtime subscriptions
   useRealtimeSubscription('policies', [['admin-policies']]);
@@ -210,11 +214,21 @@ export function AdminDashboard() {
                         >
                           <Info className="h-3.5 w-3.5" />
                         </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-7 w-7 text-muted-foreground hover:text-destructive"
+                          onClick={() => setDeleteAgentId(agent.id)}
+                          title="Eliminar agente"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </Button>
                       </div>
                     </div>
                   </div>
                 );
               })}
+
             </div>
           </div>
         )}
@@ -420,6 +434,41 @@ export function AdminDashboard() {
           agentName={agentMap[importAgentId] ?? 'Agente'}
         />
       )}
+
+      {/* Delete agent confirmation */}
+      <AlertDialog open={!!deleteAgentId} onOpenChange={(open) => { if (!open) setDeleteAgentId(null); }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Eliminar agente?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Se eliminará permanentemente a <strong>{deleteAgentId ? (agentMap[deleteAgentId] ?? 'este agente') : ''}</strong> junto con todas sus pólizas, credenciales y datos asociados. Esta acción no se puede deshacer.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={() => {
+                if (!deleteAgentId) return;
+                const name = agentMap[deleteAgentId] ?? 'Agente';
+                deleteAgent.mutate(deleteAgentId, {
+                  onSuccess: () => {
+                    toast.success(`Agente "${name}" eliminado`);
+                    if (agentFilter === deleteAgentId) setAgentFilter('all');
+                    setDeleteAgentId(null);
+                  },
+                  onError: (err: any) => {
+                    toast.error(err?.message || 'Error al eliminar el agente');
+                  },
+                });
+              }}
+              disabled={deleteAgent.isPending}
+            >
+              {deleteAgent.isPending ? 'Eliminando...' : 'Eliminar'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
