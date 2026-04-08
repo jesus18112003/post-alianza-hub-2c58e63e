@@ -10,9 +10,11 @@ import { ClosingAssignments } from '@/components/ClosingAssignments';
 import { WelcomeTemplateManager } from '@/components/WelcomeTemplateManager';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { LogOut, Search, Filter, Users, ChevronDown, Building2, Info, Phone, UserPlus, FileSpreadsheet } from 'lucide-react';
+import { LogOut, Search, Filter, Users, ChevronDown, Building2, Info, Phone, UserPlus, FileSpreadsheet, Trash2 } from 'lucide-react';
 import { AddAgentDialog } from '@/components/AddAgentDialog';
 import { ImportPoliciesDialog } from '@/components/ImportPoliciesDialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+import { toast } from 'sonner';
 
 export function AdminDashboard() {
   const { profile, signOut } = useAuth();
