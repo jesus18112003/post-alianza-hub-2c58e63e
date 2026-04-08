@@ -87,6 +87,24 @@ export function useUpdatePolicy() {
   });
 }
 
+export function useDeleteAgent() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (agentId: string) => {
+      const response = await supabase.functions.invoke('delete-agent', {
+        body: { agentId },
+      });
+      if (response.error) throw response.error;
+      if (response.data?.error) throw new Error(response.data.error);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['agent-profiles'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-policies'] });
+    },
+  });
+}
+
 export function useDeletePolicy() {
   const queryClient = useQueryClient();
 
