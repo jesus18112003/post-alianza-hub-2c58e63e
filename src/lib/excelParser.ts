@@ -242,8 +242,9 @@ export function parseSheet(workbook: XLSX.WorkBook, dateFormat: DateFormat, shee
     if (!clientName) continue;
     const dateVal = parseExcelDate(getVal(r, bestMap, 'date'), effectiveFormat);
     if (!dateVal) continue;
-    const company = getStr(r, bestMap, 'company');
-    if (!company) continue;
+    const rawCompany = getStr(r, bestMap, 'company');
+    if (!rawCompany) continue;
+    const company = normalizeCompany(rawCompany);
 
     const agentPremium = getNum(r, bestMap, 'agent_premium');
 
