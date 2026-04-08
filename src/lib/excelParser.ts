@@ -238,7 +238,7 @@ export function parseSheet(workbook: XLSX.WorkBook, dateFormat: DateFormat, shee
       notes: getStr(r, bestMap, 'notes'),
       location: getStr(r, bestMap, 'location'),
       agent_premium: agentPremium,
-      target_premium: getNum(r, bestMap, 'target_premium'),
+      target_premium: (() => { const v = getNum(r, bestMap, 'target_premium'); return v !== null ? Math.round((v / 12) * 100) / 100 : null; })(),
       total_commission: getNum(r, bestMap, 'total_commission'),
       payment_method: getStr(r, bestMap, 'payment_method') || (agentPremium ? `$${agentPremium}/mes` : null),
     });
