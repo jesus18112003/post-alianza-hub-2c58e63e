@@ -137,6 +137,26 @@ function mapStatus(val: unknown): string {
   return STATUS_MAP[String(val).trim().toLowerCase()] || 'pendiente';
 }
 
+const COMPANY_NORMALIZE: Record<string, string> = {
+  'aman': 'AMAM',
+  'amam': 'AMAM',
+  'national life group': 'NL',
+  'national life': 'NL',
+  'nlg': 'NL',
+  'nl': 'NL',
+  'corebridge': 'Corebridge',
+  'corebrige': 'Corebridge',
+  'cob': 'Corebridge',
+  'mutual of omaha': 'MUTUAL OF OMAHA',
+  'moo': 'MUTUAL OF OMAHA',
+  'americo': 'AMERICO',
+};
+
+function normalizeCompany(val: string): string {
+  const key = val.trim().toLowerCase();
+  return COMPANY_NORMALIZE[key] || val.trim();
+}
+
 function getVal(row: unknown[], map: ColumnMap, field: string): unknown {
   const idx = map[field];
   return idx !== undefined ? row[idx] : undefined;
@@ -222,8 +242,9 @@ export function parseSheet(workbook: XLSX.WorkBook, dateFormat: DateFormat, shee
     if (!clientName) continue;
     const dateVal = parseExcelDate(getVal(r, bestMap, 'date'), effectiveFormat);
     if (!dateVal) continue;
-    const company = getStr(r, bestMap, 'company');
-    if (!company) continue;
+    const rawCompany = getStr(r, bestMap, 'company');
+    if (!rawCompany) continue;
+    const company = normalizeCompany(rawCompany);
 
     const agentPremium = getNum(r, bestMap, 'agent_premium');
 

@@ -14,8 +14,13 @@ function parseMessage(raw: string) {
   if (!match) return null;
   const amount = parseFloat(match[1].replace(/,/g, ""));
   let company = match[2].toUpperCase();
-  if (company === "AMAN") company = "AMAM";
-  if (company === "MOO") company = "MUTUAL OF OMAHA";
+  const COMPANY_MAP: Record<string, string> = {
+    'AMAN': 'AMAM', 'AMAM': 'AMAM',
+    'MOO': 'MUTUAL OF OMAHA',
+    'NLG': 'NL', 'NL': 'NL',
+    'COB': 'Corebridge',
+  };
+  company = COMPANY_MAP[company] || company;
   const policyType = match[3].toUpperCase();
   // Everything between policy_type and (client) is payment_method
   const paymentMethod = match[4].trim();
