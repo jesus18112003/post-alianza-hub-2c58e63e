@@ -13,12 +13,25 @@ export function useAllPolicies() {
   return useQuery({
     queryKey: ['admin-policies'],
     queryFn: async (): Promise<Policy[]> => {
-      const { data, error } = await supabase
-        .from('policies')
-        .select('*')
-        .order('date', { ascending: false });
-      if (error) throw error;
-      return (data ?? []) as Policy[];
+      // Fetch all policies in batches to avoid the default 1000-row limit
+      const allData: Policy[] = [];
+      const PAGE_SIZE = 1000;
+      let from = 0;
+      let hasMore = true;
+
+      while (hasMore) {
+        const { data, error } = await supabase
+          .from('policies')
+          .select('*')
+          .order('date', { ascending: false })
+          .range(from, from + PAGE_SIZE - 1);
+        if (error) throw error;
+        allData.push(...((data ?? []) as Policy[]));
+        hasMore = (data?.length ?? 0) === PAGE_SIZE;
+        from += PAGE_SIZE;
+      }
+
+      return allData;
     },
   });
 }
