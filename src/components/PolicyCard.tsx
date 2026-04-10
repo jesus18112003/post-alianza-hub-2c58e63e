@@ -106,7 +106,7 @@ export function PolicyCard({ policy }: PolicyCardProps) {
                   Datos Financieros
                 </h4>
                 <DetailRow label="Target Premium" value={policy.target_premium} />
-                <DetailRow label="Agent Premium" value={policy.agent_premium} />
+                <DetailRow label="Annual Premium" value={policy.agent_premium} />
                 <DetailRow label="Comisión Total" value={policy.total_commission} />
               </div>
             )}

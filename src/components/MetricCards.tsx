@@ -1,12 +1,13 @@
-import { DollarSign, FileText, Clock } from 'lucide-react';
+import { DollarSign, FileText, Clock, TrendingUp } from 'lucide-react';
 
 interface MetricCardsProps {
   totalCommission: number;
   policiesEmitted: number;
   pendingCases: number;
+  totalAnnualPremium?: number;
 }
 
-export function MetricCards({ totalCommission, policiesEmitted, pendingCases }: MetricCardsProps) {
+export function MetricCards({ totalCommission, policiesEmitted, pendingCases, totalAnnualPremium }: MetricCardsProps) {
   const cards = [
     {
       title: 'Comisión Total',
@@ -26,10 +27,20 @@ export function MetricCards({ totalCommission, policiesEmitted, pendingCases }: 
       icon: Clock,
       accent: false,
     },
+    ...(totalAnnualPremium !== undefined
+      ? [
+          {
+            title: 'Total Annual Premium',
+            value: `$${totalAnnualPremium.toLocaleString('en-US', { minimumFractionDigits: 2 })}`,
+            icon: TrendingUp,
+            accent: true,
+          },
+        ]
+      : []),
   ];
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+    <div className={`grid grid-cols-1 sm:grid-cols-2 ${cards.length > 3 ? 'lg:grid-cols-4' : 'sm:grid-cols-3'} gap-4`}>
       {cards.map((card) => (
         <div
           key={card.title}

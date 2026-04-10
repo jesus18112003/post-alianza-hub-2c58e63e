@@ -3,6 +3,7 @@ import { usePolicies } from '@/hooks/usePolicies';
 import { useRealtimeSubscription } from '@/hooks/useRealtimeSubscription';
 import { MetricCards } from '@/components/MetricCards';
 import { PolicyCard } from '@/components/PolicyCard';
+import { AgentCharts } from '@/components/AgentCharts';
 import { AdminDashboard } from '@/components/AdminDashboard';
 import { Button } from '@/components/ui/button';
 import { LogOut, Search, Filter } from 'lucide-react';
@@ -62,6 +63,11 @@ function AgentDashboard() {
     [policies]
   );
 
+  const totalAnnualPremium = useMemo(
+    () => (policies ?? []).reduce((sum, p) => sum + (p.agent_premium ?? 0), 0),
+    [policies]
+  );
+
   const allStatuses = Object.keys(STATUS_CONFIG) as PolicyStatus[];
 
   return (
@@ -93,7 +99,9 @@ function AgentDashboard() {
           <p className="text-sm text-muted-foreground mt-1">Resumen de tu actividad y pólizas</p>
         </div>
 
-        <MetricCards totalCommission={totalCommission} policiesEmitted={policiesEmitted} pendingCases={pendingCases} />
+        <MetricCards totalCommission={totalCommission} policiesEmitted={policiesEmitted} pendingCases={pendingCases} totalAnnualPremium={totalAnnualPremium} />
+
+        <AgentCharts policies={policies ?? []} />
 
         <div className="flex flex-col sm:flex-row gap-3">
           <div className="relative flex-1">
@@ -162,3 +170,4 @@ function AgentDashboard() {
     </div>
   );
 }
+
