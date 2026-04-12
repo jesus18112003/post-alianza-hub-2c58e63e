@@ -58,7 +58,8 @@ export function GeneralListDialog({ open, onOpenChange, agentPolicies, agentName
       .filter((p) =>
         p.status === 'pendiente' ||
         p.status === 'chargeback' ||
-        p.status === 'fondo_insuficiente'
+        p.status === 'fondo_insuficiente' ||
+        p.status === 'emitido'
       )
       // Sort by date descending (most recent first)
       .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
