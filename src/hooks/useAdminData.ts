@@ -134,3 +134,37 @@ export function useDeletePolicy() {
     },
   });
 }
+
+export function useCreatePolicy() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (newPolicy: {
+      agent_id: string;
+      date: string;
+      company: string;
+      client_name: string;
+      status?: string;
+      policy_number?: string | null;
+      policy_type?: string | null;
+      payment_method?: string | null;
+      location?: string | null;
+      target_premium?: number | null;
+      agent_premium?: number | null;
+      total_commission?: number | null;
+      bank_amount?: number | null;
+      notes?: string | null;
+      phone_number?: string | null;
+      collection_date?: string | null;
+    }) => {
+      const { error } = await supabase
+        .from('policies')
+        .insert(newPolicy as any);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-policies'] });
+    },
+  });
+}
+

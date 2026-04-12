@@ -10,11 +10,12 @@ import { ClosingAssignments } from '@/components/ClosingAssignments';
 import { WelcomeTemplateManager } from '@/components/WelcomeTemplateManager';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { LogOut, Search, Filter, Users, ChevronDown, Building2, Info, Phone, UserPlus, FileSpreadsheet, Trash2, ListChecks } from 'lucide-react';
+import { LogOut, Search, Filter, Users, ChevronDown, Building2, Info, Phone, UserPlus, FileSpreadsheet, Trash2, ListChecks, Plus } from 'lucide-react';
 import { ThemeToggleButton } from '@/components/ThemeToggleButton';
 import { AddAgentDialog } from '@/components/AddAgentDialog';
 import { ImportPoliciesDialog } from '@/components/ImportPoliciesDialog';
 import { GeneralListDialog } from '@/components/GeneralListDialog';
+import { CreatePolicyDialog } from '@/components/CreatePolicyDialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { toast } from 'sonner';
 
@@ -36,6 +37,7 @@ export function AdminDashboard() {
   const [importAgentId, setImportAgentId] = useState<string | null>(null);
   const [deleteAgentId, setDeleteAgentId] = useState<string | null>(null);
   const [generalListAgentId, setGeneralListAgentId] = useState<string | null>(null);
+  const [createPolicyAgentId, setCreatePolicyAgentId] = useState<string | null>(null);
 
   // Realtime subscriptions
   useRealtimeSubscription('policies', [['admin-policies']]);
@@ -200,6 +202,15 @@ export function AdminDashboard() {
                         </p>
                       </button>
                       <div className="flex flex-col gap-1 shrink-0 -mt-1 -mr-1">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-7 w-7 text-muted-foreground hover:text-primary"
+                          onClick={() => setCreatePolicyAgentId(agent.id)}
+                          title="Crear póliza"
+                        >
+                          <Plus className="h-3.5 w-3.5" />
+                        </Button>
                         <Button
                           variant="ghost"
                           size="icon"
@@ -492,8 +503,19 @@ export function AdminDashboard() {
           agentName={agentMap[generalListAgentId] ?? 'Agente'}
         />
       )}
+
+      {/* Create Policy dialog */}
+      {createPolicyAgentId && (
+        <CreatePolicyDialog
+          open={!!createPolicyAgentId}
+          onOpenChange={(open) => { if (!open) setCreatePolicyAgentId(null); }}
+          agentId={createPolicyAgentId}
+          agentName={agentMap[createPolicyAgentId] ?? 'Agente'}
+        />
+      )}
     </div>
   );
 }
+
 
 
