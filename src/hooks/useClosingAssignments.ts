@@ -51,9 +51,11 @@ export function useAssignClosing() {
     mutationFn: async ({
       assignmentId,
       agentId,
+      customDate,
     }: {
       assignmentId: string;
       agentId: string;
+      customDate?: string;
     }) => {
       // Create the policy from assignment data
       const { data: assignment, error: fetchErr } = await supabase
@@ -62,6 +64,9 @@ export function useAssignClosing() {
         .eq('id', assignmentId)
         .single();
       if (fetchErr) throw fetchErr;
+
+      // Use custom date, or fallback to the date the discord message was created
+      const policyDate = customDate || assignment.created_at.split('T')[0];
 
       const { data: policy, error: policyErr } = await supabase
         .from('policies')
@@ -73,6 +78,7 @@ export function useAssignClosing() {
           policy_type: assignment.policy_type,
           payment_method: assignment.payment_method,
           target_premium: assignment.amount ? Math.round((assignment.amount / 12) * 100) / 100 : null,
+          date: policyDate,
         })
         .select('id')
         .single();
@@ -111,3 +117,4 @@ export function useDismissAssignment() {
     },
   });
 }
+

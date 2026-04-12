@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { useClosingAssignments, usePollDiscord, useAssignClosing, useDismissAssignment, ClosingAssignment } from '@/hooks/useClosingAssignments';
 import { useAgentProfiles } from '@/hooks/useAdminData';
 import { Button } from '@/components/ui/button';
-import { RefreshCw, UserPlus, X, ChevronDown, MessageSquare, DollarSign, Building } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { RefreshCw, UserPlus, X, ChevronDown, MessageSquare, DollarSign, Building, CalendarDays } from 'lucide-react';
 import { toast } from 'sonner';
 
 export function ClosingAssignments() {
@@ -18,6 +19,7 @@ export function ClosingAssignments() {
     const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
     return new Date(a.updated_at) >= oneDayAgo;
   });
+
   const handlePoll = () => {
     pollDiscord.mutate(undefined, {
       onSuccess: (data) => {
@@ -72,9 +74,9 @@ export function ClosingAssignments() {
               key={assignment.id}
               assignment={assignment}
               agents={agents ?? []}
-              onAssign={(agentId) => {
+              onAssign={(agentId, customDate) => {
                 assignClosing.mutate(
-                  { assignmentId: assignment.id, agentId },
+                  { assignmentId: assignment.id, agentId, customDate: customDate || undefined },
                   {
                     onSuccess: () => toast.success('Póliza creada y asignada'),
                     onError: () => toast.error('Error al asignar'),
@@ -122,11 +124,12 @@ function AssignmentCard({
 }: {
   assignment: ClosingAssignment;
   agents: { id: string; full_name: string | null; username: string | null }[];
-  onAssign: (agentId: string) => void;
+  onAssign: (agentId: string, customDate: string) => void;
   onDismiss: () => void;
   isAssigning: boolean;
 }) {
   const [agentDropdown, setAgentDropdown] = useState(false);
+  const [closingDate, setClosingDate] = useState('');
 
   return (
     <div className="rounded-lg border border-border bg-card p-4 transition-all hover:border-border/80 hover:shadow-sm">
@@ -167,6 +170,24 @@ function AssignmentCard({
         )}
       </div>
 
+      {/* Date picker */}
+      <div className="flex items-center gap-2 mb-3">
+        <CalendarDays className="h-3.5 w-3.5 text-primary/60" />
+        <span className="text-xs text-muted-foreground">Fecha del cierre:</span>
+        <Input
+          type="date"
+          value={closingDate}
+          onChange={(e) => setClosingDate(e.target.value)}
+          className="bg-secondary border-border text-foreground text-xs h-8 w-40"
+          placeholder="Dejar vacío = fecha del mensaje"
+        />
+        {!closingDate && (
+          <span className="text-[10px] text-muted-foreground/60 italic">
+            (se usará la fecha del mensaje)
+          </span>
+        )}
+      </div>
+
       {/* Actions */}
       <div className="flex items-center gap-2">
         <div className="relative flex-1">
@@ -185,7 +206,7 @@ function AssignmentCard({
                   key={agent.id}
                   onClick={() => {
                     setAgentDropdown(false);
-                    onAssign(agent.id);
+                    onAssign(agent.id, closingDate);
                   }}
                   disabled={isAssigning}
                   className="w-full text-left px-3 py-2 rounded-md text-xs transition-colors hover:bg-secondary/60 active:scale-95 text-foreground"
@@ -209,3 +230,4 @@ function AssignmentCard({
     </div>
   );
 }
+
