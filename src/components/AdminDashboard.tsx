@@ -10,9 +10,10 @@ import { ClosingAssignments } from '@/components/ClosingAssignments';
 import { WelcomeTemplateManager } from '@/components/WelcomeTemplateManager';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { LogOut, Search, Filter, Users, ChevronDown, Building2, Info, Phone, UserPlus, FileSpreadsheet, Trash2 } from 'lucide-react';
+import { LogOut, Search, Filter, Users, ChevronDown, Building2, Info, Phone, UserPlus, FileSpreadsheet, Trash2, ListChecks } from 'lucide-react';
 import { AddAgentDialog } from '@/components/AddAgentDialog';
 import { ImportPoliciesDialog } from '@/components/ImportPoliciesDialog';
+import { GeneralListDialog } from '@/components/GeneralListDialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { toast } from 'sonner';
 
@@ -33,6 +34,7 @@ export function AdminDashboard() {
   const [addAgentOpen, setAddAgentOpen] = useState(false);
   const [importAgentId, setImportAgentId] = useState<string | null>(null);
   const [deleteAgentId, setDeleteAgentId] = useState<string | null>(null);
+  const [generalListAgentId, setGeneralListAgentId] = useState<string | null>(null);
 
   // Realtime subscriptions
   useRealtimeSubscription('policies', [['admin-policies']]);
@@ -204,6 +206,15 @@ export function AdminDashboard() {
                           title="Importar Excel"
                         >
                           <FileSpreadsheet className="h-3.5 w-3.5" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-7 w-7 text-muted-foreground hover:text-primary"
+                          onClick={() => setGeneralListAgentId(agent.id)}
+                          title="Lista General"
+                        >
+                          <ListChecks className="h-3.5 w-3.5" />
                         </Button>
                         <Button
                           variant="ghost"
@@ -469,6 +480,17 @@ export function AdminDashboard() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* General List dialog */}
+      {generalListAgentId && (
+        <GeneralListDialog
+          open={!!generalListAgentId}
+          onOpenChange={(open) => { if (!open) setGeneralListAgentId(null); }}
+          agentPolicies={(policies ?? []).filter((p) => p.agent_id === generalListAgentId)}
+          agentName={agentMap[generalListAgentId] ?? 'Agente'}
+        />
+      )}
     </div>
   );
 }
+
