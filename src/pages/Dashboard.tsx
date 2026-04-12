@@ -7,6 +7,7 @@ import { AgentCharts } from '@/components/AgentCharts';
 import { AdminDashboard } from '@/components/AdminDashboard';
 import { Button } from '@/components/ui/button';
 import { LogOut, Search, Filter } from 'lucide-react';
+import { ThemeToggleButton } from '@/components/ThemeToggleButton';
 import { Input } from '@/components/ui/input';
 import { useState, useMemo } from 'react';
 import { STATUS_CONFIG, PolicyStatus } from '@/components/StatusBadge';
@@ -85,6 +86,7 @@ function AgentDashboard() {
           <span className="text-sm text-muted-foreground hidden sm:block">
             {profile?.full_name || profile?.username}
           </span>
+          <ThemeToggleButton />
           <Button variant="ghost" size="icon" onClick={signOut} className="text-muted-foreground hover:text-foreground active:scale-95 transition-all">
             <LogOut className="h-4 w-4" />
           </Button>
@@ -170,4 +172,5 @@ function AgentDashboard() {
     </div>
   );
 }
+
 

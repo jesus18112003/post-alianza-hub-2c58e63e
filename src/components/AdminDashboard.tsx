@@ -11,6 +11,7 @@ import { WelcomeTemplateManager } from '@/components/WelcomeTemplateManager';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { LogOut, Search, Filter, Users, ChevronDown, Building2, Info, Phone, UserPlus, FileSpreadsheet, Trash2, ListChecks } from 'lucide-react';
+import { ThemeToggleButton } from '@/components/ThemeToggleButton';
 import { AddAgentDialog } from '@/components/AddAgentDialog';
 import { ImportPoliciesDialog } from '@/components/ImportPoliciesDialog';
 import { GeneralListDialog } from '@/components/GeneralListDialog';
@@ -112,6 +113,7 @@ export function AdminDashboard() {
           <span className="text-sm text-muted-foreground hidden sm:block">
             {profile?.full_name || profile?.username}
           </span>
+          <ThemeToggleButton />
           <Button
             variant="ghost"
             size="icon"
@@ -493,4 +495,5 @@ export function AdminDashboard() {
     </div>
   );
 }
+
 
