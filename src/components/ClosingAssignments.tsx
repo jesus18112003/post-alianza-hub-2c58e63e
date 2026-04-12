@@ -13,8 +13,11 @@ export function ClosingAssignments() {
   const dismissAssignment = useDismissAssignment();
 
   const pending = (assignments ?? []).filter((a) => a.status === 'pending');
-  const assigned = (assignments ?? []).filter((a) => a.status === 'assigned');
-
+  const assigned = (assignments ?? []).filter((a) => {
+    if (a.status !== 'assigned') return false;
+    const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+    return new Date(a.updated_at) >= oneDayAgo;
+  });
   const handlePoll = () => {
     pollDiscord.mutate(undefined, {
       onSuccess: (data) => {
