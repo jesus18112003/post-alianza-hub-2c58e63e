@@ -5,9 +5,10 @@ interface MetricCardsProps {
   policiesEmitted: number;
   pendingCases: number;
   totalAnnualPremium?: number;
+  totalBankAmount?: number;
 }
 
-export function MetricCards({ totalCommission, policiesEmitted, pendingCases, totalAnnualPremium }: MetricCardsProps) {
+export function MetricCards({ totalCommission, policiesEmitted, pendingCases, totalAnnualPremium, totalBankAmount }: MetricCardsProps) {
   const cards = [
     {
       title: 'Comisión Total',
@@ -33,6 +34,16 @@ export function MetricCards({ totalCommission, policiesEmitted, pendingCases, to
             title: 'Total Annual Premium',
             value: `$${totalAnnualPremium.toLocaleString('en-US', { minimumFractionDigits: 2 })}`,
             icon: TrendingUp,
+            accent: true,
+          },
+        ]
+      : []),
+    ...(totalBankAmount !== undefined
+      ? [
+          {
+            title: 'Entró al Banco',
+            value: `$${totalBankAmount.toLocaleString('en-US', { minimumFractionDigits: 2 })}`,
+            icon: DollarSign,
             accent: true,
           },
         ]

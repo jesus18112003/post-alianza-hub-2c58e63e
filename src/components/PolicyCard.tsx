@@ -28,7 +28,7 @@ export function PolicyCard({ policy }: PolicyCardProps) {
 
   const formattedDate = format(new Date(policy.date + 'T12:00:00'), 'dd MMM yyyy', { locale: es });
 
-  const hasFinancials = policy.target_premium || policy.agent_premium || policy.total_commission;
+  const hasFinancials = policy.target_premium || policy.agent_premium || policy.total_commission || policy.bank_amount;
   const hasTechnical = policy.policy_type || policy.payment_method || policy.location;
 
   return (
@@ -108,6 +108,7 @@ export function PolicyCard({ policy }: PolicyCardProps) {
                 <DetailRow label="Target Premium" value={policy.target_premium} />
                 <DetailRow label="Annual Premium" value={policy.agent_premium} />
                 <DetailRow label="Comisión Total" value={policy.total_commission} />
+                <DetailRow label="Entró al Banco" value={policy.bank_amount} />
               </div>
             )}
 

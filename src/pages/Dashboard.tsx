@@ -6,7 +6,7 @@ import { PolicyCard } from '@/components/PolicyCard';
 import { AgentCharts } from '@/components/AgentCharts';
 import { AdminDashboard } from '@/components/AdminDashboard';
 import { Button } from '@/components/ui/button';
-import { LogOut, Search, Filter } from 'lucide-react';
+import { LogOut, Search, Filter, CalendarDays, X } from 'lucide-react';
 import { ThemeToggleButton } from '@/components/ThemeToggleButton';
 import { Input } from '@/components/ui/input';
 import { useState, useMemo } from 'react';
@@ -27,13 +27,24 @@ function AgentDashboard() {
   const { data: policies, isLoading } = usePolicies();
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<PolicyStatus | 'all'>('all');
+  const [dateFrom, setDateFrom] = useState('');
+  const [dateTo, setDateTo] = useState('');
 
   // Realtime subscription for agent's own policies
   useRealtimeSubscription('policies', [['policies']]);
 
-  const filtered = useMemo(() => {
+  // Date-filtered policies for metrics and charts
+  const dateFiltered = useMemo(() => {
     if (!policies) return [];
     return policies.filter((p) => {
+      if (dateFrom && p.date < dateFrom) return false;
+      if (dateTo && p.date > dateTo) return false;
+      return true;
+    });
+  }, [policies, dateFrom, dateTo]);
+
+  const filtered = useMemo(() => {
+    return dateFiltered.filter((p) => {
       const matchesSearch =
         search === '' ||
         p.client_name.toLowerCase().includes(search.toLowerCase()) ||
@@ -41,35 +52,41 @@ function AgentDashboard() {
       const matchesStatus = statusFilter === 'all' || p.status === statusFilter;
       return matchesSearch && matchesStatus;
     });
-  }, [policies, search, statusFilter]);
+  }, [dateFiltered, search, statusFilter]);
 
   const totalCommission = useMemo(
     () =>
-      (policies ?? [])
+      dateFiltered
         .filter((p) => p.status === 'emitido' || p.status === 'cobrado')
         .reduce((sum, p) => sum + (p.total_commission ?? 0), 0),
-    [policies]
+    [dateFiltered]
   );
 
   const policiesEmitted = useMemo(
-    () => (policies ?? []).filter((p) => p.status === 'emitido').length,
-    [policies]
+    () => dateFiltered.filter((p) => p.status === 'emitido').length,
+    [dateFiltered]
   );
 
   const pendingCases = useMemo(
     () =>
-      (policies ?? []).filter(
+      dateFiltered.filter(
         (p) => p.status === 'pendiente' || p.status === 'fondo_insuficiente'
       ).length,
-    [policies]
+    [dateFiltered]
   );
 
   const totalAnnualPremium = useMemo(
-    () => (policies ?? []).reduce((sum, p) => sum + (p.agent_premium ?? 0), 0),
-    [policies]
+    () => dateFiltered.reduce((sum, p) => sum + (p.agent_premium ?? 0), 0),
+    [dateFiltered]
+  );
+
+  const totalBankAmount = useMemo(
+    () => dateFiltered.reduce((sum, p) => sum + (p.bank_amount ?? 0), 0),
+    [dateFiltered]
   );
 
   const allStatuses = Object.keys(STATUS_CONFIG) as PolicyStatus[];
+  const hasDateFilter = dateFrom || dateTo;
 
   return (
     <div className="min-h-screen bg-background">
@@ -101,9 +118,58 @@ function AgentDashboard() {
           <p className="text-sm text-muted-foreground mt-1">Resumen de tu actividad y pólizas</p>
         </div>
 
-        <MetricCards totalCommission={totalCommission} policiesEmitted={policiesEmitted} pendingCases={pendingCases} totalAnnualPremium={totalAnnualPremium} />
+        {/* Date Range Filter */}
+        <div className="rounded-lg border border-border bg-card p-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+            <div className="flex items-center gap-2 text-muted-foreground">
+              <CalendarDays className="h-4 w-4" />
+              <span className="text-xs uppercase tracking-widest">Rango de fechas</span>
+            </div>
+            <div className="flex items-center gap-2 flex-1">
+              <Input
+                type="date"
+                value={dateFrom}
+                onChange={(e) => setDateFrom(e.target.value)}
+                className="bg-secondary border-border text-foreground text-sm w-40"
+                placeholder="Desde"
+              />
+              <span className="text-muted-foreground text-xs">—</span>
+              <Input
+                type="date"
+                value={dateTo}
+                onChange={(e) => setDateTo(e.target.value)}
+                className="bg-secondary border-border text-foreground text-sm w-40"
+                placeholder="Hasta"
+              />
+              {hasDateFilter && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => { setDateFrom(''); setDateTo(''); }}
+                  className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                  title="Limpiar filtro de fechas"
+                >
+                  <X className="h-3.5 w-3.5" />
+                </Button>
+              )}
+            </div>
+            {hasDateFilter && (
+              <span className="text-xs text-primary">
+                {dateFiltered.length} pólizas en rango
+              </span>
+            )}
+          </div>
+        </div>
 
-        <AgentCharts policies={policies ?? []} />
+        <MetricCards
+          totalCommission={totalCommission}
+          policiesEmitted={policiesEmitted}
+          pendingCases={pendingCases}
+          totalAnnualPremium={totalAnnualPremium}
+          totalBankAmount={totalBankAmount}
+        />
+
+        <AgentCharts policies={dateFiltered} />
 
         <div className="flex flex-col sm:flex-row gap-3">
           <div className="relative flex-1">
@@ -153,7 +219,7 @@ function AgentDashboard() {
           ) : filtered.length === 0 ? (
             <div className="rounded-lg border border-border bg-card p-12 text-center">
               <p className="text-muted-foreground text-sm">
-                {search || statusFilter !== 'all'
+                {search || statusFilter !== 'all' || hasDateFilter
                   ? 'No se encontraron pólizas con esos filtros.'
                   : 'Aún no tienes pólizas registradas.'}
               </p>
@@ -172,5 +238,6 @@ function AgentDashboard() {
     </div>
   );
 }
+
 
 

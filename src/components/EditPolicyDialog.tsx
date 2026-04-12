@@ -30,6 +30,7 @@ export function EditPolicyDialog({ policy, open, onOpenChange }: EditPolicyDialo
     target_premium: policy.target_premium?.toString() ?? '',
     agent_premium: policy.agent_premium?.toString() ?? '',
     total_commission: policy.total_commission?.toString() ?? '',
+    bank_amount: policy.bank_amount?.toString() ?? '',
     notes: policy.notes ?? '',
     phone_number: policy.phone_number ?? '',
     collection_date: policy.collection_date ?? '',
@@ -58,6 +59,7 @@ export function EditPolicyDialog({ policy, open, onOpenChange }: EditPolicyDialo
           target_premium: form.target_premium ? parseFloat(form.target_premium) : null,
           agent_premium: form.agent_premium ? parseFloat(form.agent_premium) : null,
           total_commission: form.total_commission ? parseFloat(form.total_commission) : null,
+          bank_amount: form.bank_amount ? parseFloat(form.bank_amount) : null,
           notes: form.notes.trim() || null,
           phone_number: form.phone_number.trim() || null,
           collection_date: form.collection_date || null,
@@ -143,7 +145,7 @@ export function EditPolicyDialog({ policy, open, onOpenChange }: EditPolicyDialo
           {/* Financial */}
           <div className="space-y-3">
             <h4 className="text-xs font-medium text-primary uppercase tracking-widest">Datos Financieros</h4>
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
                 <Label className="text-xs text-muted-foreground">Target Premium</Label>
                 <Input type="number" step="0.01" value={form.target_premium}
@@ -160,6 +162,12 @@ export function EditPolicyDialog({ policy, open, onOpenChange }: EditPolicyDialo
                 <Label className="text-xs text-muted-foreground">Comisión Total</Label>
                 <Input type="number" step="0.01" value={form.total_commission}
                   onChange={(e) => set('total_commission', e.target.value)}
+                  className="bg-secondary border-border text-foreground text-sm" />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs text-muted-foreground">Entró al Banco</Label>
+                <Input type="number" step="0.01" value={form.bank_amount}
+                  onChange={(e) => set('bank_amount', e.target.value)}
                   className="bg-secondary border-border text-foreground text-sm" />
               </div>
             </div>
@@ -207,3 +215,4 @@ export function EditPolicyDialog({ policy, open, onOpenChange }: EditPolicyDialo
     </Dialog>
   );
 }
+
