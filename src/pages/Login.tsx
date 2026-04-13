@@ -55,7 +55,7 @@ export default function Login() {
             className="text-4xl tracking-tight text-accent"
             style={{ fontFamily: "'Georgia', 'Times New Roman', serif" }}
           >
-            Post Alianza
+            POSTALIANZA
           </h1>
           <p className="text-sm text-muted-foreground">
             Management Platform
@@ -170,7 +170,7 @@ export default function Login() {
         </div>
 
         <p className="text-center text-xs text-muted-foreground/60">
-          © {new Date().getFullYear()} Post Alianza
+          © {new Date().getFullYear()} POSTALIANZA
         </p>
       </div>
     </div>
