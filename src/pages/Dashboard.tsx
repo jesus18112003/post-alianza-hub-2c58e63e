@@ -76,7 +76,7 @@ function AgentDashboard() {
   );
 
   const totalAnnualPremium = useMemo(
-    () => dateFiltered.reduce((sum, p) => sum + (p.agent_premium ?? 0), 0),
+    () => dateFiltered.reduce((sum, p) => sum + (p.target_premium ?? 0), 0),
     [dateFiltered]
   );
 

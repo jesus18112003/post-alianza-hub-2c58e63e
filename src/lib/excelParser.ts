@@ -12,6 +12,7 @@ export interface ParsedRow {
   location: string | null;
   agent_premium: number | null;
   target_premium: number | null;
+  prima_payment: number | null;
   total_commission: number | null;
   payment_method: string | null;
 }
@@ -259,11 +260,13 @@ export function parseSheet(workbook: XLSX.WorkBook, dateFormat: DateFormat, shee
       notes: getStr(r, bestMap, 'notes'),
       location: getStr(r, bestMap, 'location'),
       agent_premium: agentPremium,
-      target_premium: (() => { const v = getNum(r, bestMap, 'target_premium'); return v !== null ? Math.round((v / 12) * 100) / 100 : null; })(),
-      total_commission: getNum(r, bestMap, 'total_commission'),
+      target_premium: getNum(r, bestMap, 'target_premium'),
+      prima_payment: (() => { const v = getNum(r, bestMap, 'target_premium'); return v !== null ? Math.round((v / 12) * 100) / 100 : null; })(),
+      total_commission: (() => { const v = getNum(r, bestMap, 'total_commission'); if (v !== null) return v; const tp = getNum(r, bestMap, 'target_premium'); return tp !== null ? Math.round(tp * 0.55 * 100) / 100 : null; })(),
       payment_method: getStr(r, bestMap, 'payment_method') || (agentPremium ? `$${agentPremium}/mes` : null),
     });
   }
 
   return { rows: parsed, detectedFormat, columnMap: bestMap, missingColumns };
 }
+

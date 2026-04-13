@@ -48,7 +48,7 @@ export function AdminPolicyRow({ policy, agentName }: AdminPolicyRowProps) {
     });
   };
 
-  const hasFinancials = policy.target_premium || policy.agent_premium || policy.total_commission;
+  const hasFinancials = policy.target_premium || policy.prima_payment || policy.total_commission || policy.bank_amount;
   const hasTechnical = policy.policy_type || policy.payment_method || policy.location;
 
   // Collection date countdown
@@ -252,9 +252,10 @@ export function AdminPolicyRow({ policy, agentName }: AdminPolicyRowProps) {
                 <h4 className="text-xs font-medium text-primary mb-2" style={{ fontFamily: "'Georgia', serif" }}>
                   Datos Financieros
                 </h4>
-                <DetailItem label="Target Premium" value={policy.target_premium} isCurrency />
-                <DetailItem label="Agent Premium" value={policy.agent_premium} isCurrency />
+                <DetailItem label="Annual Premium" value={policy.target_premium} isCurrency />
+                <DetailItem label="Pago de Prima" value={policy.prima_payment} isCurrency />
                 <DetailItem label="Comisión Total" value={policy.total_commission} isCurrency />
+                <DetailItem label="Entró al Banco" value={policy.bank_amount} isCurrency />
               </div>
             )}
             {hasTechnical && (
@@ -336,3 +337,4 @@ function DetailItem({
     </div>
   );
 }
+

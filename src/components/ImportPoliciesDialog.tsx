@@ -121,6 +121,7 @@ export function ImportPoliciesDialog({ open, onOpenChange, agentId, agentName }:
           collection_date: r.collection_date,
           agent_premium: r.agent_premium,
           target_premium: r.target_premium,
+          prima_payment: r.prima_payment,
           total_commission: r.total_commission,
           payment_method: r.payment_method,
         }));
@@ -149,8 +150,9 @@ export function ImportPoliciesDialog({ open, onOpenChange, agentId, agentName }:
     date: 'Fecha', company: 'Compañía', collection_date: 'Fecha cobro',
     client_name: 'Cliente', phone_number: 'Teléfono', status: 'Estado',
     policy_number: 'No. Póliza', notes: 'Notas', location: 'Ubicación',
-    agent_premium: 'Prima agente', target_premium: 'Prima objetivo',
-    total_commission: 'Comisión', payment_method: 'Método pago',
+    agent_premium: 'Prima agente', target_premium: 'Annual Premium',
+    prima_payment: 'Pago de Prima', total_commission: 'Comisión',
+    payment_method: 'Método pago',
   };
 
   return (
@@ -308,3 +310,4 @@ export function ImportPoliciesDialog({ open, onOpenChange, agentId, agentName }:
     </Dialog>
   );
 }
+
