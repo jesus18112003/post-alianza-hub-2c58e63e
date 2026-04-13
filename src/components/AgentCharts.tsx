@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
+// 1. Importamos Legend de recharts
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
 import { Policy } from '@/types/policy';
 import { STATUS_CONFIG, PolicyStatus } from '@/components/StatusBadge';
 
@@ -24,18 +25,8 @@ interface AgentChartsProps {
   policies: Policy[];
 }
 
-function CustomLabel({ cx, cy, midAngle, innerRadius, outerRadius, name, percent }: any) {
-  if (percent < 0.05) return null;
-  const RADIAN = Math.PI / 180;
-  const radius = outerRadius + 18;
-  const x = cx + radius * Math.cos(-midAngle * RADIAN);
-  const y = cy + radius * Math.sin(-midAngle * RADIAN);
-  return (
-    <text x={x} y={y} fill="hsl(var(--muted-foreground))" textAnchor={x > cx ? 'start' : 'end'} dominantBaseline="central" fontSize={11}>
-      {name} {(percent * 100).toFixed(1)}%
-    </text>
-  );
-}
+// Eliminamos el CustomLabel si vas a usar Leyendas para que no se amontone el texto,
+// pero si lo quieres dejar, te recomiendo reducir el outerRadius del Pie.
 
 export function AgentCharts({ policies }: AgentChartsProps) {
   const companyData = useMemo(() => {
@@ -61,18 +52,34 @@ export function AgentCharts({ policies }: AgentChartsProps) {
   if (policies.length === 0) return null;
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
       {/* Company Distribution */}
       <div className="rounded-lg border border-border bg-card p-5">
         <h4 className="text-xs uppercase tracking-widest text-muted-foreground mb-3">Top Empresas</h4>
-        <ResponsiveContainer width="100%" height={200}>
+        <ResponsiveContainer width="100%" height={250}>
           <PieChart>
-            <Pie data={companyData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={70} label={CustomLabel}>
+            <Pie 
+              data={companyData} 
+              dataKey="value" 
+              nameKey="name" 
+              cx="35%" // Movemos el centro a la izquierda para dejar espacio a la leyenda
+              cy="50%" 
+              innerRadius={50} // Lo hacemos tipo "Donut" para que se vea más moderno
+              outerRadius={70} 
+            >
               {companyData.map((_, i) => (
                 <Cell key={i} fill={COMPANY_COLORS[i % COMPANY_COLORS.length]} />
               ))}
             </Pie>
             <Tooltip contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: 8, fontSize: 12 }} />
+            {/* Leyenda lateral */}
+            <Legend 
+              layout="vertical" 
+              verticalAlign="middle" 
+              align="right" 
+              iconType="circle"
+              wrapperStyle={{ fontSize: '11px', paddingLeft: '10px' }}
+            />
           </PieChart>
         </ResponsiveContainer>
       </div>
@@ -80,14 +87,29 @@ export function AgentCharts({ policies }: AgentChartsProps) {
       {/* Status Distribution */}
       <div className="rounded-lg border border-border bg-card p-5">
         <h4 className="text-xs uppercase tracking-widest text-muted-foreground mb-3">Status</h4>
-        <ResponsiveContainer width="100%" height={200}>
+        <ResponsiveContainer width="100%" height={250}>
           <PieChart>
-            <Pie data={statusData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={70} label={CustomLabel}>
+            <Pie 
+              data={statusData} 
+              dataKey="value" 
+              nameKey="name" 
+              cx="35%" 
+              cy="50%" 
+              innerRadius={50}
+              outerRadius={70} 
+            >
               {statusData.map((entry) => (
                 <Cell key={entry.key} fill={STATUS_COLORS[entry.key] || 'hsl(0,0%,50%)'} />
               ))}
             </Pie>
             <Tooltip contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: 8, fontSize: 12 }} />
+            <Legend 
+              layout="vertical" 
+              verticalAlign="middle" 
+              align="right" 
+              iconType="circle"
+              wrapperStyle={{ fontSize: '11px', paddingLeft: '10px' }}
+            />
           </PieChart>
         </ResponsiveContainer>
       </div>
