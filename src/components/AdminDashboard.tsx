@@ -100,14 +100,6 @@ export function AdminDashboard() {
                 Resumen administrativo y financiero del día
               </p>
             </div>
-            <Button
-              variant="outline"
-              className="gap-2 text-sm"
-              onClick={handleExportCsv}
-            >
-              <Download className="h-4 w-4" />
-              Exportar CSV
-            </Button>
           </div>
 
           {/* Metric cards */}
