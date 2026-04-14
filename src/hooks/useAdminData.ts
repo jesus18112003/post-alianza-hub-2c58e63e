@@ -150,6 +150,7 @@ export function useCreatePolicy() {
       payment_method?: string | null;
       location?: string | null;
       target_premium?: number | null;
+      prima_payment?: number | null;
       agent_premium?: number | null;
       total_commission?: number | null;
       bank_amount?: number | null;
