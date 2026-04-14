@@ -13,7 +13,7 @@ interface MetricCardsProps {
 export function MetricCards({ totalCommission, policiesEmitted, pendingCases, totalAnnualPremium, totalBankAmount, totalAdvanceCommission, totalRemainingCommission }: MetricCardsProps) {
   const cards = [
     {
-      title: 'Comisión Total',
+      title: 'Entró al Banco',
       value: `$${totalCommission.toLocaleString('en-US', { minimumFractionDigits: 2 })}`,
       icon: DollarSign,
       accent: true,

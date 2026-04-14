@@ -79,11 +79,11 @@ export function AdminDashboard() {
     });
   }, [policies, search, statusFilter, agentFilter, effectiveCompanyFilter, agentMap, phoneFilter]);
 
-  const totalCommission = useMemo(
+  const totalBankAmount = useMemo(
     () =>
       (policies ?? [])
         .filter((p) => p.status === 'emitido' || p.status === 'cobrado')
-        .reduce((sum, p) => sum + (p.total_commission ?? 0), 0),
+        .reduce((sum, p) => sum + (p.bank_amount ?? 0), 0),
     [policies]
   );
   const policiesEmitted = useMemo(
@@ -140,7 +140,7 @@ export function AdminDashboard() {
         </div>
 
         <MetricCards
-          totalCommission={totalCommission}
+          totalCommission={totalBankAmount}
           policiesEmitted={policiesEmitted}
           pendingCases={pendingCases}
         />
