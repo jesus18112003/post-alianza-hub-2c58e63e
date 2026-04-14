@@ -23,7 +23,8 @@ export function EditPolicyDialog({ policy, open, onOpenChange }: EditPolicyDialo
   const [form, setForm] = useState({
     date: policy.date,
     company: policy.company,
-    client_name: policy.client_name,
+    client_first_name: policy.client_first_name ?? '',
+    client_last_name: policy.client_last_name ?? '',
     status: policy.status as PolicyStatus,
     policy_number: policy.policy_number ?? '',
     policy_type: policy.policy_type ?? '',

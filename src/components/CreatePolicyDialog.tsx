@@ -23,7 +23,8 @@ export function CreatePolicyDialog({ agentId, agentName, open, onOpenChange }: C
   const [form, setForm] = useState({
     date: new Date().toISOString().split('T')[0],
     company: '',
-    client_name: '',
+    client_first_name: '',
+    client_last_name: '',
     status: 'pendiente' as PolicyStatus,
     policy_number: '',
     policy_type: '',

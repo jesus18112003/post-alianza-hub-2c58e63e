@@ -24,12 +24,13 @@ export function WelcomeMessageDialog({ policy, agentName, open, onOpenChange }: 
     if (!open || !templates) return;
     const template = resolveTemplate(templates, policy.agent_id);
     if (!template) {
-      setMessage(`Hola ${policy.client_name}, bienvenido/a. Tu póliza con ${policy.company} ha sido registrada.`);
+      setMessage(`Hola ${policy.client_first_name || policy.client_name}, bienvenido/a. Tu póliza con ${policy.company} ha sido registrada.`);
       return;
     }
 
     const data: Record<string, string> = {
-      '{{cliente}}': policy.client_name || '',
+      '{{nombre}}': policy.client_first_name || '',
+      '{{apellido}}': policy.client_last_name || '',
       '{{compañia}}': policy.company || '',
       '{{poliza}}': policy.policy_number || '',
       '{{cobertura}}': policy.policy_type || '',
