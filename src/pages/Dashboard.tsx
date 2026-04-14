@@ -26,7 +26,7 @@ function AgentDashboard() {
   const { profile, role, signOut } = useAuth();
   const { data: policies, isLoading } = usePolicies();
   const [search, setSearch] = useState('');
-  const [statusFilter, setStatusFilter] = useState<PolicyStatus | 'all'>('all');
+  const [statusFilters, setStatusFilters] = useState<Set<PolicyStatus>>(new Set());
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
 
