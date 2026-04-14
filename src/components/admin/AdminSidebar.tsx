@@ -1,29 +1,24 @@
-import { LayoutDashboard, FileText, Users, DollarSign, BarChart3, Settings, LogOut, Plus } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { LayoutDashboard, FileText, Users, Settings, LogOut } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 
-export type AdminSection = 'dashboard' | 'policies' | 'agents' | 'commissions' | 'reports';
+export type AdminSection = 'dashboard' | 'policies' | 'agents';
 
 interface AdminSidebarProps {
   activeSection: AdminSection;
   onSectionChange: (section: AdminSection) => void;
-  onNewPolicy: () => void;
 }
 
 const NAV_ITEMS: { id: AdminSection; label: string; icon: React.ElementType }[] = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { id: 'policies', label: 'Pólizas', icon: FileText },
   { id: 'agents', label: 'Agentes', icon: Users },
-  { id: 'commissions', label: 'Comisiones', icon: DollarSign },
-  { id: 'reports', label: 'Reportes', icon: BarChart3 },
 ];
 
-export function AdminSidebar({ activeSection, onSectionChange, onNewPolicy }: AdminSidebarProps) {
+export function AdminSidebar({ activeSection, onSectionChange }: AdminSidebarProps) {
   const { signOut } = useAuth();
 
   return (
     <aside className="w-56 border-r border-border bg-sidebar-background flex flex-col h-screen sticky top-0">
-      {/* Logo */}
       <div className="px-5 py-6">
         <h1 className="text-lg text-accent tracking-tight" style={{ fontFamily: "'Georgia', serif" }}>
           POSTALIANZA
@@ -33,7 +28,6 @@ export function AdminSidebar({ activeSection, onSectionChange, onNewPolicy }: Ad
         </p>
       </div>
 
-      {/* Navigation */}
       <nav className="flex-1 px-3 space-y-1">
         {NAV_ITEMS.map((item) => {
           const Icon = item.icon;
@@ -55,16 +49,7 @@ export function AdminSidebar({ activeSection, onSectionChange, onNewPolicy }: Ad
         })}
       </nav>
 
-      {/* Bottom actions */}
       <div className="px-3 pb-4 space-y-2">
-        <Button
-          onClick={onNewPolicy}
-          className="w-full gap-2 bg-primary text-primary-foreground hover:bg-primary/90"
-        >
-          <Plus className="h-4 w-4" />
-          New Policy
-        </Button>
-
         <button
           onClick={() => {}}
           className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-sidebar-accent/50 transition-all"
@@ -72,7 +57,6 @@ export function AdminSidebar({ activeSection, onSectionChange, onNewPolicy }: Ad
           <Settings className="h-4 w-4" />
           Settings
         </button>
-
         <button
           onClick={signOut}
           className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-sidebar-accent/50 transition-all"
