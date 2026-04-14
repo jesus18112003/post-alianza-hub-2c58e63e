@@ -16,10 +16,8 @@ import { ImportPoliciesDialog } from '@/components/ImportPoliciesDialog';
 import { GeneralListDialog } from '@/components/GeneralListDialog';
 import { CreatePolicyDialog } from '@/components/CreatePolicyDialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
-import { Button } from '@/components/ui/button';
-import { Download, Users, ChevronDown, Building2 } from 'lucide-react';
+import { Users, ChevronDown, Building2 } from 'lucide-react';
 import { toast } from 'sonner';
-import { exportPoliciesToCsv } from '@/lib/exportCsv';
 
 export function AdminDashboard() {
   const { profile, signOut } = useAuth();
@@ -78,14 +76,6 @@ export function AdminDashboard() {
   const selectedAgentLabel =
     agentFilter === 'all' ? 'Todos los Agentes' : agentMap[agentFilter] ?? 'Agente';
 
-  const handleExportCsv = () => {
-    if (!policies || policies.length === 0) {
-      toast.error('No hay pólizas para exportar');
-      return;
-    }
-    exportPoliciesToCsv(policies, agentMap);
-    toast.success('Archivo CSV descargado');
-  };
 
   return (
     <div className="flex min-h-screen bg-background">
