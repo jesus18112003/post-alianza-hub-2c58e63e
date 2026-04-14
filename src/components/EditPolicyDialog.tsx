@@ -144,7 +144,6 @@ export function EditPolicyDialog({ policy, open, onOpenChange }: EditPolicyDialo
                   placeholder="Apellido" className="bg-secondary border-border text-foreground text-sm" />
               </div>
             </div>
-            </div>
             <div className="space-y-1.5">
               <Label className="text-xs text-muted-foreground">Nro. de Póliza</Label>
               <Input value={form.policy_number} onChange={(e) => set('policy_number', e.target.value)}
