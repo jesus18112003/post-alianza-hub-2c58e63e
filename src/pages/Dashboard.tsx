@@ -26,7 +26,7 @@ function AgentDashboard() {
   const { profile, role, signOut } = useAuth();
   const { data: policies, isLoading } = usePolicies();
   const [search, setSearch] = useState('');
-  const [statusFilter, setStatusFilter] = useState<PolicyStatus | 'all'>('all');
+  const [statusFilters, setStatusFilters] = useState<Set<PolicyStatus>>(new Set());
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
 
@@ -49,10 +49,10 @@ function AgentDashboard() {
         search === '' ||
         p.client_name.toLowerCase().includes(search.toLowerCase()) ||
         p.company.toLowerCase().includes(search.toLowerCase());
-      const matchesStatus = statusFilter === 'all' || p.status === statusFilter;
+      const matchesStatus = statusFilters.size === 0 || statusFilters.has(p.status);
       return matchesSearch && matchesStatus;
     });
-  }, [dateFiltered, search, statusFilter]);
+  }, [dateFiltered, search, statusFilters]);
 
   const totalCommission = useMemo(
     () =>
@@ -196,9 +196,9 @@ function AgentDashboard() {
           <div className="flex items-center gap-2 overflow-x-auto pb-1">
             <Filter className="h-4 w-4 text-muted-foreground shrink-0" />
             <button
-              onClick={() => setStatusFilter('all')}
+              onClick={() => setStatusFilters(new Set())}
               className={`text-xs px-2.5 py-1 rounded-full border transition-all whitespace-nowrap active:scale-95 ${
-                statusFilter === 'all'
+                statusFilters.size === 0
                   ? 'border-primary/40 bg-primary/10 text-primary'
                   : 'border-border text-muted-foreground hover:text-foreground'
               }`}
@@ -208,9 +208,16 @@ function AgentDashboard() {
             {allStatuses.map((s) => (
               <button
                 key={s}
-                onClick={() => setStatusFilter(s === statusFilter ? 'all' : s)}
+                onClick={() => {
+                  setStatusFilters((prev) => {
+                    const next = new Set(prev);
+                    if (next.has(s)) next.delete(s);
+                    else next.add(s);
+                    return next;
+                  });
+                }}
                 className={`text-xs px-2.5 py-1 rounded-full border transition-all whitespace-nowrap active:scale-95 ${
-                  statusFilter === s
+                  statusFilters.has(s)
                     ? 'border-primary/40 bg-primary/10 text-primary'
                     : 'border-border text-muted-foreground hover:text-foreground'
                 }`}
@@ -231,7 +238,7 @@ function AgentDashboard() {
           ) : filtered.length === 0 ? (
             <div className="rounded-lg border border-border bg-card p-12 text-center">
               <p className="text-muted-foreground text-sm">
-                {search || statusFilter !== 'all' || hasDateFilter
+                {search || statusFilters.size > 0 || hasDateFilter
                   ? 'No se encontraron pólizas con esos filtros.'
                   : 'Aún no tienes pólizas registradas.'}
               </p>
