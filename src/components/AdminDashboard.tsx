@@ -227,7 +227,6 @@ export function AdminDashboard() {
 
           {/* Closing Assignments */}
           <ClosingAssignments />
-          )}
         </main>
       </div>
 
