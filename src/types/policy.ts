@@ -4,6 +4,8 @@ export interface Policy {
   date: string;
   company: string;
   client_name: string;
+  client_first_name: string | null;
+  client_last_name: string | null;
   status: 'emitido' | 'cobrado' | 'pendiente' | 'fondo_insuficiente' | 'descalificado' | 'cancelado' | 'chargeback' | 'aprobado';
   policy_number: string | null;
   location: string | null;
@@ -21,4 +23,3 @@ export interface Policy {
   created_at: string;
   updated_at: string;
 }
-
