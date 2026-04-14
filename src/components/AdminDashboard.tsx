@@ -16,10 +16,8 @@ import { ImportPoliciesDialog } from '@/components/ImportPoliciesDialog';
 import { GeneralListDialog } from '@/components/GeneralListDialog';
 import { CreatePolicyDialog } from '@/components/CreatePolicyDialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
-import { Button } from '@/components/ui/button';
-import { Download, Users, ChevronDown, Building2 } from 'lucide-react';
+import { Users, ChevronDown, Building2 } from 'lucide-react';
 import { toast } from 'sonner';
-import { exportPoliciesToCsv } from '@/lib/exportCsv';
 
 export function AdminDashboard() {
   const { profile, signOut } = useAuth();
@@ -78,14 +76,6 @@ export function AdminDashboard() {
   const selectedAgentLabel =
     agentFilter === 'all' ? 'Todos los Agentes' : agentMap[agentFilter] ?? 'Agente';
 
-  const handleExportCsv = () => {
-    if (!policies || policies.length === 0) {
-      toast.error('No hay pólizas para exportar');
-      return;
-    }
-    exportPoliciesToCsv(policies, agentMap);
-    toast.success('Archivo CSV descargado');
-  };
 
   return (
     <div className="flex min-h-screen bg-background">
@@ -93,13 +83,6 @@ export function AdminDashboard() {
       <AdminSidebar
         activeSection={activeSection}
         onSectionChange={setActiveSection}
-        onNewPolicy={() => {
-          if (agents && agents.length > 0) {
-            setCreatePolicyAgentId(agents[0].id);
-          } else {
-            toast.error('No hay agentes registrados');
-          }
-        }}
       />
 
       {/* Main content area */}
@@ -117,14 +100,6 @@ export function AdminDashboard() {
                 Resumen administrativo y financiero del día
               </p>
             </div>
-            <Button
-              variant="outline"
-              className="gap-2 text-sm"
-              onClick={handleExportCsv}
-            >
-              <Download className="h-4 w-4" />
-              Exportar CSV
-            </Button>
           </div>
 
           {/* Metric cards */}
@@ -134,9 +109,25 @@ export function AdminDashboard() {
             pendingCases={pendingCases}
           />
 
+          {/* Agents section (collapsible, moved up) */}
+          {agents && agents.length > 0 && (
+            <AgentCards
+              agents={agents}
+              policies={policies ?? []}
+              agentMap={agentMap}
+              agentFilter={agentFilter}
+              onAgentFilter={setAgentFilter}
+              onAddAgent={() => setAddAgentOpen(true)}
+              onCreatePolicy={setCreatePolicyAgentId}
+              onImportExcel={setImportAgentId}
+              onGeneralList={setGeneralListAgentId}
+              onAgentDetail={setAgentModalId}
+              onDeleteAgent={setDeleteAgentId}
+            />
+          )}
+
           {/* Agent & Company dropdowns */}
           <div className="flex items-center gap-3">
-            {/* Agent dropdown */}
             <div className="relative">
               <button
                 onClick={() => { setAgentDropdown(!agentDropdown); setCompanyDropdown(false); }}
@@ -167,7 +158,6 @@ export function AdminDashboard() {
               )}
             </div>
 
-            {/* Company dropdown */}
             <div className="relative">
               <button
                 onClick={() => { setCompanyDropdown(!companyDropdown); setAgentDropdown(false); }}
@@ -219,22 +209,6 @@ export function AdminDashboard() {
 
           {/* Closing Assignments */}
           <ClosingAssignments />
-
-          {/* Agents section */}
-          {agents && agents.length > 0 && (
-            <AgentCards
-              agents={agents}
-              policies={policies ?? []}
-              agentFilter={agentFilter}
-              onAgentFilter={setAgentFilter}
-              onAddAgent={() => setAddAgentOpen(true)}
-              onCreatePolicy={setCreatePolicyAgentId}
-              onImportExcel={setImportAgentId}
-              onGeneralList={setGeneralListAgentId}
-              onAgentDetail={setAgentModalId}
-              onDeleteAgent={setDeleteAgentId}
-            />
-          )}
         </main>
       </div>
 
