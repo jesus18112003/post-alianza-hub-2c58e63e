@@ -93,13 +93,6 @@ export function AdminDashboard() {
       <AdminSidebar
         activeSection={activeSection}
         onSectionChange={setActiveSection}
-        onNewPolicy={() => {
-          if (agents && agents.length > 0) {
-            setCreatePolicyAgentId(agents[0].id);
-          } else {
-            toast.error('No hay agentes registrados');
-          }
-        }}
       />
 
       {/* Main content area */}
@@ -225,6 +218,7 @@ export function AdminDashboard() {
             <AgentCards
               agents={agents}
               policies={policies ?? []}
+              agentMap={agentMap}
               agentFilter={agentFilter}
               onAgentFilter={setAgentFilter}
               onAddAgent={() => setAddAgentOpen(true)}
