@@ -91,7 +91,8 @@ export function resolveTemplate(
  * Available placeholders for template interpolation
  */
 export const TEMPLATE_PLACEHOLDERS = [
-  { key: '{{cliente}}', desc: 'Nombre del cliente' },
+  { key: '{{nombre}}', desc: 'Nombre del cliente' },
+  { key: '{{apellido}}', desc: 'Apellido del cliente' },
   { key: '{{compañia}}', desc: 'Compañía aseguradora' },
   { key: '{{poliza}}', desc: 'Número de póliza' },
   { key: '{{cobertura}}', desc: 'Tipo de póliza / cobertura' },

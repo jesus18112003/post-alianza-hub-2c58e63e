@@ -23,7 +23,8 @@ export function EditPolicyDialog({ policy, open, onOpenChange }: EditPolicyDialo
   const [form, setForm] = useState({
     date: policy.date,
     company: policy.company,
-    client_name: policy.client_name,
+    client_first_name: policy.client_first_name ?? '',
+    client_last_name: policy.client_last_name ?? '',
     status: policy.status as PolicyStatus,
     policy_number: policy.policy_number ?? '',
     policy_type: policy.policy_type ?? '',
@@ -60,7 +61,7 @@ export function EditPolicyDialog({ policy, open, onOpenChange }: EditPolicyDialo
   };
 
   const handleSave = () => {
-    if (!form.company.trim() || !form.client_name.trim()) {
+    if (!form.company.trim() || !form.client_first_name.trim()) {
       toast.error('Compañía y Nombre del Cliente son obligatorios');
       return;
     }
@@ -71,7 +72,7 @@ export function EditPolicyDialog({ policy, open, onOpenChange }: EditPolicyDialo
         updates: {
           date: form.date,
           company: form.company.trim(),
-          client_name: form.client_name.trim(),
+          client_name: `${form.client_first_name.trim()} ${form.client_last_name.trim()}`.trim(),
           status: form.status,
           policy_number: form.policy_number.trim() || null,
           policy_type: form.policy_type.trim() || null,
@@ -131,10 +132,17 @@ export function EditPolicyDialog({ policy, open, onOpenChange }: EditPolicyDialo
               <Input value={form.company} onChange={(e) => set('company', e.target.value)}
                 className="bg-secondary border-border text-foreground text-sm" />
             </div>
-            <div className="space-y-1.5">
-              <Label className="text-xs text-muted-foreground">Nombre del Cliente *</Label>
-              <Input value={form.client_name} onChange={(e) => set('client_name', e.target.value)}
-                className="bg-secondary border-border text-foreground text-sm" />
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label className="text-xs text-muted-foreground">Nombre *</Label>
+                <Input value={form.client_first_name} onChange={(e) => set('client_first_name', e.target.value)}
+                  placeholder="Nombre" className="bg-secondary border-border text-foreground text-sm" />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs text-muted-foreground">Apellido</Label>
+                <Input value={form.client_last_name} onChange={(e) => set('client_last_name', e.target.value)}
+                  placeholder="Apellido" className="bg-secondary border-border text-foreground text-sm" />
+              </div>
             </div>
             <div className="space-y-1.5">
               <Label className="text-xs text-muted-foreground">Nro. de Póliza</Label>
