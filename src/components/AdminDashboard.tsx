@@ -177,9 +177,9 @@ export function AdminDashboard() {
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
               {agents.map((agent) => {
                 const agentPolicies = (policies ?? []).filter((p) => p.agent_id === agent.id);
-                const agentCommission = agentPolicies
+                const agentBankAmount = agentPolicies
                   .filter((p) => p.status === 'emitido' || p.status === 'cobrado')
-                  .reduce((sum, p) => sum + (p.total_commission ?? 0), 0);
+                  .reduce((sum, p) => sum + (p.bank_amount ?? 0), 0);
                 
                 return (
                   <div
@@ -202,7 +202,7 @@ export function AdminDashboard() {
                           {agentPolicies.length} póliza{agentPolicies.length !== 1 ? 's' : ''}
                         </p>
                         <p className="text-sm text-accent mt-2 tabular-nums">
-                          ${agentCommission.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                          ${agentBankAmount.toLocaleString('en-US', { minimumFractionDigits: 2 })}
                         </p>
                       </button>
                       <div className="flex flex-col gap-1 shrink-0 -mt-1 -mr-1">

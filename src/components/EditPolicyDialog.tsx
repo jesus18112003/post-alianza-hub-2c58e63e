@@ -15,7 +15,7 @@ interface EditPolicyDialogProps {
   onOpenChange: (open: boolean) => void;
 }
 
-const DEFAULT_COMMISSION_RATE = 0.55;
+const DEFAULT_COMMISSION_RATE = 0;
 
 export function EditPolicyDialog({ policy, open, onOpenChange }: EditPolicyDialogProps) {
   const updatePolicy = useUpdatePolicy();
