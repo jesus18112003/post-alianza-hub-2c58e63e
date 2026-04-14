@@ -255,6 +255,8 @@ export function AdminPolicyRow({ policy, agentName }: AdminPolicyRowProps) {
                 <DetailItem label="Annual Premium" value={policy.target_premium} isCurrency />
                 <DetailItem label="Pago de Prima" value={policy.prima_payment} isCurrency />
                 <DetailItem label="Comisión Total" value={policy.total_commission} isCurrency />
+                <DetailItem label="Adelanto de Comisión (75%)" value={policy.total_commission ? Math.round(policy.total_commission * 0.75 * 100) / 100 : null} isCurrency />
+                <DetailItem label="Resto de Meses (25%)" value={policy.total_commission ? Math.round(policy.total_commission * 0.25 * 100) / 100 : null} isCurrency />
                 <DetailItem label="Entró al Banco" value={policy.bank_amount} isCurrency />
               </div>
             )}
@@ -337,4 +339,5 @@ function DetailItem({
     </div>
   );
 }
+
 

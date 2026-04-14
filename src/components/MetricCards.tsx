@@ -1,4 +1,4 @@
-import { DollarSign, FileText, Clock, TrendingUp } from 'lucide-react';
+import { DollarSign, FileText, Clock, TrendingUp, Percent } from 'lucide-react';
 
 interface MetricCardsProps {
   totalCommission: number;
@@ -6,9 +6,11 @@ interface MetricCardsProps {
   pendingCases: number;
   totalAnnualPremium?: number;
   totalBankAmount?: number;
+  totalAdvanceCommission?: number;
+  totalRemainingCommission?: number;
 }
 
-export function MetricCards({ totalCommission, policiesEmitted, pendingCases, totalAnnualPremium, totalBankAmount }: MetricCardsProps) {
+export function MetricCards({ totalCommission, policiesEmitted, pendingCases, totalAnnualPremium, totalBankAmount, totalAdvanceCommission, totalRemainingCommission }: MetricCardsProps) {
   const cards = [
     {
       title: 'Comisión Total',
@@ -48,10 +50,30 @@ export function MetricCards({ totalCommission, policiesEmitted, pendingCases, to
           },
         ]
       : []),
+    ...(totalAdvanceCommission !== undefined
+      ? [
+          {
+            title: 'Adelanto de Comisión',
+            value: `$${totalAdvanceCommission.toLocaleString('en-US', { minimumFractionDigits: 2 })}`,
+            icon: TrendingUp,
+            accent: false,
+          },
+        ]
+      : []),
+    ...(totalRemainingCommission !== undefined
+      ? [
+          {
+            title: 'Resto de Meses (10-12)',
+            value: `$${totalRemainingCommission.toLocaleString('en-US', { minimumFractionDigits: 2 })}`,
+            icon: Clock,
+            accent: false,
+          },
+        ]
+      : []),
   ];
 
   return (
-    <div className={`grid grid-cols-1 sm:grid-cols-2 ${cards.length > 3 ? 'lg:grid-cols-4' : 'sm:grid-cols-3'} gap-4`}>
+    <div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4`}>
       {cards.map((card) => (
         <div
           key={card.title}

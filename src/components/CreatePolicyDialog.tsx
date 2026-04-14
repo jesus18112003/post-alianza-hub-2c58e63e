@@ -200,6 +200,18 @@ export function CreatePolicyDialog({ agentId, agentName, open, onOpenChange }: C
                   className="bg-secondary border-border text-foreground text-sm" />
                 <p className="text-[10px] text-muted-foreground/60">Auto: Annual Premium × %</p>
               </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs text-muted-foreground">Adelanto de Comisión (75%)</Label>
+                <Input type="number" step="0.01" readOnly
+                  value={form.total_commission ? (Math.round(parseFloat(form.total_commission) * 0.75 * 100) / 100).toString() : ''}
+                  className="bg-secondary/50 border-border text-foreground text-sm cursor-not-allowed" />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs text-muted-foreground">Resto de Meses 10-12 (25%)</Label>
+                <Input type="number" step="0.01" readOnly
+                  value={form.total_commission ? (Math.round(parseFloat(form.total_commission) * 0.25 * 100) / 100).toString() : ''}
+                  className="bg-secondary/50 border-border text-foreground text-sm cursor-not-allowed" />
+              </div>
               <div className="space-y-1.5 col-span-2">
                 <Label className="text-xs text-muted-foreground">Entró al Banco</Label>
                 <Input type="number" step="0.01" value={form.bank_amount}
@@ -247,4 +259,5 @@ export function CreatePolicyDialog({ agentId, agentName, open, onOpenChange }: C
     </Dialog>
   );
 }
+
 

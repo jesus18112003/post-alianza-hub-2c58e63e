@@ -74,6 +74,8 @@ export function PolicyCard({ policy }: PolicyCardProps) {
                 <DetailRow label="Annual Premium" value={policy.target_premium} />
                 <DetailRow label="Pago de Prima" value={policy.prima_payment} />
                 <DetailRow label="Comisión Total" value={policy.total_commission} />
+                <DetailRow label="Adelanto de Comisión (75%)" value={policy.total_commission ? Math.round(policy.total_commission * 0.75 * 100) / 100 : null} />
+                <DetailRow label="Resto de Meses (25%)" value={policy.total_commission ? Math.round(policy.total_commission * 0.25 * 100) / 100 : null} />
                 <DetailRow label="Entró al Banco" value={policy.bank_amount} />
               </div>
             )}
@@ -108,3 +110,4 @@ export function PolicyCard({ policy }: PolicyCardProps) {
     </div>
   );
 }
+

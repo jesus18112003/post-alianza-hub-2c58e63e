@@ -85,6 +85,16 @@ function AgentDashboard() {
     [dateFiltered]
   );
 
+  const totalAdvanceCommission = useMemo(
+    () => Math.round(totalCommission * 0.75 * 100) / 100,
+    [totalCommission]
+  );
+
+  const totalRemainingCommission = useMemo(
+    () => Math.round(totalCommission * 0.25 * 100) / 100,
+    [totalCommission]
+  );
+
   const allStatuses = Object.keys(STATUS_CONFIG) as PolicyStatus[];
   const hasDateFilter = dateFrom || dateTo;
 
@@ -167,6 +177,8 @@ function AgentDashboard() {
           pendingCases={pendingCases}
           totalAnnualPremium={totalAnnualPremium}
           totalBankAmount={totalBankAmount}
+          totalAdvanceCommission={totalAdvanceCommission}
+          totalRemainingCommission={totalRemainingCommission}
         />
 
         <AgentCharts policies={dateFiltered} />
@@ -238,6 +250,7 @@ function AgentDashboard() {
     </div>
   );
 }
+
 
 
 

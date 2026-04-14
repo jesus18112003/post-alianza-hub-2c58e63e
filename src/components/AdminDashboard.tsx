@@ -106,7 +106,7 @@ export function AdminDashboard() {
       <header className="border-b border-border px-6 py-4 flex items-center justify-between sticky top-0 z-30 bg-background/95 backdrop-blur-sm">
         <div className="flex items-center gap-4">
           <h1 className="text-xl text-accent tracking-tight" style={{ fontFamily: "'Georgia', serif" }}>
-            Post Alianza
+            POSTALIANZA
           </h1>
           <span className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground border border-border rounded px-2 py-0.5">
             admin
@@ -520,6 +520,7 @@ export function AdminDashboard() {
     </div>
   );
 }
+
 
 
 
