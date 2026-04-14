@@ -127,9 +127,25 @@ export function AdminDashboard() {
             pendingCases={pendingCases}
           />
 
+          {/* Agents section (collapsible, moved up) */}
+          {agents && agents.length > 0 && (
+            <AgentCards
+              agents={agents}
+              policies={policies ?? []}
+              agentMap={agentMap}
+              agentFilter={agentFilter}
+              onAgentFilter={setAgentFilter}
+              onAddAgent={() => setAddAgentOpen(true)}
+              onCreatePolicy={setCreatePolicyAgentId}
+              onImportExcel={setImportAgentId}
+              onGeneralList={setGeneralListAgentId}
+              onAgentDetail={setAgentModalId}
+              onDeleteAgent={setDeleteAgentId}
+            />
+          )}
+
           {/* Agent & Company dropdowns */}
           <div className="flex items-center gap-3">
-            {/* Agent dropdown */}
             <div className="relative">
               <button
                 onClick={() => { setAgentDropdown(!agentDropdown); setCompanyDropdown(false); }}
@@ -160,7 +176,6 @@ export function AdminDashboard() {
               )}
             </div>
 
-            {/* Company dropdown */}
             <div className="relative">
               <button
                 onClick={() => { setCompanyDropdown(!companyDropdown); setAgentDropdown(false); }}
@@ -212,22 +227,6 @@ export function AdminDashboard() {
 
           {/* Closing Assignments */}
           <ClosingAssignments />
-
-          {/* Agents section */}
-          {agents && agents.length > 0 && (
-            <AgentCards
-              agents={agents}
-              policies={policies ?? []}
-              agentMap={agentMap}
-              agentFilter={agentFilter}
-              onAgentFilter={setAgentFilter}
-              onAddAgent={() => setAddAgentOpen(true)}
-              onCreatePolicy={setCreatePolicyAgentId}
-              onImportExcel={setImportAgentId}
-              onGeneralList={setGeneralListAgentId}
-              onAgentDetail={setAgentModalId}
-              onDeleteAgent={setDeleteAgentId}
-            />
           )}
         </main>
       </div>
