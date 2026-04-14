@@ -150,6 +150,7 @@ export type Database = {
         Row: {
           agent_id: string
           agent_premium: number | null
+          bank_amount: number | null
           client_name: string
           collection_date: string | null
           company: string
@@ -163,6 +164,7 @@ export type Database = {
           phone_number: string | null
           policy_number: string | null
           policy_type: string | null
+          prima_payment: number | null
           status: Database["public"]["Enums"]["policy_status"]
           target_premium: number | null
           total_commission: number | null
@@ -171,6 +173,7 @@ export type Database = {
         Insert: {
           agent_id: string
           agent_premium?: number | null
+          bank_amount?: number | null
           client_name: string
           collection_date?: string | null
           company: string
@@ -184,6 +187,7 @@ export type Database = {
           phone_number?: string | null
           policy_number?: string | null
           policy_type?: string | null
+          prima_payment?: number | null
           status?: Database["public"]["Enums"]["policy_status"]
           target_premium?: number | null
           total_commission?: number | null
@@ -192,6 +196,7 @@ export type Database = {
         Update: {
           agent_id?: string
           agent_premium?: number | null
+          bank_amount?: number | null
           client_name?: string
           collection_date?: string | null
           company?: string
@@ -205,6 +210,7 @@ export type Database = {
           phone_number?: string | null
           policy_number?: string | null
           policy_type?: string | null
+          prima_payment?: number | null
           status?: Database["public"]["Enums"]["policy_status"]
           target_premium?: number | null
           total_commission?: number | null
