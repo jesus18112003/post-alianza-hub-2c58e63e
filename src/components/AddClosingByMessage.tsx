@@ -100,7 +100,7 @@ export function AddClosingByMessage() {
       location: result.location || '',
       agentId: '',
       date: new Date().toISOString().split('T')[0],
-      commissionRate: (rate * 100).toString(),
+      commissionRate: '',
     });
   };
 
@@ -116,10 +116,10 @@ export function AddClosingByMessage() {
       return;
     }
 
-    const rate = parseFloat(parsed.commissionRate) / 100;
+    const rate = parsed.commissionRate ? parseFloat(parsed.commissionRate) / 100 : null;
     const annualPremium = amount; // Full value
     const primaPago = Math.round((annualPremium / 12) * 100) / 100;
-    const totalCommission = Math.round(annualPremium * rate * 100) / 100;
+    const totalCommission = rate !== null ? Math.round(annualPremium * rate * 100) / 100 : null;
 
     createPolicy.mutate(
       {
@@ -284,7 +284,7 @@ export function AddClosingByMessage() {
             <div className="flex flex-wrap gap-4 text-xs text-muted-foreground pt-2 border-t border-border/50">
               <span>Annual Premium: <strong className="text-accent">${parseFloat(parsed.amount).toLocaleString('en-US', { minimumFractionDigits: 2 })}</strong></span>
               <span>Pago de Prima: <strong className="text-accent">${(parseFloat(parsed.amount) / 12).toLocaleString('en-US', { minimumFractionDigits: 2 })}</strong></span>
-              <span>Comisión: <strong className="text-accent">${(parseFloat(parsed.amount) * (parseFloat(parsed.commissionRate || '55') / 100)).toLocaleString('en-US', { minimumFractionDigits: 2 })}</strong></span>
+              <span>Comisión: <strong className="text-accent">{parsed.commissionRate ? `$${(parseFloat(parsed.amount) * (parseFloat(parsed.commissionRate) / 100)).toLocaleString('en-US', { minimumFractionDigits: 2 })}` : '—'}</strong></span>
             </div>
           )}
 
