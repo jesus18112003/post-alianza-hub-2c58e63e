@@ -34,6 +34,7 @@ export function EditPolicyDialog({ policy, open, onOpenChange }: EditPolicyDialo
     prima_payment: policy.prima_payment?.toString() ?? '',
     total_commission: policy.total_commission?.toString() ?? '',
     bank_amount: policy.bank_amount?.toString() ?? '',
+    chargeback_amount: policy.chargeback_amount?.toString() ?? '',
     notes: policy.notes ?? '',
     phone_number: policy.phone_number ?? '',
     collection_date: policy.collection_date ?? '',
