@@ -20,7 +20,7 @@ export function AgentMetricCards({
       title: 'COMISIÓN TOTAL',
       value: `$${totalCommission.toLocaleString('en-US', { minimumFractionDigits: 2 })}`,
       subtitle: totalCommission > 0 ? (
-        <span className="flex items-center gap-1 text-green-500">
+        <span className="flex items-center gap-1 text-emerald-500">
           <TrendingUp className="h-3 w-3" />
           Acumulado
         </span>
@@ -39,7 +39,7 @@ export function AgentMetricCards({
       title: 'CASOS PENDIENTES',
       value: pendingCases.toString(),
       subtitle: pendingCases > 0 ? (
-        <span className="text-orange-500">! Requiere acción</span>
+        <span className="text-destructive">! Requiere acción</span>
       ) : (
         <span className="text-muted-foreground">Sin pendientes</span>
       ),
