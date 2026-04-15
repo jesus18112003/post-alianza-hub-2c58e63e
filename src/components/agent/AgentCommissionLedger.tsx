@@ -8,16 +8,10 @@ interface Props {
   isLoading: boolean;
 }
 
-const CUTOFF_DATE = '2026-04-14';
-
 export function AgentCommissionLedger({ policies, isLoading }: Props) {
   const ledgerPolicies = useMemo(() => {
     return policies
-      .filter(
-        (p) =>
-          (p.status === 'cobrado' || p.status === 'chargeback') &&
-          p.date >= CUTOFF_DATE
-      )
+      .filter((p) => p.status === 'cobrado' || p.status === 'chargeback')
       .sort((a, b) => a.date.localeCompare(b.date));
   }, [policies]);
 
