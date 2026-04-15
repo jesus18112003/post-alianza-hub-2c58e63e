@@ -8,7 +8,8 @@ import { AgentMetricCards } from '@/components/agent/AgentMetricCards';
 import { AgentPoliciesTable } from '@/components/agent/AgentPoliciesTable';
 import { AgentCommissionLedger } from '@/components/agent/AgentCommissionLedger';
 import { ThemeToggleButton } from '@/components/ThemeToggleButton';
-import { CalendarDays, X, Bell } from 'lucide-react';
+import { CalendarDays, X } from 'lucide-react';
+import { NotificationBell } from '@/components/agent/NotificationBell';
 import { Input } from '@/components/ui/input';
 import { useState, useMemo } from 'react';
 import type { AgentSection } from '@/components/agent/AgentSidebar';
@@ -88,9 +89,7 @@ function AgentDashboard() {
           </div>
           <div className="flex items-center gap-3">
             <ThemeToggleButton />
-            <button className="relative p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors">
-              <Bell className="h-4 w-4" />
-            </button>
+            <NotificationBell />
           </div>
         </header>
 
