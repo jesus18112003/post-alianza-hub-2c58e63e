@@ -1,0 +1,1 @@
+ALTER TABLE public.closing_assignments ADD COLUMN location text DEFAULT NULL;

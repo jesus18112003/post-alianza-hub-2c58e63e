@@ -6,10 +6,17 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-/** Parse Discord message like "$1200 AMAM FEX UPON ISSUE PA (Nancy Bustos)" */
+const US_STATES = new Set([
+  'AL','AK','AZ','AR','CA','CO','CT','DE','FL','GA','HI','ID','IL','IN','IA',
+  'KS','KY','LA','ME','MD','MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ',
+  'NM','NY','NC','ND','OH','OK','OR','PA','RI','SC','SD','TN','TX','UT','VT',
+  'VA','WA','WV','WI','WY','DC','PR',
+]);
+
+/** Parse Discord message like "$1200 AMAM FEX UPON ISSUE (Nancy Bustos) TX" */
 function parseMessage(raw: string) {
   const match = raw.match(
-    /^\$?([\d,]+(?:\.\d+)?)\s+(\S+)\s+(\S+)\s+(.+?)\s+\(([^)]+)\)\s*$/
+    /^\$?([\d,]+(?:\.\d+)?)\s+(\S+)\s+(\S+)\s+(.+?)\s+\(([^)]+)\)\s*(.*)$/
   );
   if (!match) return null;
   const amount = parseFloat(match[1].replace(/,/g, ""));
@@ -22,10 +29,11 @@ function parseMessage(raw: string) {
   };
   company = COMPANY_MAP[company] || company;
   const policyType = match[3].toUpperCase();
-  // Everything between policy_type and (client) is payment_method
   const paymentMethod = match[4].trim();
   const clientName = match[5].trim();
-  return { amount, company, policyType, paymentMethod, clientName };
+  const trailing = match[6]?.trim().toUpperCase() || "";
+  const location = US_STATES.has(trailing) ? trailing : null;
+  return { amount, company, policyType, paymentMethod, clientName, location };
 }
 
 Deno.serve(async (req) => {
@@ -96,6 +104,7 @@ Deno.serve(async (req) => {
         policy_type: parsed?.policyType ?? null,
         payment_method: parsed?.paymentMethod ?? null,
         client_name: parsed?.clientName ?? null,
+        location: parsed?.location ?? null,
         status: "pending",
       };
 

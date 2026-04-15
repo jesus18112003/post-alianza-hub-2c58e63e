@@ -19,9 +19,16 @@ const COMMISSION_RATES: Record<string, number> = {
   default: 0.55,
 };
 
+const US_STATES = new Set([
+  'AL','AK','AZ','AR','CA','CO','CT','DE','FL','GA','HI','ID','IL','IN','IA',
+  'KS','KY','LA','ME','MD','MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ',
+  'NM','NY','NC','ND','OH','OK','OR','PA','RI','SC','SD','TN','TX','UT','VT',
+  'VA','WA','WV','WI','WY','DC','PR',
+]);
+
 function parseClosingMessage(raw: string) {
   const match = raw.trim().match(
-    /^\$?([\d,]+(?:\.\d+)?)\s+(\S+)\s+(\S+)\s+(.+?)\s+\(([^)]+)\)\s*$/
+    /^\$?([\d,]+(?:\.\d+)?)\s+(\S+)\s+(\S+)\s+(.+?)\s+\(([^)]+)\)\s*(.*)$/
   );
   if (!match) return null;
   const amount = parseFloat(match[1].replace(/,/g, ''));
@@ -30,7 +37,9 @@ function parseClosingMessage(raw: string) {
   const policyType = match[3].toUpperCase();
   const paymentMethod = match[4].trim();
   const clientName = match[5].trim();
-  return { amount, company, policyType, paymentMethod, clientName };
+  const trailing = match[6]?.trim().toUpperCase() || '';
+  const location = US_STATES.has(trailing) ? trailing : null;
+  return { amount, company, policyType, paymentMethod, clientName, location };
 }
 
 export function AddClosingByMessage() {
@@ -44,6 +53,7 @@ export function AddClosingByMessage() {
     policyType: string;
     paymentMethod: string;
     clientName: string;
+    location: string;
     agentId: string;
     date: string;
     commissionRate: string;
@@ -66,6 +76,7 @@ export function AddClosingByMessage() {
       policyType: result.policyType,
       paymentMethod: result.paymentMethod,
       clientName: result.clientName,
+      location: result.location || '',
       agentId: '',
       date: new Date().toISOString().split('T')[0],
       commissionRate: (rate * 100).toString(),
@@ -98,6 +109,7 @@ export function AddClosingByMessage() {
         status: 'pendiente',
         policy_type: parsed.policyType.trim() || null,
         payment_method: parsed.paymentMethod.trim() || null,
+        location: parsed.location.trim() || null,
         target_premium: annualPremium,
         prima_payment: primaPago,
         total_commission: totalCommission,
@@ -216,6 +228,15 @@ export function AddClosingByMessage() {
           </div>
 
           <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <Label className="text-xs text-muted-foreground">Estado (Location)</Label>
+              <Input
+                value={parsed.location}
+                onChange={(e) => setParsed({ ...parsed, location: e.target.value })}
+                placeholder="TX, FL, CA..."
+                className="bg-secondary border-border text-foreground text-sm"
+              />
+            </div>
             <div className="space-y-1.5">
               <Label className="text-xs text-muted-foreground">Fecha del cierre</Label>
               <Input

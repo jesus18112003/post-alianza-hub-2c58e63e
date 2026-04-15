@@ -9,6 +9,7 @@ export interface ClosingAssignment {
   company: string | null;
   policy_type: string | null;
   payment_method: string | null;
+  location: string | null;
   client_name: string | null;
   status: string;
   assigned_agent_id: string | null;
@@ -81,6 +82,7 @@ export function useAssignClosing() {
           prima_payment: assignment.amount ? Math.round((assignment.amount / 12) * 100) / 100 : null,
           total_commission: assignment.amount ? Math.round(assignment.amount * 0.55 * 100) / 100 : null,
           date: policyDate,
+          location: assignment.location || null,
         })
         .select('id')
         .single();

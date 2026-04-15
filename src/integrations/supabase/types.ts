@@ -108,6 +108,7 @@ export type Database = {
           created_policy_id: string | null
           discord_message_id: string
           id: string
+          location: string | null
           payment_method: string | null
           policy_type: string | null
           raw_message: string
@@ -123,6 +124,7 @@ export type Database = {
           created_policy_id?: string | null
           discord_message_id: string
           id?: string
+          location?: string | null
           payment_method?: string | null
           policy_type?: string | null
           raw_message: string
@@ -138,6 +140,7 @@ export type Database = {
           created_policy_id?: string | null
           discord_message_id?: string
           id?: string
+          location?: string | null
           payment_method?: string | null
           policy_type?: string | null
           raw_message?: string
