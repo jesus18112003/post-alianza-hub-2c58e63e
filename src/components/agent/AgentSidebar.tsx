@@ -13,9 +13,7 @@ const NAV_ITEMS: { id: AgentSection; label: string; icon: React.ElementType }[] 
   { id: 'commission', label: 'COMMISSION', icon: DollarSign },
 ];
 
-const BOTTOM_ITEMS = [
-  { id: 'documents', label: 'DOCUMENTS', icon: FileText, disabled: true },
-];
+const BOTTOM_ITEMS: { id: string; label: string; icon: React.ElementType; disabled: boolean }[] = [];
 
 export function AgentSidebar({ activeSection, onSectionChange }: AgentSidebarProps) {
   const { signOut } = useAuth();
