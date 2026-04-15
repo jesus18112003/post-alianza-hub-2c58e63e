@@ -6,6 +6,7 @@ import { AdminDashboard } from '@/components/AdminDashboard';
 import { AgentSidebar } from '@/components/agent/AgentSidebar';
 import { AgentMetricCards } from '@/components/agent/AgentMetricCards';
 import { AgentPoliciesTable } from '@/components/agent/AgentPoliciesTable';
+import { AgentCommissionLedger } from '@/components/agent/AgentCommissionLedger';
 import { ThemeToggleButton } from '@/components/ThemeToggleButton';
 import { CalendarDays, X, Bell } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -94,57 +95,60 @@ function AgentDashboard() {
         </header>
 
         <main className="flex-1 px-6 py-6 space-y-6 overflow-y-auto">
-          {/* Welcome + Date Range */}
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <div>
-              <h2 className="text-3xl text-accent tracking-tight" style={{ fontFamily: "'Georgia', serif" }}>
-                Bienvenido, {profile?.full_name || 'Agente'}
-              </h2>
-              <p className="text-sm text-muted-foreground mt-1">
-                Aquí tienes el resumen ejecutivo de tu cartera.
-              </p>
-            </div>
+          {activeSection === 'overview' && (
+            <>
+              {/* Welcome + Date Range */}
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div>
+                  <h2 className="text-3xl text-accent tracking-tight" style={{ fontFamily: "'Georgia', serif" }}>
+                    Bienvenido, {profile?.full_name || 'Agente'}
+                  </h2>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Aquí tienes el resumen ejecutivo de tu cartera.
+                  </p>
+                </div>
 
-            <div className="flex items-center gap-2 bg-card border border-border rounded-lg px-3 py-2">
-              <CalendarDays className="h-4 w-4 text-muted-foreground" />
-              <Input
-                type="date"
-                value={dateFrom}
-                onChange={(e) => setDateFrom(e.target.value)}
-                className="bg-transparent border-0 text-sm w-36 h-7 p-0 focus-visible:ring-0"
+                <div className="flex items-center gap-2 bg-card border border-border rounded-lg px-3 py-2">
+                  <CalendarDays className="h-4 w-4 text-muted-foreground" />
+                  <Input
+                    type="date"
+                    value={dateFrom}
+                    onChange={(e) => setDateFrom(e.target.value)}
+                    className="bg-transparent border-0 text-sm w-36 h-7 p-0 focus-visible:ring-0"
+                  />
+                  <span className="text-muted-foreground text-xs">—</span>
+                  <Input
+                    type="date"
+                    value={dateTo}
+                    onChange={(e) => setDateTo(e.target.value)}
+                    className="bg-transparent border-0 text-sm w-36 h-7 p-0 focus-visible:ring-0"
+                  />
+                  {hasDateFilter && (
+                    <button
+                      onClick={() => { setDateFrom(''); setDateTo(''); }}
+                      className="p-1 text-muted-foreground hover:text-foreground"
+                    >
+                      <X className="h-3.5 w-3.5" />
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              <AgentMetricCards
+                totalCommission={totalCommission}
+                policiesEmitted={policiesEmitted}
+                pendingCases={pendingCases}
+                totalAnnualPremium={totalAnnualPremium}
+                totalBankAmount={totalBankAmount}
               />
-              <span className="text-muted-foreground text-xs">—</span>
-              <Input
-                type="date"
-                value={dateTo}
-                onChange={(e) => setDateTo(e.target.value)}
-                className="bg-transparent border-0 text-sm w-36 h-7 p-0 focus-visible:ring-0"
-              />
-              {hasDateFilter && (
-                <button
-                  onClick={() => { setDateFrom(''); setDateTo(''); }}
-                  className="p-1 text-muted-foreground hover:text-foreground"
-                >
-                  <X className="h-3.5 w-3.5" />
-                </button>
-              )}
-            </div>
-          </div>
+              <AgentCharts policies={dateFiltered} />
+              <AgentPoliciesTable policies={dateFiltered} isLoading={isLoading} />
+            </>
+          )}
 
-          {/* Metric Cards */}
-          <AgentMetricCards
-            totalCommission={totalCommission}
-            policiesEmitted={policiesEmitted}
-            pendingCases={pendingCases}
-            totalAnnualPremium={totalAnnualPremium}
-            totalBankAmount={totalBankAmount}
-          />
-
-          {/* Charts */}
-          <AgentCharts policies={dateFiltered} />
-
-          {/* Policies Table */}
-          <AgentPoliciesTable policies={dateFiltered} isLoading={isLoading} />
+          {activeSection === 'commission' && (
+            <AgentCommissionLedger policies={policies ?? []} isLoading={isLoading} />
+          )}
         </main>
       </div>
     </div>

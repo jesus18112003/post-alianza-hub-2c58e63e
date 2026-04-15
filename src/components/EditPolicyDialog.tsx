@@ -34,6 +34,7 @@ export function EditPolicyDialog({ policy, open, onOpenChange }: EditPolicyDialo
     prima_payment: policy.prima_payment?.toString() ?? '',
     total_commission: policy.total_commission?.toString() ?? '',
     bank_amount: policy.bank_amount?.toString() ?? '',
+    chargeback_amount: policy.chargeback_amount?.toString() ?? '',
     notes: policy.notes ?? '',
     phone_number: policy.phone_number ?? '',
     collection_date: policy.collection_date ?? '',
@@ -82,6 +83,7 @@ export function EditPolicyDialog({ policy, open, onOpenChange }: EditPolicyDialo
           prima_payment: form.prima_payment ? parseFloat(form.prima_payment) : null,
           total_commission: form.total_commission ? parseFloat(form.total_commission) : null,
           bank_amount: form.bank_amount ? parseFloat(form.bank_amount) : null,
+          chargeback_amount: form.chargeback_amount ? parseFloat(form.chargeback_amount) : null,
           notes: form.notes.trim() || null,
           phone_number: form.phone_number.trim() || null,
           collection_date: form.collection_date || null,
@@ -202,10 +204,16 @@ export function EditPolicyDialog({ policy, open, onOpenChange }: EditPolicyDialo
                   value={form.total_commission ? (Math.round(parseFloat(form.total_commission) * 0.25 * 100) / 100).toString() : ''}
                   className="bg-secondary/50 border-border text-foreground text-sm cursor-not-allowed" />
               </div>
-              <div className="space-y-1.5 col-span-2">
+              <div className="space-y-1.5">
                 <Label className="text-xs text-muted-foreground">Entró al Banco</Label>
                 <Input type="number" step="0.01" value={form.bank_amount}
                   onChange={(e) => set('bank_amount', e.target.value)}
+                  className="bg-secondary border-border text-foreground text-sm" />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs text-muted-foreground">Chargeback</Label>
+                <Input type="number" step="0.01" value={form.chargeback_amount}
+                  onChange={(e) => set('chargeback_amount', e.target.value)}
                   className="bg-secondary border-border text-foreground text-sm" />
               </div>
             </div>
