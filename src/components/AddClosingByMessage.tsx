@@ -36,9 +36,30 @@ function parseClosingMessage(raw: string) {
   company = COMPANY_MAP[company] || company;
   const policyType = match[3].toUpperCase();
   const paymentMethod = match[4].trim();
-  const clientName = match[5].trim();
+  let clientName = match[5].trim();
   const trailing = match[6]?.trim().toUpperCase() || '';
-  const location = US_STATES.has(trailing) ? trailing : null;
+
+  // Detect state: could be trailing after () or leading/trailing inside ()
+  let location: string | null = null;
+
+  if (US_STATES.has(trailing)) {
+    location = trailing;
+  } else {
+    // Check if state is at the end of client name: "(jose c justin AZ)"
+    const lastWord = clientName.split(/\s+/).pop()?.toUpperCase() || '';
+    if (US_STATES.has(lastWord)) {
+      location = lastWord;
+      clientName = clientName.replace(/\s+\S+\s*$/, '').trim();
+    } else {
+      // Check if state is at the beginning: "(AZ jose c justin)"
+      const firstWord = clientName.split(/\s+/)[0]?.toUpperCase() || '';
+      if (US_STATES.has(firstWord)) {
+        location = firstWord;
+        clientName = clientName.replace(/^\S+\s+/, '').trim();
+      }
+    }
+  }
+
   return { amount, company, policyType, paymentMethod, clientName, location };
 }
 
