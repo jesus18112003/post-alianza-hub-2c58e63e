@@ -237,8 +237,6 @@ export function AddClosingByMessage() {
                 className="bg-secondary border-border text-foreground text-sm"
               />
             </div>
-
-          <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
               <Label className="text-xs text-muted-foreground">Fecha del cierre</Label>
               <Input
