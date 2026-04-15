@@ -146,6 +146,36 @@ export type Database = {
         }
         Relationships: []
       }
+      notifications: {
+        Row: {
+          agent_id: string
+          created_at: string
+          expires_at: string
+          id: string
+          message: string
+          policy_id: string
+          read: boolean
+        }
+        Insert: {
+          agent_id: string
+          created_at?: string
+          expires_at: string
+          id?: string
+          message: string
+          policy_id: string
+          read?: boolean
+        }
+        Update: {
+          agent_id?: string
+          created_at?: string
+          expires_at?: string
+          id?: string
+          message?: string
+          policy_id?: string
+          read?: boolean
+        }
+        Relationships: []
+      }
       policies: {
         Row: {
           agent_id: string
