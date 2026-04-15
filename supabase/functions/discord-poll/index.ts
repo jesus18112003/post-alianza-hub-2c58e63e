@@ -13,7 +13,7 @@ const US_STATES = new Set([
   'VA','WA','WV','WI','WY','DC','PR',
 ]);
 
-/** Parse Discord message like "$1200 AMAM FEX UPON ISSUE (Nancy Bustos) TX" */
+/** Parse Discord message — state can be after (), or inside () at start/end */
 function parseMessage(raw: string) {
   const match = raw.match(
     /^\$?([\d,]+(?:\.\d+)?)\s+(\S+)\s+(\S+)\s+(.+?)\s+\(([^)]+)\)\s*(.*)$/
@@ -30,9 +30,26 @@ function parseMessage(raw: string) {
   company = COMPANY_MAP[company] || company;
   const policyType = match[3].toUpperCase();
   const paymentMethod = match[4].trim();
-  const clientName = match[5].trim();
+  let clientName = match[5].trim();
   const trailing = match[6]?.trim().toUpperCase() || "";
-  const location = US_STATES.has(trailing) ? trailing : null;
+
+  let location: string | null = null;
+  if (US_STATES.has(trailing)) {
+    location = trailing;
+  } else {
+    const lastWord = clientName.split(/\s+/).pop()?.toUpperCase() || "";
+    if (US_STATES.has(lastWord)) {
+      location = lastWord;
+      clientName = clientName.replace(/\s+\S+\s*$/, "").trim();
+    } else {
+      const firstWord = clientName.split(/\s+/)[0]?.toUpperCase() || "";
+      if (US_STATES.has(firstWord)) {
+        location = firstWord;
+        clientName = clientName.replace(/^\S+\s+/, "").trim();
+      }
+    }
+  }
+
   return { amount, company, policyType, paymentMethod, clientName, location };
 }
 
