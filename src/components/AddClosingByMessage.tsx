@@ -16,7 +16,7 @@ const COMPANY_MAP: Record<string, string> = {
 };
 
 const COMMISSION_RATES: Record<string, number> = {
-  default: 0.55,
+  default: 0,
 };
 
 const US_STATES = new Set([
