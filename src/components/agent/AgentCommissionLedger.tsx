@@ -85,7 +85,7 @@ export function AgentCommissionLedger({ policies, isLoading }: Props) {
                 <span className="text-sm text-secondary-foreground">{p.company}</span>
                 <span className="text-sm text-card-foreground">{p.client_name}</span>
                 <span className="text-sm text-muted-foreground">{p.policy_number ?? '-'}</span>
-                <span className="text-sm text-right text-card-foreground" style={{ fontFamily: "'Inter', sans-serif" }}>
+                <span className="text-sm text-right text-emerald-500" style={{ fontFamily: "'Inter', sans-serif" }}>
                   {p.status === 'cobrado' ? fmt(p.bank_amount) : '-'}
                 </span>
                 <span className="text-sm text-right text-destructive" style={{ fontFamily: "'Inter', sans-serif" }}>
