@@ -1,7 +1,7 @@
 import { LayoutDashboard, DollarSign, FileText, HelpCircle, LogOut } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 
-export type AgentSection = 'overview';
+export type AgentSection = 'overview' | 'commission';
 
 interface AgentSidebarProps {
   activeSection: AgentSection;
@@ -10,10 +10,10 @@ interface AgentSidebarProps {
 
 const NAV_ITEMS: { id: AgentSection; label: string; icon: React.ElementType }[] = [
   { id: 'overview', label: 'OVERVIEW', icon: LayoutDashboard },
+  { id: 'commission', label: 'COMMISSION', icon: DollarSign },
 ];
 
 const BOTTOM_ITEMS = [
-  { id: 'commission', label: 'COMMISSION', icon: DollarSign, disabled: true },
   { id: 'documents', label: 'DOCUMENTS', icon: FileText, disabled: true },
 ];
 
