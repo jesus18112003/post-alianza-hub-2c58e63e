@@ -80,7 +80,7 @@ export function useAssignClosing() {
           payment_method: assignment.payment_method,
           target_premium: assignment.amount ?? null,
           prima_payment: assignment.amount ? Math.round((assignment.amount / 12) * 100) / 100 : null,
-          total_commission: assignment.amount ? Math.round(assignment.amount * 0.55 * 100) / 100 : null,
+          total_commission: null,
           date: policyDate,
           location: assignment.location || null,
         })
