@@ -106,7 +106,7 @@ export function AgentCommissionLedger({ policies, isLoading }: Props) {
           <span className="text-xs uppercase tracking-widest text-muted-foreground font-medium text-right">
             TOTALES
           </span>
-          <span className="text-sm font-semibold text-right text-accent" style={{ fontFamily: "'Inter', sans-serif" }}>
+          <span className="text-sm font-semibold text-right text-emerald-500" style={{ fontFamily: "'Inter', sans-serif" }}>
             {fmt(totalCommission)}
           </span>
           <span className="text-sm font-semibold text-right text-destructive" style={{ fontFamily: "'Inter', sans-serif" }}>
