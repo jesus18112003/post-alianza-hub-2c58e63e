@@ -104,6 +104,7 @@ Deno.serve(async (req) => {
         policy_type: parsed?.policyType ?? null,
         payment_method: parsed?.paymentMethod ?? null,
         client_name: parsed?.clientName ?? null,
+        location: parsed?.location ?? null,
         status: "pending",
       };
 

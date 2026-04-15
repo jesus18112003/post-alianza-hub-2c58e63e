@@ -9,6 +9,7 @@ export interface ClosingAssignment {
   company: string | null;
   policy_type: string | null;
   payment_method: string | null;
+  location: string | null;
   client_name: string | null;
   status: string;
   assigned_agent_id: string | null;
