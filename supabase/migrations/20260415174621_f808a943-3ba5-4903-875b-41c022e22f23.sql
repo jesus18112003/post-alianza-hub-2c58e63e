@@ -1,0 +1,1 @@
+SELECT cron.unschedule('poll-discord-every-2-min');
