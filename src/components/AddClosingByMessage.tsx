@@ -109,6 +109,7 @@ export function AddClosingByMessage() {
         status: 'pendiente',
         policy_type: parsed.policyType.trim() || null,
         payment_method: parsed.paymentMethod.trim() || null,
+        location: parsed.location.trim() || null,
         target_premium: annualPremium,
         prima_payment: primaPago,
         total_commission: totalCommission,
@@ -225,6 +226,17 @@ export function AddClosingByMessage() {
               />
             </div>
           </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <Label className="text-xs text-muted-foreground">Estado (Location)</Label>
+              <Input
+                value={parsed.location}
+                onChange={(e) => setParsed({ ...parsed, location: e.target.value })}
+                placeholder="TX, FL, CA..."
+                className="bg-secondary border-border text-foreground text-sm"
+              />
+            </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
