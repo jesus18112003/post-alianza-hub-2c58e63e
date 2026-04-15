@@ -54,8 +54,8 @@ export function AgentCharts({ policies }: AgentChartsProps) {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
       {/* Company Distribution */}
-      <div className="rounded-lg border border-border bg-card p-5">
-        <h4 className="text-xs uppercase tracking-widest text-muted-foreground mb-3">Top Empresas</h4>
+      <div className="rounded-xl border border-border bg-card p-5">
+        <h4 className="text-base text-accent tracking-tight mb-3" style={{ fontFamily: "'Georgia', serif" }}>Top Empresas por Volumen</h4>
         <ResponsiveContainer width="100%" height={250}>
           <PieChart>
             <Pie 
@@ -85,8 +85,8 @@ export function AgentCharts({ policies }: AgentChartsProps) {
       </div>
 
       {/* Status Distribution */}
-      <div className="rounded-lg border border-border bg-card p-5">
-        <h4 className="text-xs uppercase tracking-widest text-muted-foreground mb-3">Status</h4>
+      <div className="rounded-xl border border-border bg-card p-5">
+        <h4 className="text-base text-accent tracking-tight mb-3" style={{ fontFamily: "'Georgia', serif" }}>Estatus de Cartera</h4>
         <ResponsiveContainer width="100%" height={250}>
           <PieChart>
             <Pie 

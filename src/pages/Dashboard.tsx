@@ -1,16 +1,16 @@
 import { useAuth } from '@/hooks/useAuth';
 import { usePolicies } from '@/hooks/usePolicies';
 import { useRealtimeSubscription } from '@/hooks/useRealtimeSubscription';
-import { MetricCards } from '@/components/MetricCards';
-import { PolicyCard } from '@/components/PolicyCard';
 import { AgentCharts } from '@/components/AgentCharts';
 import { AdminDashboard } from '@/components/AdminDashboard';
-import { Button } from '@/components/ui/button';
-import { LogOut, Search, Filter, CalendarDays, X } from 'lucide-react';
+import { AgentSidebar } from '@/components/agent/AgentSidebar';
+import { AgentMetricCards } from '@/components/agent/AgentMetricCards';
+import { AgentPoliciesTable } from '@/components/agent/AgentPoliciesTable';
 import { ThemeToggleButton } from '@/components/ThemeToggleButton';
+import { CalendarDays, X, Bell } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { useState, useMemo } from 'react';
-import { STATUS_CONFIG, PolicyStatus } from '@/components/StatusBadge';
+import type { AgentSection } from '@/components/agent/AgentSidebar';
 
 export default function Dashboard() {
   const { role } = useAuth();
@@ -23,17 +23,14 @@ export default function Dashboard() {
 }
 
 function AgentDashboard() {
-  const { profile, role, signOut } = useAuth();
+  const { profile } = useAuth();
   const { data: policies, isLoading } = usePolicies();
-  const [search, setSearch] = useState('');
-  const [statusFilters, setStatusFilters] = useState<Set<PolicyStatus>>(new Set());
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
+  const [activeSection, setActiveSection] = useState<AgentSection>('overview');
 
-  // Realtime subscription for agent's own policies
   useRealtimeSubscription('policies', [['policies']]);
 
-  // Date-filtered policies for metrics and charts
   const dateFiltered = useMemo(() => {
     if (!policies) return [];
     return policies.filter((p) => {
@@ -42,17 +39,6 @@ function AgentDashboard() {
       return true;
     });
   }, [policies, dateFrom, dateTo]);
-
-  const filtered = useMemo(() => {
-    return dateFiltered.filter((p) => {
-      const matchesSearch =
-        search === '' ||
-        p.client_name.toLowerCase().includes(search.toLowerCase()) ||
-        p.company.toLowerCase().includes(search.toLowerCase());
-      const matchesStatus = statusFilters.size === 0 || statusFilters.has(p.status);
-      return matchesSearch && matchesStatus;
-    });
-  }, [dateFiltered, search, statusFilters]);
 
   const totalCommission = useMemo(
     () =>
@@ -85,179 +71,82 @@ function AgentDashboard() {
     [dateFiltered]
   );
 
-  const totalAdvanceCommission = useMemo(
-    () => Math.round(totalCommission * 0.75 * 100) / 100,
-    [totalCommission]
-  );
-
-  const totalRemainingCommission = useMemo(
-    () => Math.round(totalCommission * 0.25 * 100) / 100,
-    [totalCommission]
-  );
-
-  const allStatuses = Object.keys(STATUS_CONFIG) as PolicyStatus[];
   const hasDateFilter = dateFrom || dateTo;
 
   return (
-    <div className="min-h-screen bg-background">
-      <header className="border-b border-border px-6 py-4 flex items-center justify-between sticky top-0 z-10 bg-background/95 backdrop-blur-sm">
-        <div className="flex items-center gap-4">
-          <h1 className="text-xl text-accent tracking-tight" style={{ fontFamily: "'Georgia', 'Times New Roman', serif" }}>
-            POSTALIANZA
-          </h1>
-          <span className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground border border-border rounded px-2 py-0.5">
-            {role ?? 'agent'}
-          </span>
-        </div>
-        <div className="flex items-center gap-4">
-          <span className="text-sm text-muted-foreground hidden sm:block">
-            {profile?.full_name || profile?.username}
-          </span>
-          <ThemeToggleButton />
-          <Button variant="ghost" size="icon" onClick={signOut} className="text-muted-foreground hover:text-foreground active:scale-95 transition-all">
-            <LogOut className="h-4 w-4" />
-          </Button>
-        </div>
-      </header>
+    <div className="min-h-screen bg-background flex">
+      <AgentSidebar activeSection={activeSection} onSectionChange={setActiveSection} />
 
-      <main className="max-w-5xl mx-auto px-4 sm:px-6 py-8 space-y-8">
-        <div>
-          <h2 className="text-2xl text-accent tracking-tight" style={{ fontFamily: "'Georgia', 'Times New Roman', serif" }}>
-            Bienvenido, {profile?.full_name || 'Agente'}
-          </h2>
-          <p className="text-sm text-muted-foreground mt-1">Resumen de tu actividad y pólizas</p>
-        </div>
+      <div className="flex-1 flex flex-col min-w-0">
+        {/* Top Bar */}
+        <header className="border-b border-border px-6 py-3 flex items-center justify-between bg-background/95 backdrop-blur-sm sticky top-0 z-30">
+          <div className="flex items-center gap-3">
+            <span className="text-lg text-accent font-semibold tracking-tight" style={{ fontFamily: "'Georgia', serif" }}>
+              {profile?.full_name || 'Agente'}
+            </span>
+          </div>
+          <div className="flex items-center gap-3">
+            <ThemeToggleButton />
+            <button className="relative p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors">
+              <Bell className="h-4 w-4" />
+            </button>
+          </div>
+        </header>
 
-        {/* Date Range Filter */}
-        <div className="rounded-lg border border-border bg-card p-4">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
-            <div className="flex items-center gap-2 text-muted-foreground">
-              <CalendarDays className="h-4 w-4" />
-              <span className="text-xs uppercase tracking-widest">Rango de fechas</span>
+        <main className="flex-1 px-6 py-6 space-y-6 overflow-y-auto">
+          {/* Welcome + Date Range */}
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div>
+              <h2 className="text-3xl text-accent tracking-tight" style={{ fontFamily: "'Georgia', serif" }}>
+                Bienvenido, {profile?.full_name || 'Agente'}
+              </h2>
+              <p className="text-sm text-muted-foreground mt-1">
+                Aquí tienes el resumen ejecutivo de tu cartera.
+              </p>
             </div>
-            <div className="flex items-center gap-2 flex-1">
+
+            <div className="flex items-center gap-2 bg-card border border-border rounded-lg px-3 py-2">
+              <CalendarDays className="h-4 w-4 text-muted-foreground" />
               <Input
                 type="date"
                 value={dateFrom}
                 onChange={(e) => setDateFrom(e.target.value)}
-                className="bg-secondary border-border text-foreground text-sm w-40"
-                placeholder="Desde"
+                className="bg-transparent border-0 text-sm w-36 h-7 p-0 focus-visible:ring-0"
               />
               <span className="text-muted-foreground text-xs">—</span>
               <Input
                 type="date"
                 value={dateTo}
                 onChange={(e) => setDateTo(e.target.value)}
-                className="bg-secondary border-border text-foreground text-sm w-40"
-                placeholder="Hasta"
+                className="bg-transparent border-0 text-sm w-36 h-7 p-0 focus-visible:ring-0"
               />
               {hasDateFilter && (
-                <Button
-                  variant="ghost"
-                  size="icon"
+                <button
                   onClick={() => { setDateFrom(''); setDateTo(''); }}
-                  className="h-8 w-8 text-muted-foreground hover:text-foreground"
-                  title="Limpiar filtro de fechas"
+                  className="p-1 text-muted-foreground hover:text-foreground"
                 >
                   <X className="h-3.5 w-3.5" />
-                </Button>
+                </button>
               )}
             </div>
-            {hasDateFilter && (
-              <span className="text-xs text-primary">
-                {dateFiltered.length} pólizas en rango
-              </span>
-            )}
           </div>
-        </div>
 
-        <MetricCards
-          totalCommission={totalCommission}
-          policiesEmitted={policiesEmitted}
-          pendingCases={pendingCases}
-          totalAnnualPremium={totalAnnualPremium}
-          totalBankAmount={totalBankAmount}
-          totalAdvanceCommission={totalAdvanceCommission}
-          totalRemainingCommission={totalRemainingCommission}
-        />
+          {/* Metric Cards */}
+          <AgentMetricCards
+            totalCommission={totalCommission}
+            policiesEmitted={policiesEmitted}
+            pendingCases={pendingCases}
+            totalAnnualPremium={totalAnnualPremium}
+            totalBankAmount={totalBankAmount}
+          />
 
-        <AgentCharts policies={dateFiltered} />
+          {/* Charts */}
+          <AgentCharts policies={dateFiltered} />
 
-        <div className="flex flex-col sm:flex-row gap-3">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Buscar por cliente o compañía..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="pl-9 bg-secondary border-border text-foreground placeholder:text-muted-foreground/50"
-            />
-          </div>
-          <div className="flex items-center gap-2 overflow-x-auto pb-1">
-            <Filter className="h-4 w-4 text-muted-foreground shrink-0" />
-            <button
-              onClick={() => setStatusFilters(new Set())}
-              className={`text-xs px-2.5 py-1 rounded-full border transition-all whitespace-nowrap active:scale-95 ${
-                statusFilters.size === 0
-                  ? 'border-primary/40 bg-primary/10 text-primary'
-                  : 'border-border text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              Todos
-            </button>
-            {allStatuses.map((s) => (
-              <button
-                key={s}
-                onClick={() => {
-                  setStatusFilters((prev) => {
-                    const next = new Set(prev);
-                    if (next.has(s)) next.delete(s);
-                    else next.add(s);
-                    return next;
-                  });
-                }}
-                className={`text-xs px-2.5 py-1 rounded-full border transition-all whitespace-nowrap active:scale-95 ${
-                  statusFilters.has(s)
-                    ? 'border-primary/40 bg-primary/10 text-primary'
-                    : 'border-border text-muted-foreground hover:text-foreground'
-                }`}
-              >
-                {STATUS_CONFIG[s].label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div className="space-y-2">
-          {isLoading ? (
-            <div className="space-y-2">
-              {[...Array(4)].map((_, i) => (
-                <div key={i} className="rounded-lg border border-border bg-card h-14 animate-pulse" />
-              ))}
-            </div>
-          ) : filtered.length === 0 ? (
-            <div className="rounded-lg border border-border bg-card p-12 text-center">
-              <p className="text-muted-foreground text-sm">
-                {search || statusFilters.size > 0 || hasDateFilter
-                  ? 'No se encontraron pólizas con esos filtros.'
-                  : 'Aún no tienes pólizas registradas.'}
-              </p>
-            </div>
-          ) : (
-            filtered.map((policy) => <PolicyCard key={policy.id} policy={policy} />)
-          )}
-        </div>
-
-        {!isLoading && filtered.length > 0 && (
-          <p className="text-xs text-muted-foreground text-center">
-            Mostrando {filtered.length} de {policies?.length ?? 0} pólizas
-          </p>
-        )}
-      </main>
+          {/* Policies Table */}
+          <AgentPoliciesTable policies={dateFiltered} isLoading={isLoading} />
+        </main>
+      </div>
     </div>
   );
 }
-
-
-
-
