@@ -116,10 +116,10 @@ export function AddClosingByMessage() {
       return;
     }
 
-    const rate = parseFloat(parsed.commissionRate) / 100;
+    const rate = parsed.commissionRate ? parseFloat(parsed.commissionRate) / 100 : null;
     const annualPremium = amount; // Full value
     const primaPago = Math.round((annualPremium / 12) * 100) / 100;
-    const totalCommission = Math.round(annualPremium * rate * 100) / 100;
+    const totalCommission = rate !== null ? Math.round(annualPremium * rate * 100) / 100 : null;
 
     createPolicy.mutate(
       {
