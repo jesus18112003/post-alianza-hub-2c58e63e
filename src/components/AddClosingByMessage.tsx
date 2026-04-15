@@ -53,6 +53,7 @@ export function AddClosingByMessage() {
     policyType: string;
     paymentMethod: string;
     clientName: string;
+    location: string;
     agentId: string;
     date: string;
     commissionRate: string;
@@ -75,6 +76,7 @@ export function AddClosingByMessage() {
       policyType: result.policyType,
       paymentMethod: result.paymentMethod,
       clientName: result.clientName,
+      location: result.location || '',
       agentId: '',
       date: new Date().toISOString().split('T')[0],
       commissionRate: (rate * 100).toString(),
