@@ -9,10 +9,10 @@ import { toast } from 'sonner';
 
 const COMPANY_MAP: Record<string, string> = {
   'AMAN': 'AMAM', 'AMAM': 'AMAM',
-  'MOO': 'MUTUAL OF OMAHA',
+  'MOO': 'MOO', 'MUTUAL': 'MOO', 'MUTUAL OF OMAHA': 'MOO',
   'NLG': 'NL', 'NL': 'NL',
-  'COB': 'Corebridge',
-  'AMERICO': 'AMERICO',
+  'COB': 'COB', 'COREBRIDGE': 'COB',
+  'AMERICO': 'AMERICO', 'AMÉRICO': 'AMERICO',
 };
 
 const COMMISSION_RATES: Record<string, number> = {
