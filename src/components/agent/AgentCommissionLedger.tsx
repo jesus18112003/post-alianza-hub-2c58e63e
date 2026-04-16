@@ -43,7 +43,7 @@ export function AgentCommissionLedger({ policies, isLoading }: Props) {
       : '-';
 
   const gridCols = notesEnabled
-    ? 'sm:grid-cols-[6rem_7rem_1fr_9rem_7rem_7rem_3rem]'
+    ? 'sm:grid-cols-[6rem_6rem_11rem_1fr_8rem_6rem_6rem]'
     : 'sm:grid-cols-[6rem_8rem_1fr_9rem_8rem_8rem]';
 
   return (
@@ -65,10 +65,10 @@ export function AgentCommissionLedger({ policies, isLoading }: Props) {
         <span>FECHA</span>
         <span>CARRIER</span>
         <span>NOMBRE DEL CLIENTE</span>
+        {notesEnabled && <span>NOTA</span>}
         <span>NÚMERO DE PÓLIZA</span>
         <span className="text-right">COMISIÓN</span>
         <span className="text-right">CHARGEBACK</span>
-        {notesEnabled && <span className="text-center">NOTA</span>}
       </div>
 
       <div className="divide-y divide-border/30">
@@ -102,6 +102,13 @@ export function AgentCommissionLedger({ policies, isLoading }: Props) {
                 </span>
                 <span className="text-sm text-secondary-foreground">{p.company}</span>
                 <span className="text-sm text-card-foreground">{p.client_name}</span>
+                {notesEnabled && (
+                  <NoteCell
+                    policyId={p.id}
+                    currentNote={note}
+                    onSave={(value) => upsert.mutate({ policy_id: p.id, note: value })}
+                  />
+                )}
                 <span className="text-sm text-muted-foreground">{p.policy_number ?? '-'}</span>
                 <span className="text-sm text-right text-emerald-500" style={{ fontFamily: "'Inter', sans-serif" }}>
                   {p.status === 'cobrado' ? fmt(p.bank_amount) : '-'}
@@ -109,15 +116,6 @@ export function AgentCommissionLedger({ policies, isLoading }: Props) {
                 <span className="text-sm text-right text-destructive" style={{ fontFamily: "'Inter', sans-serif" }}>
                   {p.chargeback_amount ? fmt(p.chargeback_amount) : '-'}
                 </span>
-                {notesEnabled && (
-                  <div className="flex justify-center">
-                    <NoteCell
-                      policyId={p.id}
-                      currentNote={note}
-                      onSave={(value) => upsert.mutate({ policy_id: p.id, note: value })}
-                    />
-                  </div>
-                )}
               </div>
             );
           })
@@ -130,6 +128,7 @@ export function AgentCommissionLedger({ policies, isLoading }: Props) {
           <span />
           <span />
           <span />
+          {notesEnabled && <span />}
           <span className="text-xs uppercase tracking-widest text-muted-foreground font-medium text-right">
             TOTALES
           </span>
@@ -139,7 +138,6 @@ export function AgentCommissionLedger({ policies, isLoading }: Props) {
           <span className="text-sm font-semibold text-right text-destructive" style={{ fontFamily: "'Inter', sans-serif" }}>
             {fmt(totalChargeback)}
           </span>
-          {notesEnabled && <span />}
         </div>
       )}
     </div>
