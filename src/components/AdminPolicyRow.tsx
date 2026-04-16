@@ -2,12 +2,15 @@ import { useState } from 'react';
 import { Policy } from '@/types/policy';
 import { StatusBadge, STATUS_CONFIG, PolicyStatus } from '@/components/StatusBadge';
 import { useUpdatePolicyStatus, useDeletePolicy } from '@/hooks/useAdminData';
+import { usePolicyFollowups } from '@/hooks/usePolicyFollowups';
 import { format, differenceInDays, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { ChevronDown, Trash2, Check, X, Pencil, Phone, AlertTriangle, Clock, MessageSquare } from 'lucide-react';
+import { ChevronDown, Trash2, Check, X, Pencil, Phone, AlertTriangle, Clock, MessageSquare, Hourglass } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { EditPolicyDialog } from '@/components/EditPolicyDialog';
 import { WelcomeMessageDialog } from '@/components/WelcomeMessageDialog';
+import { FollowupManagerDialog } from '@/components/FollowupManagerDialog';
+import { FollowupBadge } from '@/components/FollowupBadge';
 import { toast } from 'sonner';
 
 interface AdminPolicyRowProps {
@@ -21,9 +24,12 @@ export function AdminPolicyRow({ policy, agentName }: AdminPolicyRowProps) {
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   const [welcomeOpen, setWelcomeOpen] = useState(false);
+  const [followupOpen, setFollowupOpen] = useState(false);
 
   const updateStatus = useUpdatePolicyStatus();
   const deletePolicy = useDeletePolicy();
+  const { data: followups = [] } = usePolicyFollowups(policy.id);
+  const activeFollowup = followups.find((f) => f.status === 'pending');
 
   const formattedDate = format(new Date(policy.date + 'T12:00:00'), 'dd MMM yyyy', { locale: es });
   const allStatuses = Object.keys(STATUS_CONFIG) as PolicyStatus[];
@@ -92,6 +98,7 @@ export function AdminPolicyRow({ policy, agentName }: AdminPolicyRowProps) {
         {policy.phone_number && (
           <Phone className="h-3.5 w-3.5 text-green-500 shrink-0" />
         )}
+        {activeFollowup && <FollowupBadge followup={activeFollowup} />}
         {collectionCountdown && collectionCountdown.days <= 5 && (
           <span
             className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-semibold uppercase tracking-wide shrink-0 ${
@@ -175,6 +182,20 @@ export function AdminPolicyRow({ policy, agentName }: AdminPolicyRowProps) {
 
             {/* Delete */}
             <div className="flex items-center gap-2">
+              {/* Followup manager */}
+              <Button
+                variant="ghost"
+                size="icon"
+                className={`h-7 w-7 ${activeFollowup ? 'text-amber-500' : 'text-muted-foreground hover:text-amber-500'}`}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setFollowupOpen(true);
+                }}
+                title="Tiempos de espera"
+              >
+                <Hourglass className="h-3.5 w-3.5" />
+              </Button>
+
               {/* Welcome message */}
               <Button
                 variant="ghost"
@@ -314,6 +335,7 @@ export function AdminPolicyRow({ policy, agentName }: AdminPolicyRowProps) {
       </div>
       <EditPolicyDialog policy={policy} open={editOpen} onOpenChange={setEditOpen} />
       <WelcomeMessageDialog policy={policy} agentName={agentName} open={welcomeOpen} onOpenChange={setWelcomeOpen} />
+      <FollowupManagerDialog policy={policy} open={followupOpen} onOpenChange={setFollowupOpen} />
     </div>
   );
 }

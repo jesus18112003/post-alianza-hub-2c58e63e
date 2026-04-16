@@ -1,7 +1,8 @@
-import { Search, Bell } from 'lucide-react';
+import { Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { ThemeToggleButton } from '@/components/ThemeToggleButton';
 import { useAuth } from '@/hooks/useAuth';
+import { AdminNotificationBell } from '@/components/admin/AdminNotificationBell';
 
 interface AdminTopBarProps {
   search: string;
@@ -27,10 +28,7 @@ export function AdminTopBar({ search, onSearchChange }: AdminTopBarProps) {
       {/* Right side */}
       <div className="flex items-center gap-3 ml-4">
         <ThemeToggleButton />
-        <button className="relative p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors">
-          <Bell className="h-4 w-4" />
-          <span className="absolute top-1.5 right-1.5 h-2 w-2 bg-primary rounded-full" />
-        </button>
+        <AdminNotificationBell />
         <div className="flex items-center gap-2 ml-2">
           <div className="text-right">
             <p className="text-sm text-foreground leading-tight">
