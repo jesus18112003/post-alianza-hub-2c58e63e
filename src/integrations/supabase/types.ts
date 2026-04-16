@@ -149,6 +149,33 @@ export type Database = {
         }
         Relationships: []
       }
+      ledger_notes: {
+        Row: {
+          agent_id: string
+          created_at: string
+          id: string
+          note: string
+          policy_id: string
+          updated_at: string
+        }
+        Insert: {
+          agent_id: string
+          created_at?: string
+          id?: string
+          note?: string
+          policy_id: string
+          updated_at?: string
+        }
+        Update: {
+          agent_id?: string
+          created_at?: string
+          id?: string
+          note?: string
+          policy_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       notifications: {
         Row: {
           agent_id: string
