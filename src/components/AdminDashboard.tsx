@@ -103,6 +103,9 @@ export function AdminDashboard() {
             </div>
           </div>
 
+          {/* Priority requirements */}
+          <PriorityRequirements policies={policies ?? []} agentMap={agentMap} />
+
           {/* Metric cards */}
           <AdminMetricCards
             totalBankAmount={totalBankAmount}
