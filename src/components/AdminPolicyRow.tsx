@@ -5,12 +5,14 @@ import { useUpdatePolicyStatus, useDeletePolicy } from '@/hooks/useAdminData';
 import { usePolicyFollowups } from '@/hooks/usePolicyFollowups';
 import { format, differenceInDays, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { ChevronDown, Trash2, Check, X, Pencil, Phone, AlertTriangle, Clock, MessageSquare, Hourglass } from 'lucide-react';
+import { ChevronDown, Trash2, Check, X, Pencil, Phone, AlertTriangle, Clock, MessageSquare, Hourglass, AlertOctagon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { EditPolicyDialog } from '@/components/EditPolicyDialog';
 import { WelcomeMessageDialog } from '@/components/WelcomeMessageDialog';
 import { FollowupManagerDialog } from '@/components/FollowupManagerDialog';
 import { FollowupBadge } from '@/components/FollowupBadge';
+import { RequirementDialog } from '@/components/RequirementDialog';
+import { usePolicyRequirement } from '@/hooks/usePolicyRequirements';
 import { toast } from 'sonner';
 
 interface AdminPolicyRowProps {
