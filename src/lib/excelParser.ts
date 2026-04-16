@@ -145,12 +145,14 @@ const COMPANY_NORMALIZE: Record<string, string> = {
   'national life': 'NL',
   'nlg': 'NL',
   'nl': 'NL',
-  'corebridge': 'Corebridge',
-  'corebrige': 'Corebridge',
-  'cob': 'Corebridge',
-  'mutual of omaha': 'MUTUAL OF OMAHA',
-  'moo': 'MUTUAL OF OMAHA',
+  'corebridge': 'COB',
+  'corebrige': 'COB',
+  'cob': 'COB',
+  'mutual of omaha': 'MOO',
+  'mutual': 'MOO',
+  'moo': 'MOO',
   'americo': 'AMERICO',
+  'américo': 'AMERICO',
 };
 
 function normalizeCompany(val: string): string {

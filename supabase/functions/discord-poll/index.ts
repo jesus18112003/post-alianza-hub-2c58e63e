@@ -23,9 +23,10 @@ function parseMessage(raw: string) {
   let company = match[2].toUpperCase();
   const COMPANY_MAP: Record<string, string> = {
     'AMAN': 'AMAM', 'AMAM': 'AMAM',
-    'MOO': 'MUTUAL OF OMAHA',
+    'MOO': 'MOO', 'MUTUAL': 'MOO', 'MUTUAL OF OMAHA': 'MOO',
     'NLG': 'NL', 'NL': 'NL',
-    'COB': 'Corebridge',
+    'COB': 'COB', 'COREBRIDGE': 'COB',
+    'AMERICO': 'AMERICO', 'AMÉRICO': 'AMERICO',
   };
   company = COMPANY_MAP[company] || company;
   const policyType = match[3].toUpperCase();
