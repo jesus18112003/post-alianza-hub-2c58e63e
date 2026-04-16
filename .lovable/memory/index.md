@@ -4,7 +4,7 @@
 - Stack: Supabase (RLS, Edge functions). Realtime enabled.
 - Design: High-end dark mode (Bg: #000, Accents: #d1c7bd, Cards: #f0e9e1). Serif headings, sans-serif data.
 - Target Premium is always calculated as `monto / 12`.
-- Company normalization applied globally (e.g., MOO -> MUTUAL OF OMAHA).
+- Company normalization: MUTUAL OF OMAHA→MOO, Corebridge→COB, AMÉRICO→AMERICO, NLG→NL, AMAN→AMAM.
 - Admins are explicitly excluded from agent lists/metrics.
 - Admin 'Entró al Banco' metric is sum of `bank_amount` for emitido/cobrado policies.
 
