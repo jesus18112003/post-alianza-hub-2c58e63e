@@ -43,8 +43,8 @@ export function AgentCommissionLedger({ policies, isLoading }: Props) {
       : '-';
 
   const gridCols = notesEnabled
-    ? 'grid-cols-[6rem_8rem_1fr_9rem_8rem_8rem_4rem]'
-    : 'grid-cols-[6rem_8rem_1fr_9rem_8rem_8rem]';
+    ? 'sm:grid-cols-[6rem_7rem_1fr_9rem_7rem_7rem_3rem]'
+    : 'sm:grid-cols-[6rem_8rem_1fr_9rem_8rem_8rem]';
 
   return (
     <div className="rounded-xl border border-border bg-card">
@@ -95,7 +95,7 @@ export function AgentCommissionLedger({ policies, isLoading }: Props) {
             return (
               <div
                 key={p.id}
-                className={`px-5 py-3 grid grid-cols-1 sm:${gridCols} gap-2 sm:gap-4 items-center hover:bg-secondary/30 transition-colors`}
+                className={`px-5 py-3 grid grid-cols-1 ${gridCols} gap-2 sm:gap-4 items-center hover:bg-secondary/30 transition-colors`}
               >
                 <span className="text-sm text-muted-foreground" style={{ fontFamily: "'Inter', sans-serif" }}>
                   {formattedDate}
@@ -126,7 +126,7 @@ export function AgentCommissionLedger({ policies, isLoading }: Props) {
 
       {/* Totals */}
       {!isLoading && ledgerPolicies.length > 0 && (
-        <div className={`px-5 py-3 border-t border-border grid grid-cols-1 sm:${gridCols} gap-2 sm:gap-4 items-center bg-secondary/20`}>
+        <div className={`px-5 py-3 border-t border-border grid grid-cols-1 ${gridCols} gap-2 sm:gap-4 items-center bg-secondary/20`}>
           <span />
           <span />
           <span />
