@@ -69,7 +69,10 @@ function AgentDashboard() {
   );
 
   const totalBankAmount = useMemo(
-    () => dateFiltered.reduce((sum, p) => sum + (p.bank_amount ?? 0), 0),
+    () =>
+      dateFiltered
+        .filter((p) => p.status === 'cobrado')
+        .reduce((sum, p) => sum + (p.bank_amount ?? 0), 0),
     [dateFiltered]
   );
 
