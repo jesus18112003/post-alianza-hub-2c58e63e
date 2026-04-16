@@ -332,6 +332,42 @@ export type Database = {
         }
         Relationships: []
       }
+      policy_requirements: {
+        Row: {
+          created_at: string
+          created_by: string
+          description: string
+          id: string
+          policy_id: string
+          resolved: boolean
+          resolved_at: string | null
+          resolved_by: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          description?: string
+          id?: string
+          policy_id: string
+          resolved?: boolean
+          resolved_at?: string | null
+          resolved_by?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          description?: string
+          id?: string
+          policy_id?: string
+          resolved?: boolean
+          resolved_at?: string | null
+          resolved_by?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
