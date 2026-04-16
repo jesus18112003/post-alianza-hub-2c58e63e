@@ -355,6 +355,7 @@ export function AdminPolicyRow({ policy, agentName }: AdminPolicyRowProps) {
       <EditPolicyDialog policy={policy} open={editOpen} onOpenChange={setEditOpen} />
       <WelcomeMessageDialog policy={policy} agentName={agentName} open={welcomeOpen} onOpenChange={setWelcomeOpen} />
       <FollowupManagerDialog policy={policy} open={followupOpen} onOpenChange={setFollowupOpen} />
+      <RequirementDialog policyId={policy.id} clientName={policy.client_name} open={requirementOpen} onOpenChange={setRequirementOpen} />
     </div>
   );
 }
