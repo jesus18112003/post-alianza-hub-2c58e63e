@@ -141,12 +141,13 @@ export function GeneralListDialog({ open, onOpenChange, agentPolicies, agentName
   // Generate the formatted text
   const generateText = useCallback(() => {
     let text = '';
-    grouped.forEach(([company, companyItems]) => {
+    grouped.forEach(([company, companyItems], idx) => {
+      if (idx > 0) text += '\n';
       text += `${company}\n\n`;
       companyItems.forEach((item) => {
         const emoji = COLOR_EMOJI[item.color];
         const notePart = item.notes ? `: ${item.notes}` : '';
-        text += `${emoji}${item.clientName}${notePart}\n\n`;
+        text += `${emoji}${item.clientName}${notePart}\n`;
       });
     });
     return text.trim();
