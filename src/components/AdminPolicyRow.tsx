@@ -27,11 +27,14 @@ export function AdminPolicyRow({ policy, agentName }: AdminPolicyRowProps) {
   const [editOpen, setEditOpen] = useState(false);
   const [welcomeOpen, setWelcomeOpen] = useState(false);
   const [followupOpen, setFollowupOpen] = useState(false);
+  const [requirementOpen, setRequirementOpen] = useState(false);
 
   const updateStatus = useUpdatePolicyStatus();
   const deletePolicy = useDeletePolicy();
   const { data: followups = [] } = usePolicyFollowups(policy.id);
   const activeFollowup = followups.find((f) => f.status === 'pending');
+  const { data: requirement } = usePolicyRequirement(policy.id);
+  const hasRequirement = !!requirement && !requirement.resolved;
 
   const formattedDate = format(new Date(policy.date + 'T12:00:00'), 'dd MMM yyyy', { locale: es });
   const allStatuses = Object.keys(STATUS_CONFIG) as PolicyStatus[];
