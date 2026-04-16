@@ -5,12 +5,14 @@ import { useUpdatePolicyStatus, useDeletePolicy } from '@/hooks/useAdminData';
 import { usePolicyFollowups } from '@/hooks/usePolicyFollowups';
 import { format, differenceInDays, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { ChevronDown, Trash2, Check, X, Pencil, Phone, AlertTriangle, Clock, MessageSquare, Hourglass } from 'lucide-react';
+import { ChevronDown, Trash2, Check, X, Pencil, Phone, AlertTriangle, Clock, MessageSquare, Hourglass, AlertOctagon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { EditPolicyDialog } from '@/components/EditPolicyDialog';
 import { WelcomeMessageDialog } from '@/components/WelcomeMessageDialog';
 import { FollowupManagerDialog } from '@/components/FollowupManagerDialog';
 import { FollowupBadge } from '@/components/FollowupBadge';
+import { RequirementDialog } from '@/components/RequirementDialog';
+import { usePolicyRequirement } from '@/hooks/usePolicyRequirements';
 import { toast } from 'sonner';
 
 interface AdminPolicyRowProps {
@@ -25,11 +27,14 @@ export function AdminPolicyRow({ policy, agentName }: AdminPolicyRowProps) {
   const [editOpen, setEditOpen] = useState(false);
   const [welcomeOpen, setWelcomeOpen] = useState(false);
   const [followupOpen, setFollowupOpen] = useState(false);
+  const [requirementOpen, setRequirementOpen] = useState(false);
 
   const updateStatus = useUpdatePolicyStatus();
   const deletePolicy = useDeletePolicy();
   const { data: followups = [] } = usePolicyFollowups(policy.id);
   const activeFollowup = followups.find((f) => f.status === 'pending');
+  const { data: requirement } = usePolicyRequirement(policy.id);
+  const hasRequirement = !!requirement && !requirement.resolved;
 
   const formattedDate = format(new Date(policy.date + 'T12:00:00'), 'dd MMM yyyy', { locale: es });
   const allStatuses = Object.keys(STATUS_CONFIG) as PolicyStatus[];
@@ -182,6 +187,20 @@ export function AdminPolicyRow({ policy, agentName }: AdminPolicyRowProps) {
 
             {/* Delete */}
             <div className="flex items-center gap-2">
+              {/* Requirement check */}
+              <Button
+                variant="ghost"
+                size="icon"
+                className={`h-7 w-7 ${hasRequirement ? 'text-destructive' : 'text-muted-foreground hover:text-destructive'}`}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setRequirementOpen(true);
+                }}
+                title={hasRequirement ? 'Requerimiento pendiente activo' : 'Marcar requerimiento pendiente'}
+              >
+                <AlertOctagon className="h-3.5 w-3.5" />
+              </Button>
+
               {/* Followup manager */}
               <Button
                 variant="ghost"
@@ -336,6 +355,7 @@ export function AdminPolicyRow({ policy, agentName }: AdminPolicyRowProps) {
       <EditPolicyDialog policy={policy} open={editOpen} onOpenChange={setEditOpen} />
       <WelcomeMessageDialog policy={policy} agentName={agentName} open={welcomeOpen} onOpenChange={setWelcomeOpen} />
       <FollowupManagerDialog policy={policy} open={followupOpen} onOpenChange={setFollowupOpen} />
+      <RequirementDialog policyId={policy.id} clientName={policy.client_name} open={requirementOpen} onOpenChange={setRequirementOpen} />
     </div>
   );
 }
