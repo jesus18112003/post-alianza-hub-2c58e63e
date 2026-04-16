@@ -156,6 +156,7 @@ export type Database = {
           expires_at: string
           id: string
           message: string
+          notification_type: string
           policy_id: string
           read: boolean
         }
@@ -165,6 +166,7 @@ export type Database = {
           expires_at: string
           id?: string
           message: string
+          notification_type?: string
           policy_id: string
           read?: boolean
         }
@@ -174,6 +176,7 @@ export type Database = {
           expires_at?: string
           id?: string
           message?: string
+          notification_type?: string
           policy_id?: string
           read?: boolean
         }
@@ -260,6 +263,48 @@ export type Database = {
         }
         Relationships: []
       }
+      policy_followups: {
+        Row: {
+          created_at: string
+          created_by: string
+          due_date: string
+          id: string
+          notify_days_before: number
+          policy_id: string
+          reason: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          due_date: string
+          id?: string
+          notify_days_before?: number
+          policy_id: string
+          reason: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          due_date?: string
+          id?: string
+          notify_days_before?: number
+          policy_id?: string
+          reason?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -337,6 +382,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      check_followup_notifications: { Args: never; Returns: undefined }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
