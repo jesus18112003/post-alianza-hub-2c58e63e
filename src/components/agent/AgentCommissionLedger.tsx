@@ -43,8 +43,8 @@ export function AgentCommissionLedger({ policies, isLoading }: Props) {
       : '-';
 
   const gridCols = notesEnabled
-    ? 'grid-cols-[6rem_8rem_1fr_9rem_8rem_8rem_4rem]'
-    : 'grid-cols-[6rem_8rem_1fr_9rem_8rem_8rem]';
+    ? 'sm:grid-cols-[6rem_7rem_1fr_9rem_7rem_7rem_3rem]'
+    : 'sm:grid-cols-[6rem_8rem_1fr_9rem_8rem_8rem]';
 
   return (
     <div className="rounded-xl border border-border bg-card">
