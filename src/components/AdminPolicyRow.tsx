@@ -187,6 +187,20 @@ export function AdminPolicyRow({ policy, agentName }: AdminPolicyRowProps) {
 
             {/* Delete */}
             <div className="flex items-center gap-2">
+              {/* Requirement check */}
+              <Button
+                variant="ghost"
+                size="icon"
+                className={`h-7 w-7 ${hasRequirement ? 'text-destructive' : 'text-muted-foreground hover:text-destructive'}`}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setRequirementOpen(true);
+                }}
+                title={hasRequirement ? 'Requerimiento pendiente activo' : 'Marcar requerimiento pendiente'}
+              >
+                <AlertOctagon className="h-3.5 w-3.5" />
+              </Button>
+
               {/* Followup manager */}
               <Button
                 variant="ghost"
