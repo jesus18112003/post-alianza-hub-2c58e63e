@@ -183,7 +183,7 @@ export function AgentPoliciesTable({ policies, isLoading }: AgentPoliciesTablePr
                           <DetailRow label="Entró al Banco" value={policy.bank_amount} />
                         </div>
                       )}
-                      {hasTechnical && (
+                      {(hasTechnical || policy.collection_date || policy.folder_sent_date) && (
                         <div className="space-y-1">
                           <h4 className="text-xs font-medium text-primary mb-2" style={{ fontFamily: "'Georgia', serif" }}>
                             Detalles Técnicos
@@ -191,6 +191,8 @@ export function AgentPoliciesTable({ policies, isLoading }: AgentPoliciesTablePr
                           <DetailRow label="Tipo de Póliza" value={policy.policy_type} />
                           <DetailRow label="Método de Pago" value={policy.payment_method} />
                           <DetailRow label="Ubicación" value={policy.location} />
+                          <DetailRow label="Fecha de Cobro" value={policy.collection_date ? format(new Date(policy.collection_date + 'T12:00:00'), 'dd MMM yyyy', { locale: es }) : null} />
+                          <DetailRow label="Envío de Carpeta" value={policy.folder_sent_date ? format(new Date(policy.folder_sent_date + 'T12:00:00'), 'dd MMM yyyy', { locale: es }) : null} />
                         </div>
                       )}
                       {policy.notes && (
