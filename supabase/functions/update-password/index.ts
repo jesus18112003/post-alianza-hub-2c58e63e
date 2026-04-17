@@ -16,23 +16,42 @@ Deno.serve(async (req) => {
 
     const adminClient = createClient(supabaseUrl, serviceRoleKey);
 
-    const { userId, newPassword, newEmail } = await req.json();
+    const { userId, newPassword, newEmail, newUsername, fullName } = await req.json();
     if (!userId || !newPassword) {
       throw new Error("Missing required fields: userId, newPassword");
     }
 
-    const updatePayload: { password: string; email?: string; email_confirm?: boolean } = { password: newPassword };
+    const updatePayload: {
+      password: string;
+      email?: string;
+      email_confirm?: boolean;
+      user_metadata?: Record<string, string>;
+    } = { password: newPassword };
+
     if (newEmail) {
       updatePayload.email = newEmail;
       updatePayload.email_confirm = true;
     }
 
-    const { error: updateError } = await adminClient.auth.admin.updateUserById(
-      userId,
-      updatePayload
-    );
+    if (newUsername || fullName) {
+      updatePayload.user_metadata = {
+        ...(newUsername ? { username: newUsername } : {}),
+        ...(fullName ? { full_name: fullName } : {}),
+      };
+    }
+
+    const { error: updateError } = await adminClient.auth.admin.updateUserById(userId, updatePayload);
 
     if (updateError) throw updateError;
+
+    if (newUsername) {
+      const { error: profileError } = await adminClient
+        .from("profiles")
+        .update({ username: newUsername })
+        .eq("id", userId);
+
+      if (profileError) throw profileError;
+    }
 
     return new Response(
       JSON.stringify({ success: true }),
