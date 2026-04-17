@@ -12,7 +12,7 @@ const COMPANY_MAP: Record<string, string> = {
   'MOO': 'MOO', 'MUTUAL': 'MOO', 'MUTUAL OF OMAHA': 'MOO',
   'NLG': 'NL', 'NL': 'NL',
   'COB': 'COB', 'COREBRIDGE': 'COB',
-  'AMERICO': 'AMERICO', 'AMÉRICO': 'AMERICO',
+  'AMERICO': 'AM', 'AMÉRICO': 'AM', 'AM': 'AM',
 };
 
 const COMMISSION_RATES: Record<string, number> = {

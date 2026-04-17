@@ -26,7 +26,7 @@ function parseMessage(raw: string) {
     'MOO': 'MOO', 'MUTUAL': 'MOO', 'MUTUAL OF OMAHA': 'MOO',
     'NLG': 'NL', 'NL': 'NL',
     'COB': 'COB', 'COREBRIDGE': 'COB',
-    'AMERICO': 'AMERICO', 'AMÉRICO': 'AMERICO',
+    'AMERICO': 'AM', 'AMÉRICO': 'AM', 'AM': 'AM',
   };
   company = COMPANY_MAP[company] || company;
   const policyType = match[3].toUpperCase();

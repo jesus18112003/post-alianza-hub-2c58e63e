@@ -151,8 +151,9 @@ const COMPANY_NORMALIZE: Record<string, string> = {
   'mutual of omaha': 'MOO',
   'mutual': 'MOO',
   'moo': 'MOO',
-  'americo': 'AMERICO',
-  'américo': 'AMERICO',
+  'americo': 'AM',
+  'américo': 'AM',
+  'am': 'AM',
 };
 
 function normalizeCompany(val: string): string {
