@@ -23,7 +23,13 @@ export function AgentCommissionLedger({ policies, isLoading }: Props) {
 
   const ledgerPolicies = useMemo(() => {
     return policies
-      .filter((p) => p.status === 'cobrado' || p.status === 'chargeback')
+      .filter(
+        (p) =>
+          p.status === 'cobrado' ||
+          p.status === 'chargeback' ||
+          ((p.status === 'cancelado' || p.status === 'fondo_insuficiente') &&
+            (p.chargeback_amount ?? 0) > 0)
+      )
       .sort((a, b) => a.date.localeCompare(b.date));
   }, [policies]);
 
