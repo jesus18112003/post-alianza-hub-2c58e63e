@@ -5,7 +5,7 @@ import { useUpdatePolicyStatus, useDeletePolicy } from '@/hooks/useAdminData';
 import { usePolicyFollowups } from '@/hooks/usePolicyFollowups';
 import { format, differenceInDays, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { ChevronDown, Trash2, Check, X, Pencil, Phone, AlertTriangle, Clock, MessageSquare, Hourglass, AlertOctagon } from 'lucide-react';
+import { ChevronDown, Trash2, Check, X, Pencil, Phone, AlertTriangle, Clock, MessageSquare, Hourglass, AlertOctagon, FolderCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { EditPolicyDialog } from '@/components/EditPolicyDialog';
 import { WelcomeMessageDialog } from '@/components/WelcomeMessageDialog';
@@ -340,6 +340,12 @@ export function AdminPolicyRow({ policy, agentName }: AdminPolicyRowProps) {
                       ({collectionCountdown.days < 0 ? 'Vencido' : collectionCountdown.days === 0 ? 'Hoy' : `en ${collectionCountdown.days} días`})
                     </span>
                   )}
+                </span>
+              )}
+              {policy.folder_sent_date && (
+                <span className="text-xs text-muted-foreground flex items-center gap-1">
+                  <FolderCheck className="h-3 w-3 text-blue-500" />
+                  Carpeta enviada: <span className="text-secondary-foreground">{format(parseISO(policy.folder_sent_date), 'dd MMM yyyy', { locale: es })}</span>
                 </span>
               )}
               {policy.phone_number && (
