@@ -1,0 +1,1 @@
+ALTER TABLE public.policies ADD COLUMN folder_sent_date date;

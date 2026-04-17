@@ -21,6 +21,7 @@ export interface Policy {
   notes_updated_at: string | null;
   phone_number: string | null;
   collection_date: string | null;
+  folder_sent_date: string | null;
   created_at: string;
   updated_at: string;
 }

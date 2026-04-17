@@ -23,6 +23,7 @@ export function exportPoliciesToCsv(
     'Chargeback',
     'Teléfono',
     'Fecha de Cobro',
+    'Envío de Carpeta',
     'Notas',
   ];
 
@@ -44,6 +45,7 @@ export function exportPoliciesToCsv(
     p.chargeback_amount ?? '',
     p.phone_number ?? '',
     p.collection_date ?? '',
+    p.folder_sent_date ?? '',
     p.notes ?? '',
   ]);
 

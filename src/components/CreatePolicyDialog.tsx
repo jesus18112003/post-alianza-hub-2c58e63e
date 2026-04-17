@@ -37,6 +37,7 @@ export function CreatePolicyDialog({ agentId, agentName, open, onOpenChange }: C
     notes: '',
     phone_number: '',
     collection_date: '',
+    folder_sent_date: '',
     commission_rate: DEFAULT_COMMISSION_RATE.toString(),
   });
 
@@ -75,6 +76,7 @@ export function CreatePolicyDialog({ agentId, agentName, open, onOpenChange }: C
       notes: '',
       phone_number: '',
       collection_date: '',
+      folder_sent_date: '',
       commission_rate: DEFAULT_COMMISSION_RATE.toString(),
     });
   };
@@ -103,6 +105,7 @@ export function CreatePolicyDialog({ agentId, agentName, open, onOpenChange }: C
         notes: form.notes.trim() || null,
         phone_number: form.phone_number.trim() || null,
         collection_date: form.collection_date || null,
+        folder_sent_date: form.folder_sent_date || null,
       },
       {
         onSuccess: () => {
@@ -176,6 +179,11 @@ export function CreatePolicyDialog({ agentId, agentName, open, onOpenChange }: C
             <div className="space-y-1.5">
               <Label className="text-xs text-muted-foreground">Fecha de Cobro</Label>
               <Input type="date" value={form.collection_date} onChange={(e) => set('collection_date', e.target.value)}
+                className="bg-secondary border-border text-foreground text-sm" />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-xs text-muted-foreground">Envío de Carpeta</Label>
+              <Input type="date" value={form.folder_sent_date} onChange={(e) => set('folder_sent_date', e.target.value)}
                 className="bg-secondary border-border text-foreground text-sm" />
             </div>
           </div>
