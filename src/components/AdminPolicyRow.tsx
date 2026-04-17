@@ -62,9 +62,10 @@ export function AdminPolicyRow({ policy, agentName }: AdminPolicyRowProps) {
   const hasFinancials = policy.target_premium || policy.prima_payment || policy.total_commission || policy.bank_amount;
   const hasTechnical = policy.policy_type || policy.payment_method || policy.location;
 
-  // Collection date countdown
+  // Collection date countdown — hidden when policy is already collected
   const collectionCountdown = (() => {
     if (!policy.collection_date) return null;
+    if (policy.status === 'cobrado') return null;
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const collDate = parseISO(policy.collection_date);
