@@ -157,6 +157,7 @@ export function useCreatePolicy() {
       notes?: string | null;
       phone_number?: string | null;
       collection_date?: string | null;
+      folder_sent_date?: string | null;
     }) => {
       const { error } = await supabase
         .from('policies')
