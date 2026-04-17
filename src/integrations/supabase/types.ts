@@ -222,6 +222,7 @@ export type Database = {
           company: string
           created_at: string
           date: string
+          folder_sent_date: string | null
           id: string
           location: string | null
           notes: string | null
@@ -248,6 +249,7 @@ export type Database = {
           company: string
           created_at?: string
           date?: string
+          folder_sent_date?: string | null
           id?: string
           location?: string | null
           notes?: string | null
@@ -274,6 +276,7 @@ export type Database = {
           company?: string
           created_at?: string
           date?: string
+          folder_sent_date?: string | null
           id?: string
           location?: string | null
           notes?: string | null
