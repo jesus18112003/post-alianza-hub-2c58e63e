@@ -1,0 +1,2 @@
+UPDATE public.policies SET company = 'AM' WHERE upper(company) IN ('AMERICO', 'AMÉRICO', 'AMERIC0');
+UPDATE public.closing_assignments SET company = 'AM' WHERE upper(company) IN ('AMERICO', 'AMÉRICO');
