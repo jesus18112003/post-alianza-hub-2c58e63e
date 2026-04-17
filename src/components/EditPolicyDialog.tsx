@@ -38,6 +38,7 @@ export function EditPolicyDialog({ policy, open, onOpenChange }: EditPolicyDialo
     notes: policy.notes ?? '',
     phone_number: policy.phone_number ?? '',
     collection_date: policy.collection_date ?? '',
+    folder_sent_date: policy.folder_sent_date ?? '',
     commission_rate: ((policy.target_premium && policy.total_commission)
       ? ((policy.total_commission / policy.target_premium) * 100).toFixed(0)
       : (DEFAULT_COMMISSION_RATE * 100).toString()),
@@ -87,6 +88,7 @@ export function EditPolicyDialog({ policy, open, onOpenChange }: EditPolicyDialo
           notes: form.notes.trim() || null,
           phone_number: form.phone_number.trim() || null,
           collection_date: form.collection_date || null,
+          folder_sent_date: form.folder_sent_date || null,
         },
       },
       {
@@ -159,6 +161,11 @@ export function EditPolicyDialog({ policy, open, onOpenChange }: EditPolicyDialo
             <div className="space-y-1.5">
               <Label className="text-xs text-muted-foreground">Fecha de Cobro</Label>
               <Input type="date" value={form.collection_date} onChange={(e) => set('collection_date', e.target.value)}
+                className="bg-secondary border-border text-foreground text-sm" />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-xs text-muted-foreground">Envío de Carpeta</Label>
+              <Input type="date" value={form.folder_sent_date} onChange={(e) => set('folder_sent_date', e.target.value)}
                 className="bg-secondary border-border text-foreground text-sm" />
             </div>
           </div>
