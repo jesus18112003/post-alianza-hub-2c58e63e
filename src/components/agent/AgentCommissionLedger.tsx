@@ -7,7 +7,8 @@ import { useLedgerNotes } from '@/hooks/useLedgerNotes';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import { StickyNote, CheckCircle2 } from 'lucide-react';
+import { StickyNote, CheckCircle2, CalendarDays, X } from 'lucide-react';
+import { Input } from '@/components/ui/input';
 
 interface Props {
   policies: Policy[];
@@ -20,6 +21,8 @@ export function AgentCommissionLedger({ policies, isLoading }: Props) {
   const { profile } = useAuth();
   const notesEnabled = !!profile?.username && NOTES_ENABLED_USERNAMES.includes(profile.username.toLowerCase());
   const { notesByPolicy, upsert } = useLedgerNotes();
+  const [dateFrom, setDateFrom] = useState('');
+  const [dateTo, setDateTo] = useState('');
 
   const ledgerPolicies = useMemo(() => {
     return policies
@@ -30,8 +33,16 @@ export function AgentCommissionLedger({ policies, isLoading }: Props) {
           ((p.status === 'cancelado' || p.status === 'fondo_insuficiente') &&
             (p.chargeback_amount ?? 0) > 0)
       )
+      .filter((p) => {
+        if (dateFrom && p.date < dateFrom) return false;
+        if (dateTo && p.date > dateTo) return false;
+        return true;
+      })
       .sort((a, b) => a.date.localeCompare(b.date));
-  }, [policies]);
+  }, [policies, dateFrom, dateTo]);
+
+  const hasDateFilter = dateFrom || dateTo;
+
 
   const totalCommission = useMemo(
     () => ledgerPolicies.reduce((sum, p) => sum + (p.bank_amount ?? 0), 0),
@@ -54,17 +65,45 @@ export function AgentCommissionLedger({ policies, isLoading }: Props) {
 
   return (
     <div className="rounded-xl border border-border bg-card">
-      <div className="px-5 py-4 border-b border-border">
-        <h3
-          className="text-lg text-accent tracking-tight"
-          style={{ fontFamily: "'Georgia', serif" }}
-        >
-          LIBRO DIARIO
-        </h3>
-        <p className="text-xs text-muted-foreground mt-1">
-          Comisiones cobradas y chargebacks a partir del 14 de abril 2026.
-        </p>
+      <div className="px-5 py-4 border-b border-border flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div>
+          <h3
+            className="text-lg text-accent tracking-tight"
+            style={{ fontFamily: "'Georgia', serif" }}
+          >
+            LIBRO DIARIO
+          </h3>
+          <p className="text-xs text-muted-foreground mt-1">
+            Comisiones cobradas y chargebacks a partir del 14 de abril 2026.
+          </p>
+        </div>
+
+        <div className="flex items-center gap-2 bg-background border border-border rounded-lg px-3 py-2">
+          <CalendarDays className="h-4 w-4 text-muted-foreground" />
+          <Input
+            type="date"
+            value={dateFrom}
+            onChange={(e) => setDateFrom(e.target.value)}
+            className="bg-transparent border-0 text-sm w-36 h-7 p-0 focus-visible:ring-0"
+          />
+          <span className="text-muted-foreground text-xs">—</span>
+          <Input
+            type="date"
+            value={dateTo}
+            onChange={(e) => setDateTo(e.target.value)}
+            className="bg-transparent border-0 text-sm w-36 h-7 p-0 focus-visible:ring-0"
+          />
+          {hasDateFilter && (
+            <button
+              onClick={() => { setDateFrom(''); setDateTo(''); }}
+              className="p-1 text-muted-foreground hover:text-foreground"
+            >
+              <X className="h-3.5 w-3.5" />
+            </button>
+          )}
+        </div>
       </div>
+
 
       {/* Table header */}
       <div className={`px-5 py-2.5 border-b border-border/50 hidden sm:grid ${gridCols} gap-4 text-[10px] uppercase tracking-[0.15em] text-muted-foreground font-medium`}>
