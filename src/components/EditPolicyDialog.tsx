@@ -296,9 +296,24 @@ export function EditPolicyDialog({ policy, open, onOpenChange }: EditPolicyDialo
           </div>
 
           <div className="space-y-1.5">
-            <Label className="text-xs text-muted-foreground">Notas</Label>
+            <Label className="text-xs text-muted-foreground">Notas <span className="text-[10px] text-muted-foreground/70">(visibles para el agente)</span></Label>
             <Textarea value={form.notes} onChange={(e) => set('notes', e.target.value)}
               rows={3} className="bg-secondary border-border text-foreground text-sm resize-none" />
+          </div>
+
+          <div className="space-y-1.5 rounded-lg border border-amber-500/30 bg-amber-500/5 p-3">
+            <Label className="text-xs text-amber-400 flex items-center gap-1.5">
+              <Lock className="h-3 w-3" />
+              Notas Internas
+              <span className="text-[10px] text-amber-400/70 font-normal">(solo admins · ocultas al agente)</span>
+            </Label>
+            <Textarea
+              value={internalNotes}
+              onChange={(e) => setInternalNotes(e.target.value)}
+              rows={3}
+              placeholder="Anotaciones privadas del equipo administrativo..."
+              className="bg-background border-amber-500/20 text-foreground text-sm resize-none"
+            />
           </div>
         </div>
 
