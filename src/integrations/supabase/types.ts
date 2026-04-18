@@ -229,6 +229,39 @@ export type Database = {
         }
         Relationships: []
       }
+      internal_tasks: {
+        Row: {
+          archived: boolean
+          content: string
+          created_at: string
+          created_by: string
+          id: string
+          mentions: string[]
+          status: boolean
+          updated_at: string
+        }
+        Insert: {
+          archived?: boolean
+          content: string
+          created_at?: string
+          created_by: string
+          id?: string
+          mentions?: string[]
+          status?: boolean
+          updated_at?: string
+        }
+        Update: {
+          archived?: boolean
+          content?: string
+          created_at?: string
+          created_by?: string
+          id?: string
+          mentions?: string[]
+          status?: boolean
+          updated_at?: string
+        }
+        Relationships: []
+      }
       ledger_notes: {
         Row: {
           agent_id: string
