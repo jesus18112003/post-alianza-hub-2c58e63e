@@ -100,40 +100,8 @@ export function CarrierTotalsTable({ agentId, agentName, editable }: Props) {
     return m;
   }, [entries]);
 
-  // Per-carrier monthly totals (all months, all entries) - exclude negatives (debts)
-  const monthlyTotalsByCarrier = useMemo(() => {
-    const m: Record<string, Record<string, number>> = {}; // carrierId -> 'YYYY-MM' -> sum
-    entries.forEach((e) => {
-      const amount = Number(e.amount ?? 0);
-      if (amount < 0) return; // Skip negative amounts (debts)
-      const ym = e.entry_date.slice(0, 7);
-      m[e.carrier_id] ??= {};
-      m[e.carrier_id][ym] = (m[e.carrier_id][ym] ?? 0) + amount;
-    });
-    return m;
-  }, [entries]);
-
-  const monthsPresent = useMemo(() => {
-    const set = new Set<string>();
-    entries.forEach((e) => set.add(e.entry_date.slice(0, 7)));
-    return Array.from(set).sort((a, b) => b.localeCompare(a));
-  }, [entries]);
-
-  // Per-date row total - exclude negatives (debts)
-  const rowTotal = (date: string) =>
-    carriers.reduce((sum, c) => {
-      const amount = Number(entryMap[`${c.id}|${date}`]?.amount ?? 0);
-      return amount >= 0 ? sum + amount : sum;
-    }, 0);
-
-  // Grand total per carrier - exclude negatives (debts)
-  const grandTotalByCarrier = (carrierId: string) =>
-    entries
-      .filter((e) => e.carrier_id === carrierId)
-      .reduce((s, e) => {
-        const amount = Number(e.amount ?? 0);
-        return amount >= 0 ? s + amount : s;
-      }, 0);
+  // Note: per the product decision, this table is a registry only.
+  // No per-row, per-column, monthly, or grand totals are calculated.
 
   const handleAddCarrier = () => {
     const name = newCarrier.trim();
