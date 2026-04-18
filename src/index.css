@@ -52,6 +52,7 @@
     --status-cancelado: 0 72% 51%;
     --status-chargeback: 0 72% 35%;
     --status-aprobado: 142 76% 36%;
+    --status-no-seguimiento: 220 10% 40%;
   }
 
    :root.light {
@@ -101,6 +102,7 @@
     --status-cancelado: 0 72% 51%;
     --status-chargeback: 0 72% 35%;
     --status-aprobado: 142 76% 36%;
+    --status-no-seguimiento: 220 10% 40%;
   }
 }
 

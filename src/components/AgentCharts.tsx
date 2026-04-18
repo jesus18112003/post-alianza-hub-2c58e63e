@@ -19,6 +19,7 @@ const STATUS_COLORS: Record<string, string> = {
   cancelado: 'hsl(0, 70%, 50%)',
   chargeback: 'hsl(0, 50%, 35%)',
   aprobado: 'hsl(142, 70%, 45%)',
+  no_seguimiento: 'hsl(220, 10%, 40%)',
 };
 
 interface AgentChartsProps {

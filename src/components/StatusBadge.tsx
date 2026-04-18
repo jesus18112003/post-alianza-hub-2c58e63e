@@ -37,6 +37,10 @@ export const STATUS_CONFIG: Record<PolicyStatus, { label: string; className: str
     label: 'Aprobado',
     className: 'bg-[hsl(var(--status-aprobado,142_70%_45%))] text-white', 
   },
+  no_seguimiento: {
+    label: 'No Seguimiento',
+    className: 'bg-[hsl(var(--status-no-seguimiento))] text-white',
+  },
 };
 
 export function StatusBadge({ status }: { status: PolicyStatus }) {
