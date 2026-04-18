@@ -23,6 +23,7 @@ export function RecentPoliciesTable({
 }: RecentPoliciesTableProps) {
   const [statusFilters, setStatusFilters] = useState<Set<PolicyStatus>>(new Set());
   const [phoneFilter, setPhoneFilter] = useState<'all' | 'with' | 'without'>('all');
+  const [commissionFilter, setCommissionFilter] = useState<'all' | 'with' | 'without'>('all');
   const [showAll, setShowAll] = useState(false);
 
   const allStatuses = Object.keys(STATUS_CONFIG) as PolicyStatus[];
