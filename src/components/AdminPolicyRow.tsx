@@ -364,6 +364,39 @@ export function AdminPolicyRow({ policy, agentName }: AdminPolicyRowProps) {
             )}
           </div>
 
+          {/* Registro de Llamadas */}
+          {callLogs.length > 0 && (
+            <div className="mt-4 pt-3 border-t border-border/30">
+              <h4
+                className="text-xs font-medium text-primary mb-2 flex items-center gap-1.5"
+                style={{ fontFamily: "'Georgia', serif" }}
+              >
+                <PhoneCall className="h-3.5 w-3.5" />
+                Registro de Llamadas ({callLogs.length})
+              </h4>
+              <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
+                {callLogs.map((log) => (
+                  <div
+                    key={log.id}
+                    className="rounded-md border border-border/50 bg-secondary/30 px-3 py-2"
+                  >
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-[10px] uppercase tracking-wide text-primary/80 font-semibold tabular-nums">
+                        {format(parseISO(log.call_date), "dd MMM yyyy", { locale: es })}
+                      </span>
+                      <span className="text-[10px] text-muted-foreground/60">
+                        {format(new Date(log.created_at), "HH:mm", { locale: es })}
+                      </span>
+                    </div>
+                    <p className="text-xs text-secondary-foreground leading-relaxed whitespace-pre-wrap">
+                      {log.note}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Agent info, phone & collection date */}
           <div className="mt-4 pt-3 border-t border-border/30 flex items-center justify-between flex-wrap gap-2">
             <span className="text-xs text-muted-foreground">
