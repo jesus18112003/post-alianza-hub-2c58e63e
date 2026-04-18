@@ -6,7 +6,10 @@ interface AgentMetricCardsProps {
   pendingCases: number;
   totalAnnualPremium: number;
   totalBankAmount: number;
+  agentName?: string;
 }
+
+const COMMISSION_ALLOWED_FIRST_NAMES = ['aneisali', 'nerio', 'alexander'];
 
 export function AgentMetricCards({
   totalCommission,
@@ -14,7 +17,10 @@ export function AgentMetricCards({
   pendingCases,
   totalAnnualPremium,
   totalBankAmount,
+  agentName,
 }: AgentMetricCardsProps) {
+  const firstName = (agentName ?? '').trim().split(/\s+/)[0]?.toLowerCase() ?? '';
+  const showCommission = COMMISSION_ALLOWED_FIRST_NAMES.includes(firstName);
   const regularCards = [
     {
       title: 'PÓLIZAS EMITIDAS',
