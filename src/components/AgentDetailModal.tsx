@@ -93,7 +93,7 @@ function PersonalInfoSection({ agentId, details }: { agentId: string; details: a
 
   const [showSsn, setShowSsn] = useState(false);
 
-  const handleSave = () => {
+  const handleSave = async () => {
     upsert.mutate(
       {
         agentId,
@@ -105,7 +105,19 @@ function PersonalInfoSection({ agentId, details }: { agentId: string; details: a
         },
       },
       {
-        onSuccess: () => toast.success('Información personal guardada'),
+        onSuccess: async () => {
+          // Save email password via SECURITY DEFINER RPC
+          const { error: pErr } = await supabase.rpc('set_agent_email_password', {
+            _agent_id: agentId,
+            _password: emailPass.trim() || null,
+          });
+          if (pErr) {
+            toast.error('Datos guardados, pero falló la contraseña del correo');
+            return;
+          }
+          qc.invalidateQueries({ queryKey: ['agent-email-password', agentId] });
+          toast.success('Información personal guardada');
+        },
         onError: () => toast.error('Error al guardar'),
       }
     );
