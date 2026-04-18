@@ -1,6 +1,7 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Policy } from '@/types/policy';
 import { useUpdatePolicy } from '@/hooks/useAdminData';
+import { useInternalNotes, useSetInternalNotes } from '@/hooks/useInternalNotes';
 import { STATUS_CONFIG, PolicyStatus } from '@/components/StatusBadge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -9,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { AssigneeBadges, extractMentions, MENTION_MAP } from '@/components/AssigneeBadges';
 import { toast } from 'sonner';
+import { Lock } from 'lucide-react';
 
 interface EditPolicyDialogProps {
   policy: Policy;
