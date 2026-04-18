@@ -38,6 +38,7 @@ export function AdminPolicyRow({ policy, agentName }: AdminPolicyRowProps) {
   const activeFollowup = followups.find((f) => f.status === 'pending');
   const { data: requirement } = usePolicyRequirement(policy.id);
   const hasRequirement = !!requirement && !requirement.resolved;
+  const { data: callLogs = [] } = usePolicyCallLogs(open ? policy.id : null);
 
   const formattedDate = format(new Date(policy.date + 'T12:00:00'), 'dd MMM yyyy', { locale: es });
   const allStatuses = Object.keys(STATUS_CONFIG) as PolicyStatus[];
