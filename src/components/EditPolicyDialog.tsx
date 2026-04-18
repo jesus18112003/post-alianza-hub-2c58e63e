@@ -22,6 +22,13 @@ const DEFAULT_COMMISSION_RATE = 0;
 
 export function EditPolicyDialog({ policy, open, onOpenChange }: EditPolicyDialogProps) {
   const updatePolicy = useUpdatePolicy();
+  const { data: loadedInternal } = useInternalNotes(policy.id, open);
+  const setInternal = useSetInternalNotes();
+  const [internalNotes, setInternalNotes] = useState('');
+
+  useEffect(() => {
+    if (loadedInternal !== undefined) setInternalNotes(loadedInternal ?? '');
+  }, [loadedInternal]);
 
   const [form, setForm] = useState({
     date: policy.date,
