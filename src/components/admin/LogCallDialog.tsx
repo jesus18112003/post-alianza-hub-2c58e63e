@@ -47,7 +47,7 @@ export function LogCallDialog({ policy, open, onOpenChange }: LogCallDialogProps
               // not fatal
             }
           }
-          toast.success('Llamada registrada y guardada en notas');
+          toast.success('Nota de llamada guardada en la tarjeta del cliente');
           setNote('');
           setResolveAfter(false);
           onOpenChange(false);
@@ -93,7 +93,7 @@ export function LogCallDialog({ policy, open, onOpenChange }: LogCallDialogProps
               className="bg-secondary border-border text-foreground text-sm resize-none"
             />
             <p className="text-[10px] text-muted-foreground/70">
-              Se guarda como <span className="text-rose-300 font-semibold">#D</span> en Tareas y en las notas del cliente.
+              Se guarda con la fecha de hoy como nota adicional en la tarjeta del cliente.
             </p>
           </div>
 

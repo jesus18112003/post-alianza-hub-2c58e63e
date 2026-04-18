@@ -69,9 +69,11 @@ export function useSetScheduledCallDate() {
 
 /**
  * Logs a call by:
- *  1) Creating an internal task prefixed with #D so Diana sees it.
- *  2) Inserting a row into `policy_call_logs` (separate from client notes).
- *  3) Optionally updating scheduled_call_date.
+ *  1) Inserting a row into `policy_call_logs` (registro permanente con fecha).
+ *  2) Optionally updating scheduled_call_date.
+ *
+ * NOTA: Ya NO crea una tarea interna para Diana. La nota queda registrada
+ * únicamente como registro adicional en la tarjeta del cliente.
  */
 export function useLogCall() {
   const qc = useQueryClient();
@@ -91,20 +93,8 @@ export function useLogCall() {
       if (!trimmed) throw new Error('La nota no puede estar vacía');
 
       const today = format(new Date(), 'yyyy-MM-dd');
-      const displayDate = format(new Date(), 'dd/MM/yyyy');
-      const taskContent = `#D 📞 Llamada ${displayDate} · ${policy.client_name} (${policy.company}${
-        policy.phone_number ? ` · ${policy.phone_number}` : ''
-      }) — ${trimmed}`;
 
-      // 1) Internal task for Diana
-      const { error: taskErr } = await supabase.from('internal_tasks').insert({
-        content: taskContent,
-        mentions: ['D'],
-        created_by: user.id,
-      });
-      if (taskErr) throw taskErr;
-
-      // 2) Call log entry (separate table — does NOT touch policy.notes)
+      // 1) Call log entry (registro adicional con fecha en la tarjeta)
       const { error: logErr } = await supabase.from('policy_call_logs').insert({
         policy_id: policy.id,
         created_by: user.id,
@@ -113,7 +103,7 @@ export function useLogCall() {
       });
       if (logErr) throw logErr;
 
-      // 3) Optionally update scheduled date
+      // 2) Optionally update scheduled date
       if (scheduledDate !== undefined) {
         const { error: polErr } = await supabase
           .from('policies')
@@ -123,7 +113,6 @@ export function useLogCall() {
       }
     },
     onSuccess: (_data, vars) => {
-      qc.invalidateQueries({ queryKey: ['internal_tasks'] });
       qc.invalidateQueries({ queryKey: ['call-followup-policies'] });
       qc.invalidateQueries({ queryKey: ['admin-policies'] });
       qc.invalidateQueries({ queryKey: ['policies'] });
