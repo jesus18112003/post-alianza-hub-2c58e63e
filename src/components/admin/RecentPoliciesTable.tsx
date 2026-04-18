@@ -42,9 +42,13 @@ export function RecentPoliciesTable({
       const matchPhone =
         phoneFilter === 'all' ||
         (phoneFilter === 'with' ? !!p.phone_number : !p.phone_number);
-      return matchSearch && matchStatus && matchAgent && matchCompany && matchPhone;
+      const hasCommission = (p.total_commission ?? 0) > 0;
+      const matchCommission =
+        commissionFilter === 'all' ||
+        (commissionFilter === 'with' ? hasCommission : !hasCommission);
+      return matchSearch && matchStatus && matchAgent && matchCompany && matchPhone && matchCommission;
     });
-  }, [policies, search, statusFilters, agentFilter, companyFilter, agentMap, phoneFilter]);
+  }, [policies, search, statusFilters, agentFilter, companyFilter, agentMap, phoneFilter, commissionFilter]);
 
   const displayed = showAll ? filtered : filtered.slice(0, 20);
 
