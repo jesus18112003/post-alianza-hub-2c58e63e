@@ -1,6 +1,7 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Policy } from '@/types/policy';
 import { useUpdatePolicy } from '@/hooks/useAdminData';
+import { useInternalNotes, useSetInternalNotes } from '@/hooks/useInternalNotes';
 import { STATUS_CONFIG, PolicyStatus } from '@/components/StatusBadge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -9,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { AssigneeBadges, extractMentions, MENTION_MAP } from '@/components/AssigneeBadges';
 import { toast } from 'sonner';
+import { Lock } from 'lucide-react';
 
 interface EditPolicyDialogProps {
   policy: Policy;
@@ -20,6 +22,13 @@ const DEFAULT_COMMISSION_RATE = 0;
 
 export function EditPolicyDialog({ policy, open, onOpenChange }: EditPolicyDialogProps) {
   const updatePolicy = useUpdatePolicy();
+  const { data: loadedInternal } = useInternalNotes(policy.id, open);
+  const setInternal = useSetInternalNotes();
+  const [internalNotes, setInternalNotes] = useState('');
+
+  useEffect(() => {
+    if (loadedInternal !== undefined) setInternalNotes(loadedInternal ?? '');
+  }, [loadedInternal]);
 
   const [form, setForm] = useState({
     date: policy.date,
@@ -101,7 +110,13 @@ export function EditPolicyDialog({ policy, open, onOpenChange }: EditPolicyDialo
         },
       },
       {
-        onSuccess: () => {
+        onSuccess: async () => {
+          try {
+            await setInternal.mutateAsync({ policyId: policy.id, notes: internalNotes });
+          } catch (e: any) {
+            // Non-fatal — admin-only field, surface error but keep dialog state
+            toast.error('No se pudo guardar la nota interna');
+          }
           toast.success('Póliza actualizada');
           onOpenChange(false);
         },
@@ -281,9 +296,24 @@ export function EditPolicyDialog({ policy, open, onOpenChange }: EditPolicyDialo
           </div>
 
           <div className="space-y-1.5">
-            <Label className="text-xs text-muted-foreground">Notas</Label>
+            <Label className="text-xs text-muted-foreground">Notas <span className="text-[10px] text-muted-foreground/70">(visibles para el agente)</span></Label>
             <Textarea value={form.notes} onChange={(e) => set('notes', e.target.value)}
               rows={3} className="bg-secondary border-border text-foreground text-sm resize-none" />
+          </div>
+
+          <div className="space-y-1.5 rounded-lg border border-amber-500/30 bg-amber-500/5 p-3">
+            <Label className="text-xs text-amber-400 flex items-center gap-1.5">
+              <Lock className="h-3 w-3" />
+              Notas Internas
+              <span className="text-[10px] text-amber-400/70 font-normal">(solo admins · ocultas al agente)</span>
+            </Label>
+            <Textarea
+              value={internalNotes}
+              onChange={(e) => setInternalNotes(e.target.value)}
+              rows={3}
+              placeholder="Anotaciones privadas del equipo administrativo..."
+              className="bg-background border-amber-500/20 text-foreground text-sm resize-none"
+            />
           </div>
         </div>
 
