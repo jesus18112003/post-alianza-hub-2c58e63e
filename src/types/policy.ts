@@ -24,6 +24,7 @@ export interface Policy {
   folder_sent_date: string | null;
   assignees: string[];
   needs_call_followup: boolean;
+  scheduled_call_date: string | null;
   created_at: string;
   updated_at: string;
 }
