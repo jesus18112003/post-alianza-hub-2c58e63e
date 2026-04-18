@@ -415,6 +415,33 @@ export type Database = {
         }
         Relationships: []
       }
+      policy_call_logs: {
+        Row: {
+          call_date: string
+          created_at: string
+          created_by: string
+          id: string
+          note: string
+          policy_id: string
+        }
+        Insert: {
+          call_date?: string
+          created_at?: string
+          created_by: string
+          id?: string
+          note: string
+          policy_id: string
+        }
+        Update: {
+          call_date?: string
+          created_at?: string
+          created_by?: string
+          id?: string
+          note?: string
+          policy_id?: string
+        }
+        Relationships: []
+      }
       policy_followups: {
         Row: {
           created_at: string
