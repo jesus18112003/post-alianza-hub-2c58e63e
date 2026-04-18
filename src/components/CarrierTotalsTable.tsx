@@ -309,31 +309,10 @@ export function CarrierTotalsTable({ agentId, agentName, editable }: Props) {
                             </td>
                           );
                         })}
-                        <td className="px-3 py-1 text-right tabular-nums font-semibold text-accent bg-secondary/20">
-                          {formatAmount(rowTotal(date))}
-                        </td>
                       </tr>
                     ))
                   )}
                 </tbody>
-                {/* Footer: grand totals per carrier */}
-                {allDates.length > 0 && (
-                  <tfoot>
-                    <tr className="border-t-2 border-accent/30 bg-secondary/30">
-                      <td className="px-3 py-2.5 font-semibold uppercase tracking-wider text-[10px] text-accent sticky left-0 bg-secondary/30 z-10">
-                        Total
-                      </td>
-                      {carriers.map((c) => (
-                        <td key={c.id} className="px-3 py-2.5 text-right tabular-nums font-semibold text-card-foreground">
-                          {formatAmount(grandTotalByCarrier(c.id))}
-                        </td>
-                      ))}
-                      <td className="px-3 py-2.5 text-right tabular-nums font-bold text-accent bg-secondary/50">
-                        {formatAmount(carriers.reduce((s, c) => s + grandTotalByCarrier(c.id), 0))}
-                      </td>
-                    </tr>
-                  </tfoot>
-                )}
               </table>
             </div>
           </div>
