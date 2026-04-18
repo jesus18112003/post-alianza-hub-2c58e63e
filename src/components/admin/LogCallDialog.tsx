@@ -4,9 +4,14 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { useLogCall, useToggleCallFollowup } from '@/hooks/useCallFollowups';
 import { toast } from 'sonner';
-import { Phone } from 'lucide-react';
+import { Phone, CalendarIcon } from 'lucide-react';
+import { format, parseISO } from 'date-fns';
+import { es } from 'date-fns/locale';
+import { cn } from '@/lib/utils';
 
 interface LogCallDialogProps {
   policy: Policy;
@@ -17,6 +22,10 @@ interface LogCallDialogProps {
 export function LogCallDialog({ policy, open, onOpenChange }: LogCallDialogProps) {
   const [note, setNote] = useState('');
   const [resolveAfter, setResolveAfter] = useState(false);
+  const [scheduled, setScheduled] = useState<Date | undefined>(
+    policy.scheduled_call_date ? parseISO(policy.scheduled_call_date) : undefined
+  );
+  const [calOpen, setCalOpen] = useState(false);
   const logCall = useLogCall();
   const toggleFlag = useToggleCallFollowup();
 
@@ -26,18 +35,19 @@ export function LogCallDialog({ policy, open, onOpenChange }: LogCallDialogProps
       toast.error('Escribe una nota antes de guardar');
       return;
     }
+    const scheduledStr = scheduled ? format(scheduled, 'yyyy-MM-dd') : null;
     logCall.mutate(
-      { policy, note: trimmed },
+      { policy, note: trimmed, scheduledDate: scheduledStr },
       {
         onSuccess: async () => {
           if (resolveAfter) {
             try {
               await toggleFlag.mutateAsync({ policyId: policy.id, value: false });
             } catch (e) {
-              // not fatal, the call was logged
+              // not fatal
             }
           }
-          toast.success('Llamada registrada y enviada a #Diana');
+          toast.success('Llamada registrada y guardada en notas');
           setNote('');
           setResolveAfter(false);
           onOpenChange(false);
@@ -83,8 +93,48 @@ export function LogCallDialog({ policy, open, onOpenChange }: LogCallDialogProps
               className="bg-secondary border-border text-foreground text-sm resize-none"
             />
             <p className="text-[10px] text-muted-foreground/70">
-              Se guarda en Tareas del Equipo con <span className="text-rose-300 font-semibold">#D</span> para Diana.
+              Se guarda como <span className="text-rose-300 font-semibold">#D</span> en Tareas y en las notas del cliente.
             </p>
+          </div>
+
+          <div className="space-y-1.5">
+            <Label className="text-xs text-muted-foreground">Programar próxima llamada</Label>
+            <div className="flex items-center gap-2">
+              <Popover open={calOpen} onOpenChange={setCalOpen}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={cn(
+                      'flex-1 justify-start text-left font-normal text-xs h-9 bg-secondary border-border',
+                      !scheduled && 'text-muted-foreground'
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-3.5 w-3.5" />
+                    {scheduled ? format(scheduled, "dd MMM yyyy", { locale: es }) : 'Sin fecha programada'}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0 bg-popover" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={scheduled}
+                    onSelect={(d) => { setScheduled(d); setCalOpen(false); }}
+                    initialFocus
+                    locale={es}
+                    className={cn('p-3 pointer-events-auto')}
+                  />
+                </PopoverContent>
+              </Popover>
+              {scheduled && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-9 text-xs text-muted-foreground"
+                  onClick={() => setScheduled(undefined)}
+                >
+                  Limpiar
+                </Button>
+              )}
+            </div>
           </div>
 
           <label className="flex items-center gap-2 text-xs text-muted-foreground cursor-pointer select-none">
