@@ -105,7 +105,38 @@ export function AdminPolicyRow({ policy, agentName }: AdminPolicyRowProps) {
           {policy.client_name}
         </span>
         {policy.phone_number && (
-          <Phone className="h-3.5 w-3.5 text-green-500 shrink-0" />
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              const next = !policy.needs_call_followup;
+              toggleCall.mutate(
+                { policyId: policy.id, value: next },
+                {
+                  onSuccess: () =>
+                    toast.success(
+                      next ? 'Añadido a Seguimiento de Llamadas' : 'Quitado de Seguimiento'
+                    ),
+                  onError: () => toast.error('Error al actualizar'),
+                }
+              );
+            }}
+            title={
+              policy.needs_call_followup
+                ? 'Quitar de Seguimiento de Llamadas'
+                : 'Añadir a Seguimiento de Llamadas'
+            }
+            className={`shrink-0 inline-flex items-center justify-center h-6 w-6 rounded-md border transition-colors active:scale-90 ${
+              policy.needs_call_followup
+                ? 'bg-green-500/15 border-green-500/40 text-green-400'
+                : 'border-border text-muted-foreground hover:text-green-400 hover:border-green-500/40'
+            }`}
+          >
+            {policy.needs_call_followup ? (
+              <PhoneCall className="h-3.5 w-3.5" />
+            ) : (
+              <Phone className="h-3.5 w-3.5" />
+            )}
+          </button>
         )}
         {policy.assignees && policy.assignees.length > 0 && (
           <AssigneeBadges codes={policy.assignees} size="sm" />
