@@ -98,6 +98,86 @@ export type Database = {
         }
         Relationships: []
       }
+      carrier_totals_access: {
+        Row: {
+          agent_id: string
+          enabled: boolean
+          updated_at: string
+        }
+        Insert: {
+          agent_id: string
+          enabled?: boolean
+          updated_at?: string
+        }
+        Update: {
+          agent_id?: string
+          enabled?: boolean
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      carrier_totals_carriers: {
+        Row: {
+          agent_id: string
+          created_at: string
+          id: string
+          name: string
+          position: number
+        }
+        Insert: {
+          agent_id: string
+          created_at?: string
+          id?: string
+          name: string
+          position?: number
+        }
+        Update: {
+          agent_id?: string
+          created_at?: string
+          id?: string
+          name?: string
+          position?: number
+        }
+        Relationships: []
+      }
+      carrier_totals_entries: {
+        Row: {
+          agent_id: string
+          amount: number
+          carrier_id: string
+          created_at: string
+          entry_date: string
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          agent_id: string
+          amount?: number
+          carrier_id: string
+          created_at?: string
+          entry_date: string
+          id?: string
+          updated_at?: string
+        }
+        Update: {
+          agent_id?: string
+          amount?: number
+          carrier_id?: string
+          created_at?: string
+          entry_date?: string
+          id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "carrier_totals_entries_carrier_id_fkey"
+            columns: ["carrier_id"]
+            isOneToOne: false
+            referencedRelation: "carrier_totals_carriers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       closing_assignments: {
         Row: {
           amount: number | null
