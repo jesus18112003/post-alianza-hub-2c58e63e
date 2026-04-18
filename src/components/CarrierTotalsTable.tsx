@@ -100,40 +100,8 @@ export function CarrierTotalsTable({ agentId, agentName, editable }: Props) {
     return m;
   }, [entries]);
 
-  // Per-carrier monthly totals (all months, all entries) - exclude negatives (debts)
-  const monthlyTotalsByCarrier = useMemo(() => {
-    const m: Record<string, Record<string, number>> = {}; // carrierId -> 'YYYY-MM' -> sum
-    entries.forEach((e) => {
-      const amount = Number(e.amount ?? 0);
-      if (amount < 0) return; // Skip negative amounts (debts)
-      const ym = e.entry_date.slice(0, 7);
-      m[e.carrier_id] ??= {};
-      m[e.carrier_id][ym] = (m[e.carrier_id][ym] ?? 0) + amount;
-    });
-    return m;
-  }, [entries]);
-
-  const monthsPresent = useMemo(() => {
-    const set = new Set<string>();
-    entries.forEach((e) => set.add(e.entry_date.slice(0, 7)));
-    return Array.from(set).sort((a, b) => b.localeCompare(a));
-  }, [entries]);
-
-  // Per-date row total - exclude negatives (debts)
-  const rowTotal = (date: string) =>
-    carriers.reduce((sum, c) => {
-      const amount = Number(entryMap[`${c.id}|${date}`]?.amount ?? 0);
-      return amount >= 0 ? sum + amount : sum;
-    }, 0);
-
-  // Grand total per carrier - exclude negatives (debts)
-  const grandTotalByCarrier = (carrierId: string) =>
-    entries
-      .filter((e) => e.carrier_id === carrierId)
-      .reduce((s, e) => {
-        const amount = Number(e.amount ?? 0);
-        return amount >= 0 ? s + amount : s;
-      }, 0);
+  // Note: per the product decision, this table is a registry only.
+  // No per-row, per-column, monthly, or grand totals are calculated.
 
   const handleAddCarrier = () => {
     const name = newCarrier.trim();
@@ -271,15 +239,12 @@ export function CarrierTotalsTable({ agentId, agentName, editable }: Props) {
                         </div>
                       </th>
                     ))}
-                    <th className="px-3 py-2.5 font-semibold uppercase tracking-wider text-[10px] text-accent text-right whitespace-nowrap min-w-[110px] bg-secondary/60">
-                      Total día
-                    </th>
                   </tr>
                 </thead>
                 <tbody>
                   {allDates.length === 0 ? (
                     <tr>
-                      <td colSpan={carriers.length + 2} className="text-center py-8 text-muted-foreground">
+                      <td colSpan={carriers.length + 1} className="text-center py-8 text-muted-foreground">
                         {editable ? 'Agrega un día para comenzar a registrar comisiones.' : 'Sin registros aún.'}
                       </td>
                     </tr>
@@ -312,91 +277,14 @@ export function CarrierTotalsTable({ agentId, agentName, editable }: Props) {
                             </td>
                           );
                         })}
-                        <td className="px-3 py-1 text-right tabular-nums font-semibold text-accent bg-secondary/20">
-                          {formatAmount(rowTotal(date))}
-                        </td>
                       </tr>
                     ))
                   )}
                 </tbody>
-                {/* Footer: grand totals per carrier */}
-                {allDates.length > 0 && (
-                  <tfoot>
-                    <tr className="border-t-2 border-accent/30 bg-secondary/30">
-                      <td className="px-3 py-2.5 font-semibold uppercase tracking-wider text-[10px] text-accent sticky left-0 bg-secondary/30 z-10">
-                        Total
-                      </td>
-                      {carriers.map((c) => (
-                        <td key={c.id} className="px-3 py-2.5 text-right tabular-nums font-semibold text-card-foreground">
-                          {formatAmount(grandTotalByCarrier(c.id))}
-                        </td>
-                      ))}
-                      <td className="px-3 py-2.5 text-right tabular-nums font-bold text-accent bg-secondary/50">
-                        {formatAmount(carriers.reduce((s, c) => s + grandTotalByCarrier(c.id), 0))}
-                      </td>
-                    </tr>
-                  </tfoot>
-                )}
               </table>
             </div>
           </div>
 
-          {/* Monthly totals */}
-          {monthsPresent.length > 0 && (
-            <div className="rounded-xl border border-border bg-card overflow-hidden">
-              <div className="px-5 py-3 border-b border-border bg-secondary/20">
-                <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                  Totales mensuales
-                </h4>
-              </div>
-              <div className="overflow-x-auto">
-                <table className="w-full text-xs">
-                  <thead className="bg-secondary/30">
-                    <tr>
-                      <th className="text-left px-3 py-2 font-semibold uppercase tracking-wider text-[10px] text-muted-foreground">
-                        Mes
-                      </th>
-                      {carriers.map((c) => (
-                        <th key={c.id} className="px-3 py-2 font-semibold uppercase tracking-wider text-[10px] text-muted-foreground text-right whitespace-nowrap">
-                          {c.name}
-                        </th>
-                      ))}
-                      <th className="px-3 py-2 font-semibold uppercase tracking-wider text-[10px] text-accent text-right whitespace-nowrap bg-secondary/40">
-                        Total
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {monthsPresent.map((ym) => {
-                      const monthTotal = carriers.reduce(
-                        (s, c) => s + (monthlyTotalsByCarrier[c.id]?.[ym] ?? 0),
-                        0
-                      );
-                      const [y, m] = ym.split('-');
-                      return (
-                        <tr key={ym} className="border-t border-border hover:bg-secondary/20">
-                          <td className="px-3 py-2 font-medium text-card-foreground tabular-nums">
-                            {m}/{y}
-                          </td>
-                          {carriers.map((c) => {
-                            const v = monthlyTotalsByCarrier[c.id]?.[ym] ?? 0;
-                            return (
-                              <td key={c.id} className={`px-3 py-2 text-right tabular-nums ${v === 0 ? 'text-muted-foreground/50' : 'text-card-foreground'}`}>
-                                {formatAmount(v)}
-                              </td>
-                            );
-                          })}
-                          <td className="px-3 py-2 text-right tabular-nums font-semibold text-accent bg-secondary/20">
-                            {formatAmount(monthTotal)}
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          )}
         </>
       )}
     </div>
