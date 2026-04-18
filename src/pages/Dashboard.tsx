@@ -143,6 +143,7 @@ function AgentDashboard() {
                 pendingCases={pendingCases}
                 totalAnnualPremium={totalAnnualPremium}
                 totalBankAmount={totalBankAmount}
+                agentName={profile?.full_name ?? ''}
               />
               <AgentCharts policies={dateFiltered} />
               <AgentPoliciesTable policies={dateFiltered} isLoading={isLoading} />
