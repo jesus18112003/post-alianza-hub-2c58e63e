@@ -27,7 +27,9 @@ export function exportPoliciesToCsv(
     'Notas',
   ];
 
-  const rows = policies.map((p) => [
+  const rows = policies
+    .filter((p) => p.status !== 'no_seguimiento')
+    .map((p) => [
     p.date,
     agentMap[p.agent_id] ?? p.agent_id,
     p.company,
