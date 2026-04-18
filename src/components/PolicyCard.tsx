@@ -53,7 +53,7 @@ export function PolicyCard({ policy }: PolicyCardProps) {
           {policy.client_name}
         </span>
         <StatusBadge status={policy.status} />
-        <span className="text-sm font-semibold w-[8rem] shrink-0 text-right tabular-nums" style={{ fontFamily: "'Inter', 'Helvetica Neue', sans-serif" }}>
+        <span className="text-sm w-[8rem] shrink-0 text-right tabular-nums" style={{ fontFamily: "'Inter', 'Helvetica Neue', sans-serif" }}>
           {policy.policy_number ? (
             <span className="text-secondary-foreground">{policy.policy_number}</span>
           ) : (
