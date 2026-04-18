@@ -113,7 +113,8 @@
 
   body {
     @apply bg-background text-foreground antialiased;
-    font-family: 'Georgia', 'Times New Roman', serif;
+    font-family: 'Roboto Slab', Georgia, 'Times New Roman', serif;
+    font-weight: 400;
   }
 }
 
