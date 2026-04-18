@@ -17,6 +17,7 @@ import { GeneralListDialog } from '@/components/GeneralListDialog';
 import { CreatePolicyDialog } from '@/components/CreatePolicyDialog';
 import { PriorityRequirements } from '@/components/admin/PriorityRequirements';
 import { CarrierTotalsManager } from '@/components/admin/CarrierTotalsManager';
+import { CallFollowupPage } from '@/components/admin/CallFollowupPage';
 import { InternalTasksWidget } from '@/components/admin/InternalTasksWidget';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Users, ChevronDown, Building2 } from 'lucide-react';
@@ -95,6 +96,8 @@ export function AdminDashboard() {
         <main className="flex-1 px-6 py-6 space-y-6 overflow-y-auto">
           {activeSection === 'carrier-totals' ? (
             <CarrierTotalsManager />
+          ) : activeSection === 'call-followup' ? (
+            <CallFollowupPage />
           ) : (
             <>
           {/* Title + Priority requirements (top, side by side) */}

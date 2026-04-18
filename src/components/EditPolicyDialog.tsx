@@ -41,6 +41,7 @@ export function EditPolicyDialog({ policy, open, onOpenChange }: EditPolicyDialo
     collection_date: policy.collection_date ?? '',
     folder_sent_date: policy.folder_sent_date ?? '',
     assignee_text: (policy.assignees ?? []).map((c) => `#${c}`).join(' '),
+    needs_call_followup: policy.needs_call_followup ?? false,
     commission_rate: ((policy.target_premium && policy.total_commission)
       ? ((policy.total_commission / policy.target_premium) * 100).toFixed(0)
       : (DEFAULT_COMMISSION_RATE * 100).toString()),
@@ -96,6 +97,7 @@ export function EditPolicyDialog({ policy, open, onOpenChange }: EditPolicyDialo
           collection_date: form.collection_date || null,
           folder_sent_date: form.folder_sent_date || null,
           assignees: extractMentions(form.assignee_text),
+          needs_call_followup: form.needs_call_followup,
         },
       },
       {

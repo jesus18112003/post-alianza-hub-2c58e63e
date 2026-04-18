@@ -1,8 +1,8 @@
-import { LayoutDashboard, FileText, Users, Settings, LogOut, PanelLeftClose, PanelLeft, Building2 } from 'lucide-react';
+import { LayoutDashboard, FileText, Users, Settings, LogOut, PanelLeftClose, PanelLeft, Building2, PhoneCall } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useState } from 'react';
 
-export type AdminSection = 'dashboard' | 'policies' | 'agents' | 'carrier-totals';
+export type AdminSection = 'dashboard' | 'policies' | 'agents' | 'carrier-totals' | 'call-followup';
 
 interface AdminSidebarProps {
   activeSection: AdminSection;
@@ -14,6 +14,7 @@ const NAV_ITEMS: { id: AdminSection; label: string; icon: React.ElementType }[] 
   { id: 'policies', label: 'Pólizas', icon: FileText },
   { id: 'agents', label: 'Agentes', icon: Users },
   { id: 'carrier-totals', label: 'Total de Carrier', icon: Building2 },
+  { id: 'call-followup', label: 'Seguimiento de Llamadas', icon: PhoneCall },
 ];
 
 export function AdminSidebar({ activeSection, onSectionChange }: AdminSidebarProps) {
