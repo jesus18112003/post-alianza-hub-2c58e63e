@@ -70,8 +70,7 @@ export function useSetScheduledCallDate() {
 /**
  * Logs a call by:
  *  1) Creating an internal task prefixed with #D so Diana sees it.
- *  2) Appending an automated entry to the policy's notes field with the
- *     format: "Llamada realizada el DD/MM/YYYY - <resumen> #D".
+ *  2) Inserting a row into `policy_call_logs` (separate from client notes).
  *  3) Optionally updating scheduled_call_date.
  */
 export function useLogCall() {
@@ -91,12 +90,12 @@ export function useLogCall() {
       const trimmed = note.trim();
       if (!trimmed) throw new Error('La nota no puede estar vacía');
 
-      const today = format(new Date(), 'dd/MM/yyyy');
+      const today = format(new Date(), 'yyyy-MM-dd');
       const taskContent = `#D Llamada · ${policy.client_name} (${policy.company}${
         policy.phone_number ? ` · ${policy.phone_number}` : ''
       }) — ${trimmed}`;
 
-      // 1) Create internal task for Diana
+      // 1) Internal task for Diana
       const { error: taskErr } = await supabase.from('internal_tasks').insert({
         content: taskContent,
         mentions: ['D'],
@@ -104,29 +103,48 @@ export function useLogCall() {
       });
       if (taskErr) throw taskErr;
 
-      // 2) Append entry to policy notes (with #D hashtag)
-      const newEntry = `Llamada realizada el ${today} - ${trimmed} #D`;
-      const updatedNotes = policy.notes ? `${policy.notes}\n${newEntry}` : newEntry;
+      // 2) Call log entry (separate table — does NOT touch policy.notes)
+      const { error: logErr } = await supabase.from('policy_call_logs').insert({
+        policy_id: policy.id,
+        created_by: user.id,
+        note: trimmed,
+        call_date: today,
+      });
+      if (logErr) throw logErr;
 
-      const updates: Record<string, unknown> = {
-        notes: updatedNotes,
-        notes_updated_at: new Date().toISOString(),
-      };
+      // 3) Optionally update scheduled date
       if (scheduledDate !== undefined) {
-        updates.scheduled_call_date = scheduledDate;
+        const { error: polErr } = await supabase
+          .from('policies')
+          .update({ scheduled_call_date: scheduledDate })
+          .eq('id', policy.id);
+        if (polErr) throw polErr;
       }
-
-      const { error: polErr } = await supabase
-        .from('policies')
-        .update(updates as never)
-        .eq('id', policy.id);
-      if (polErr) throw polErr;
     },
-    onSuccess: () => {
+    onSuccess: (_data, vars) => {
       qc.invalidateQueries({ queryKey: ['internal_tasks'] });
       qc.invalidateQueries({ queryKey: ['call-followup-policies'] });
       qc.invalidateQueries({ queryKey: ['admin-policies'] });
       qc.invalidateQueries({ queryKey: ['policies'] });
+      qc.invalidateQueries({ queryKey: ['policy-call-logs', vars.policy.id] });
+    },
+  });
+}
+
+/** Fetch call logs for a single policy (admin view). */
+export function usePolicyCallLogs(policyId: string | null) {
+  return useQuery({
+    queryKey: ['policy-call-logs', policyId],
+    enabled: !!policyId,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('policy_call_logs')
+        .select('*')
+        .eq('policy_id', policyId!)
+        .order('call_date', { ascending: false })
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      return data ?? [];
     },
   });
 }
