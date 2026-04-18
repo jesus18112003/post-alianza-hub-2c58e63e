@@ -21,6 +21,8 @@ export function AgentCommissionLedger({ policies, isLoading }: Props) {
   const { profile } = useAuth();
   const notesEnabled = !!profile?.username && NOTES_ENABLED_USERNAMES.includes(profile.username.toLowerCase());
   const { notesByPolicy, upsert } = useLedgerNotes();
+  const [dateFrom, setDateFrom] = useState('');
+  const [dateTo, setDateTo] = useState('');
 
   const ledgerPolicies = useMemo(() => {
     return policies
@@ -31,8 +33,16 @@ export function AgentCommissionLedger({ policies, isLoading }: Props) {
           ((p.status === 'cancelado' || p.status === 'fondo_insuficiente') &&
             (p.chargeback_amount ?? 0) > 0)
       )
+      .filter((p) => {
+        if (dateFrom && p.date < dateFrom) return false;
+        if (dateTo && p.date > dateTo) return false;
+        return true;
+      })
       .sort((a, b) => a.date.localeCompare(b.date));
-  }, [policies]);
+  }, [policies, dateFrom, dateTo]);
+
+  const hasDateFilter = dateFrom || dateTo;
+
 
   const totalCommission = useMemo(
     () => ledgerPolicies.reduce((sum, p) => sum + (p.bank_amount ?? 0), 0),
