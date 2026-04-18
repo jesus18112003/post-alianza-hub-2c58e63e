@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
-import { Eye, EyeOff, Plus, Trash2, Save, Shield, Hash, KeyRound, Mail, Calendar } from 'lucide-react';
+import { Eye, EyeOff, Plus, Trash2, Save, Shield, Hash, KeyRound, Mail, Calendar, Lock } from 'lucide-react';
 import {
   useAgentDetails,
   useProducerNumbers,
@@ -60,19 +62,38 @@ function AgentDetailContent({ agentId }: { agentId: string }) {
 /* ─── Personal Info ─── */
 function PersonalInfoSection({ agentId, details }: { agentId: string; details: any }) {
   const upsert = useUpsertAgentDetails();
+  const qc = useQueryClient();
   const [ssn, setSsn] = useState(details?.ssn ?? '');
   const [dob, setDob] = useState(details?.date_of_birth ?? '');
   const [email1, setEmail1] = useState(details?.personal_email ?? '');
   const [email2, setEmail2] = useState(details?.secondary_email ?? '');
+  const [emailPass, setEmailPass] = useState('');
+  const [showEmailPass, setShowEmailPass] = useState(false);
+
+  // Load email password via SECURITY DEFINER RPC (admin-only)
+  const { data: loadedEmailPass } = useQuery({
+    queryKey: ['agent-email-password', agentId],
+    queryFn: async (): Promise<string> => {
+      const { data, error } = await supabase.rpc('get_agent_email_password', { _agent_id: agentId });
+      if (error) throw error;
+      return (data as string | null) ?? '';
+    },
+  });
+
   useEffect(() => {
     setSsn(details?.ssn ?? '');
     setDob(details?.date_of_birth ?? '');
     setEmail1(details?.personal_email ?? '');
     setEmail2(details?.secondary_email ?? '');
   }, [details]);
+
+  useEffect(() => {
+    if (loadedEmailPass !== undefined) setEmailPass(loadedEmailPass ?? '');
+  }, [loadedEmailPass]);
+
   const [showSsn, setShowSsn] = useState(false);
 
-  const handleSave = () => {
+  const handleSave = async () => {
     upsert.mutate(
       {
         agentId,
@@ -84,7 +105,19 @@ function PersonalInfoSection({ agentId, details }: { agentId: string; details: a
         },
       },
       {
-        onSuccess: () => toast.success('Información personal guardada'),
+        onSuccess: async () => {
+          // Save email password via SECURITY DEFINER RPC
+          const { error: pErr } = await supabase.rpc('set_agent_email_password', {
+            _agent_id: agentId,
+            _password: emailPass.trim() || null,
+          });
+          if (pErr) {
+            toast.error('Datos guardados, pero falló la contraseña del correo');
+            return;
+          }
+          qc.invalidateQueries({ queryKey: ['agent-email-password', agentId] });
+          toast.success('Información personal guardada');
+        },
         onError: () => toast.error('Error al guardar'),
       }
     );
@@ -146,6 +179,30 @@ function PersonalInfoSection({ agentId, details }: { agentId: string; details: a
             onChange={(e) => setEmail2(e.target.value)}
             className="bg-secondary border-border text-foreground text-sm"
           />
+        </div>
+      </div>
+
+      <div className="space-y-1.5 rounded-lg border border-amber-500/30 bg-amber-500/5 p-3">
+        <Label className="text-xs text-amber-400 flex items-center gap-1.5">
+          <Lock className="h-3 w-3" />
+          Contraseña del Correo
+          <span className="text-[10px] text-amber-400/70 font-normal">(solo admins)</span>
+        </Label>
+        <div className="relative">
+          <Input
+            type={showEmailPass ? 'text' : 'password'}
+            value={emailPass}
+            onChange={(e) => setEmailPass(e.target.value)}
+            placeholder="Contraseña del correo del agente"
+            className="bg-background border-amber-500/20 text-foreground text-sm pr-9"
+          />
+          <button
+            type="button"
+            onClick={() => setShowEmailPass(!showEmailPass)}
+            className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+          >
+            {showEmailPass ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
+          </button>
         </div>
       </div>
 

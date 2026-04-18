@@ -21,6 +21,7 @@ export type Database = {
           date_of_birth: string | null
           id: string
           personal_email: string | null
+          personal_email_password: string | null
           secondary_email: string | null
           ssn: string | null
           updated_at: string
@@ -31,6 +32,7 @@ export type Database = {
           date_of_birth?: string | null
           id?: string
           personal_email?: string | null
+          personal_email_password?: string | null
           secondary_email?: string | null
           ssn?: string | null
           updated_at?: string
@@ -41,6 +43,7 @@ export type Database = {
           date_of_birth?: string | null
           id?: string
           personal_email?: string | null
+          personal_email_password?: string | null
           secondary_email?: string | null
           ssn?: string | null
           updated_at?: string
@@ -601,6 +604,7 @@ export type Database = {
     }
     Functions: {
       check_followup_notifications: { Args: never; Returns: undefined }
+      get_agent_email_password: { Args: { _agent_id: string }; Returns: string }
       get_policy_internal_notes: {
         Args: { _policy_id: string }
         Returns: string
@@ -611,6 +615,10 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      set_agent_email_password: {
+        Args: { _agent_id: string; _password: string }
+        Returns: undefined
       }
       set_policy_internal_notes: {
         Args: { _notes: string; _policy_id: string }
