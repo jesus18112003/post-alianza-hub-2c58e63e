@@ -207,7 +207,6 @@ export function AdminDashboard() {
               companyFilter={effectiveCompanyFilter}
             />
             <div className="space-y-6">
-              <PriorityRequirements policies={policies ?? []} agentMap={agentMap} />
               <AddClosingByMessage />
               <WelcomeTemplateManager />
             </div>
