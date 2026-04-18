@@ -49,28 +49,30 @@ export function AgentMetricCards({
   return (
     <div className="space-y-4">
       {/* Hero cards for Comisión Total and Entró al Banco */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {/* Comisión Total */}
-        <div className="relative overflow-hidden rounded-xl border border-primary/30 bg-gradient-to-br from-primary/10 via-card to-card p-6">
-          <div className="absolute top-3 right-3 rounded-full bg-primary/15 p-2.5">
-            <Trophy className="h-5 w-5 text-primary" />
-          </div>
-          <span className="text-[10px] uppercase tracking-[0.2em] text-primary/80 font-semibold">
-            COMISIÓN TOTAL
-          </span>
-          <p
-            className="text-3xl font-bold tracking-tight text-accent mt-2"
-            style={{ fontFamily: "'Inter', 'Helvetica Neue', sans-serif" }}
-          >
-            ${totalCommission.toLocaleString('en-US', { minimumFractionDigits: 2 })}
-          </p>
-          {totalCommission > 0 && (
-            <span className="inline-flex items-center gap-1 text-xs text-emerald-500 mt-2">
-              <TrendingUp className="h-3 w-3" />
-              Acumulado
+      <div className={`grid grid-cols-1 ${showCommission ? 'sm:grid-cols-2' : ''} gap-4`}>
+        {/* Comisión Total - solo visible para agentes autorizados */}
+        {showCommission && (
+          <div className="relative overflow-hidden rounded-xl border border-primary/30 bg-gradient-to-br from-primary/10 via-card to-card p-6">
+            <div className="absolute top-3 right-3 rounded-full bg-primary/15 p-2.5">
+              <Trophy className="h-5 w-5 text-primary" />
+            </div>
+            <span className="text-[10px] uppercase tracking-[0.2em] text-primary/80 font-semibold">
+              COMISIÓN TOTAL
             </span>
-          )}
-        </div>
+            <p
+              className="text-3xl font-bold tracking-tight text-accent mt-2"
+              style={{ fontFamily: "'Inter', 'Helvetica Neue', sans-serif" }}
+            >
+              ${totalCommission.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+            </p>
+            {totalCommission > 0 && (
+              <span className="inline-flex items-center gap-1 text-xs text-emerald-500 mt-2">
+                <TrendingUp className="h-3 w-3" />
+                Acumulado
+              </span>
+            )}
+          </div>
+        )}
 
         {/* Entró al Banco */}
         <div className="relative overflow-hidden rounded-xl border border-emerald-500/30 bg-gradient-to-br from-emerald-500/10 via-card to-card p-6">
