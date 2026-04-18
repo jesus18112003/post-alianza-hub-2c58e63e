@@ -118,7 +118,7 @@ export function useLogCall() {
 
       const { error: polErr } = await supabase
         .from('policies')
-        .update(updates)
+        .update(updates as never)
         .eq('id', policy.id);
       if (polErr) throw polErr;
     },
