@@ -110,7 +110,7 @@ function RequirementCard({ req, policy, agentName, onResolve, onDelete, busy }: 
         <Button
           size="icon"
           variant="ghost"
-          className="h-6 w-6 text-emerald-500 hover:bg-emerald-500/10"
+          className="h-6 w-6 text-primary hover:bg-primary/10"
           title="Marcar como resuelto"
           onClick={onResolve}
           disabled={busy}
