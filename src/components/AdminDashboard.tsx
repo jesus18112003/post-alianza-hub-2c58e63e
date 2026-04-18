@@ -103,9 +103,6 @@ export function AdminDashboard() {
             </div>
           </div>
 
-          {/* Priority requirements */}
-          <PriorityRequirements policies={policies ?? []} agentMap={agentMap} />
-
           {/* Metric cards */}
           <AdminMetricCards
             totalBankAmount={totalBankAmount}
@@ -206,6 +203,7 @@ export function AdminDashboard() {
               companyFilter={effectiveCompanyFilter}
             />
             <div className="space-y-6">
+              <PriorityRequirements policies={policies ?? []} agentMap={agentMap} />
               <AddClosingByMessage />
               <WelcomeTemplateManager />
             </div>
