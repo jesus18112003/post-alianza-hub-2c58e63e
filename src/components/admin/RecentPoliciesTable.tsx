@@ -124,6 +124,28 @@ export function RecentPoliciesTable({
         >
           Sin Teléfono
         </button>
+
+        <span className="w-px h-4 bg-border mx-1" />
+        <button
+          onClick={() => setCommissionFilter(commissionFilter === 'with' ? 'all' : 'with')}
+          className={`text-[11px] px-2.5 py-1 rounded-full border transition-all whitespace-nowrap active:scale-95 ${
+            commissionFilter === 'with'
+              ? 'border-primary/40 bg-primary/10 text-primary'
+              : 'border-border text-muted-foreground hover:text-foreground'
+          }`}
+        >
+          Con Comisión
+        </button>
+        <button
+          onClick={() => setCommissionFilter(commissionFilter === 'without' ? 'all' : 'without')}
+          className={`text-[11px] px-2.5 py-1 rounded-full border transition-all whitespace-nowrap active:scale-95 ${
+            commissionFilter === 'without'
+              ? 'border-primary/40 bg-primary/10 text-primary'
+              : 'border-border text-muted-foreground hover:text-foreground'
+          }`}
+        >
+          Sin Comisión
+        </button>
       </div>
 
       {/* Policy rows */}
