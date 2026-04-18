@@ -41,6 +41,7 @@ export function EditPolicyDialog({ policy, open, onOpenChange }: EditPolicyDialo
     collection_date: policy.collection_date ?? '',
     folder_sent_date: policy.folder_sent_date ?? '',
     assignee_text: (policy.assignees ?? []).map((c) => `#${c}`).join(' '),
+    needs_call_followup: policy.needs_call_followup ?? false,
     commission_rate: ((policy.target_premium && policy.total_commission)
       ? ((policy.total_commission / policy.target_premium) * 100).toFixed(0)
       : (DEFAULT_COMMISSION_RATE * 100).toString()),
@@ -96,6 +97,7 @@ export function EditPolicyDialog({ policy, open, onOpenChange }: EditPolicyDialo
           collection_date: form.collection_date || null,
           folder_sent_date: form.folder_sent_date || null,
           assignees: extractMentions(form.assignee_text),
+          needs_call_followup: form.needs_call_followup,
         },
       },
       {
@@ -190,6 +192,15 @@ export function EditPolicyDialog({ policy, open, onOpenChange }: EditPolicyDialo
                 {previewAssignees.length > 0 && <AssigneeBadges codes={previewAssignees} size="md" />}
               </div>
             </div>
+            <label className="flex items-center gap-2 text-xs text-muted-foreground cursor-pointer select-none rounded-md border border-border bg-secondary/40 px-3 py-2.5">
+              <input
+                type="checkbox"
+                checked={form.needs_call_followup}
+                onChange={(e) => setForm((f) => ({ ...f, needs_call_followup: e.target.checked }))}
+                className="h-4 w-4 rounded border-border accent-primary"
+              />
+              <span className="text-foreground">Marcar para Seguimiento de Llamadas</span>
+            </label>
           </div>
 
           <div className="space-y-3">

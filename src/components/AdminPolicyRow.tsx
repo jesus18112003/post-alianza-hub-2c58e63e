@@ -5,7 +5,7 @@ import { useUpdatePolicyStatus, useDeletePolicy } from '@/hooks/useAdminData';
 import { usePolicyFollowups } from '@/hooks/usePolicyFollowups';
 import { format, differenceInDays, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { ChevronDown, Trash2, Check, X, Pencil, Phone, AlertTriangle, Clock, MessageSquare, Hourglass, AlertOctagon, FolderCheck } from 'lucide-react';
+import { ChevronDown, Trash2, Check, X, Pencil, Phone, PhoneCall, AlertTriangle, Clock, MessageSquare, Hourglass, AlertOctagon, FolderCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { EditPolicyDialog } from '@/components/EditPolicyDialog';
 import { WelcomeMessageDialog } from '@/components/WelcomeMessageDialog';
@@ -14,6 +14,7 @@ import { FollowupBadge } from '@/components/FollowupBadge';
 import { RequirementDialog } from '@/components/RequirementDialog';
 import { usePolicyRequirement } from '@/hooks/usePolicyRequirements';
 import { AssigneeBadges } from '@/components/AssigneeBadges';
+import { useToggleCallFollowup } from '@/hooks/useCallFollowups';
 import { toast } from 'sonner';
 
 interface AdminPolicyRowProps {
@@ -32,6 +33,7 @@ export function AdminPolicyRow({ policy, agentName }: AdminPolicyRowProps) {
 
   const updateStatus = useUpdatePolicyStatus();
   const deletePolicy = useDeletePolicy();
+  const toggleCall = useToggleCallFollowup();
   const { data: followups = [] } = usePolicyFollowups(policy.id);
   const activeFollowup = followups.find((f) => f.status === 'pending');
   const { data: requirement } = usePolicyRequirement(policy.id);
@@ -103,7 +105,38 @@ export function AdminPolicyRow({ policy, agentName }: AdminPolicyRowProps) {
           {policy.client_name}
         </span>
         {policy.phone_number && (
-          <Phone className="h-3.5 w-3.5 text-green-500 shrink-0" />
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              const next = !policy.needs_call_followup;
+              toggleCall.mutate(
+                { policyId: policy.id, value: next },
+                {
+                  onSuccess: () =>
+                    toast.success(
+                      next ? 'Añadido a Seguimiento de Llamadas' : 'Quitado de Seguimiento'
+                    ),
+                  onError: () => toast.error('Error al actualizar'),
+                }
+              );
+            }}
+            title={
+              policy.needs_call_followup
+                ? 'Quitar de Seguimiento de Llamadas'
+                : 'Añadir a Seguimiento de Llamadas'
+            }
+            className={`shrink-0 inline-flex items-center justify-center h-6 w-6 rounded-md border transition-colors active:scale-90 ${
+              policy.needs_call_followup
+                ? 'bg-green-500/15 border-green-500/40 text-green-400'
+                : 'border-border text-muted-foreground hover:text-green-400 hover:border-green-500/40'
+            }`}
+          >
+            {policy.needs_call_followup ? (
+              <PhoneCall className="h-3.5 w-3.5" />
+            ) : (
+              <Phone className="h-3.5 w-3.5" />
+            )}
+          </button>
         )}
         {policy.assignees && policy.assignees.length > 0 && (
           <AssigneeBadges codes={policy.assignees} size="sm" />

@@ -23,6 +23,7 @@ export interface Policy {
   collection_date: string | null;
   folder_sent_date: string | null;
   assignees: string[];
+  needs_call_followup: boolean;
   created_at: string;
   updated_at: string;
 }
