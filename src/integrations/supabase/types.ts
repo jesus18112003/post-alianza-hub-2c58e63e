@@ -326,6 +326,7 @@ export type Database = {
         Row: {
           agent_id: string
           agent_premium: number | null
+          assignees: string[]
           bank_amount: number | null
           chargeback_amount: number | null
           client_first_name: string | null
@@ -353,6 +354,7 @@ export type Database = {
         Insert: {
           agent_id: string
           agent_premium?: number | null
+          assignees?: string[]
           bank_amount?: number | null
           chargeback_amount?: number | null
           client_first_name?: string | null
@@ -380,6 +382,7 @@ export type Database = {
         Update: {
           agent_id?: string
           agent_premium?: number | null
+          assignees?: string[]
           bank_amount?: number | null
           chargeback_amount?: number | null
           client_first_name?: string | null
