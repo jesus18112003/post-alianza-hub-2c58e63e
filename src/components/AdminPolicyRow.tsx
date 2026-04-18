@@ -164,7 +164,7 @@ export function AdminPolicyRow({ policy, agentName }: AdminPolicyRowProps) {
           </span>
         )}
         <StatusBadge status={policy.status} />
-        <span className="text-xs w-[7rem] shrink-0 text-right tabular-nums">
+        <span className="text-sm font-semibold w-[8rem] shrink-0 text-right tabular-nums">
           {policy.policy_number ? (
             <span className="text-secondary-foreground">{policy.policy_number}</span>
           ) : (
