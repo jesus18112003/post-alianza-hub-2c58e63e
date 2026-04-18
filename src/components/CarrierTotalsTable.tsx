@@ -317,62 +317,6 @@ export function CarrierTotalsTable({ agentId, agentName, editable }: Props) {
             </div>
           </div>
 
-          {/* Monthly totals */}
-          {monthsPresent.length > 0 && (
-            <div className="rounded-xl border border-border bg-card overflow-hidden">
-              <div className="px-5 py-3 border-b border-border bg-secondary/20">
-                <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                  Totales mensuales
-                </h4>
-              </div>
-              <div className="overflow-x-auto">
-                <table className="w-full text-xs">
-                  <thead className="bg-secondary/30">
-                    <tr>
-                      <th className="text-left px-3 py-2 font-semibold uppercase tracking-wider text-[10px] text-muted-foreground">
-                        Mes
-                      </th>
-                      {carriers.map((c) => (
-                        <th key={c.id} className="px-3 py-2 font-semibold uppercase tracking-wider text-[10px] text-muted-foreground text-right whitespace-nowrap">
-                          {c.name}
-                        </th>
-                      ))}
-                      <th className="px-3 py-2 font-semibold uppercase tracking-wider text-[10px] text-accent text-right whitespace-nowrap bg-secondary/40">
-                        Total
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {monthsPresent.map((ym) => {
-                      const monthTotal = carriers.reduce(
-                        (s, c) => s + (monthlyTotalsByCarrier[c.id]?.[ym] ?? 0),
-                        0
-                      );
-                      const [y, m] = ym.split('-');
-                      return (
-                        <tr key={ym} className="border-t border-border hover:bg-secondary/20">
-                          <td className="px-3 py-2 font-medium text-card-foreground tabular-nums">
-                            {m}/{y}
-                          </td>
-                          {carriers.map((c) => {
-                            const v = monthlyTotalsByCarrier[c.id]?.[ym] ?? 0;
-                            return (
-                              <td key={c.id} className={`px-3 py-2 text-right tabular-nums ${v === 0 ? 'text-muted-foreground/50' : 'text-card-foreground'}`}>
-                                {formatAmount(v)}
-                              </td>
-                            );
-                          })}
-                          <td className="px-3 py-2 text-right tabular-nums font-semibold text-accent bg-secondary/20">
-                            {formatAmount(monthTotal)}
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          )}
         </>
       )}
     </div>
