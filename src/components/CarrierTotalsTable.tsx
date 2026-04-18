@@ -271,9 +271,6 @@ export function CarrierTotalsTable({ agentId, agentName, editable }: Props) {
                         </div>
                       </th>
                     ))}
-                    <th className="px-3 py-2.5 font-semibold uppercase tracking-wider text-[10px] text-accent text-right whitespace-nowrap min-w-[110px] bg-secondary/60">
-                      Total día
-                    </th>
                   </tr>
                 </thead>
                 <tbody>
