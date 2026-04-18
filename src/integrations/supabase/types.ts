@@ -347,6 +347,7 @@ export type Database = {
           policy_number: string | null
           policy_type: string | null
           prima_payment: number | null
+          scheduled_call_date: string | null
           status: Database["public"]["Enums"]["policy_status"]
           target_premium: number | null
           total_commission: number | null
@@ -376,6 +377,7 @@ export type Database = {
           policy_number?: string | null
           policy_type?: string | null
           prima_payment?: number | null
+          scheduled_call_date?: string | null
           status?: Database["public"]["Enums"]["policy_status"]
           target_premium?: number | null
           total_commission?: number | null
@@ -405,6 +407,7 @@ export type Database = {
           policy_number?: string | null
           policy_type?: string | null
           prima_payment?: number | null
+          scheduled_call_date?: string | null
           status?: Database["public"]["Enums"]["policy_status"]
           target_premium?: number | null
           total_commission?: number | null
