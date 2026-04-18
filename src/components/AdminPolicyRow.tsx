@@ -105,6 +105,9 @@ export function AdminPolicyRow({ policy, agentName }: AdminPolicyRowProps) {
         {policy.phone_number && (
           <Phone className="h-3.5 w-3.5 text-green-500 shrink-0" />
         )}
+        {policy.assignees && policy.assignees.length > 0 && (
+          <AssigneeBadges codes={policy.assignees} size="sm" />
+        )}
         {activeFollowup && <FollowupBadge followup={activeFollowup} />}
         {collectionCountdown && collectionCountdown.days <= 5 && (
           <span
