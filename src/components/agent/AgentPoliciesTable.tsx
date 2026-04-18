@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { Policy } from '@/types/policy';
 import { StatusBadge, STATUS_CONFIG, PolicyStatus } from '@/components/StatusBadge';
-import { Search, SlidersHorizontal, ChevronDown } from 'lucide-react';
+import { Search, SlidersHorizontal, ChevronDown, AlertTriangle } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -39,7 +39,8 @@ export function AgentPoliciesTable({ policies, isLoading }: AgentPoliciesTablePr
       const matchSearch =
         search === '' ||
         p.client_name.toLowerCase().includes(search.toLowerCase()) ||
-        p.company.toLowerCase().includes(search.toLowerCase());
+        p.company.toLowerCase().includes(search.toLowerCase()) ||
+        (p.policy_number ?? '').toLowerCase().includes(search.toLowerCase());
       const matchStatus = statusFilters.size === 0 || statusFilters.has(p.status);
       return matchSearch && matchStatus;
     });
@@ -58,7 +59,7 @@ export function AgentPoliciesTable({ policies, isLoading }: AgentPoliciesTablePr
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
             <Input
-              placeholder="Buscar cliente..."
+              placeholder="Buscar cliente o nº..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="pl-9 h-9 w-56 bg-secondary border-border text-sm placeholder:text-muted-foreground/50"
@@ -115,10 +116,11 @@ export function AgentPoliciesTable({ policies, isLoading }: AgentPoliciesTablePr
       )}
 
       {/* Table header */}
-      <div className="px-5 py-2.5 border-b border-border/50 hidden sm:grid grid-cols-[6rem_1fr_1fr_7rem_3rem] gap-4 text-[10px] uppercase tracking-[0.15em] text-muted-foreground font-medium">
+      <div className="px-5 py-2.5 border-b border-border/50 hidden sm:grid grid-cols-[6rem_1fr_1fr_8rem_7rem_3rem] gap-4 text-[10px] uppercase tracking-[0.15em] text-muted-foreground font-medium">
         <span>FECHA</span>
         <span>EMPRESA</span>
         <span>CLIENTE</span>
+        <span>Nº PÓLIZA</span>
         <span>ESTATUS</span>
         <span></span>
       </div>
@@ -150,7 +152,7 @@ export function AgentPoliciesTable({ policies, isLoading }: AgentPoliciesTablePr
               <div key={policy.id}>
                 <button
                   onClick={() => setExpandedId(isOpen ? null : policy.id)}
-                  className="w-full px-5 py-3 grid grid-cols-1 sm:grid-cols-[6rem_1fr_1fr_7rem_3rem] gap-2 sm:gap-4 items-center text-left hover:bg-secondary/30 transition-colors active:scale-[0.998]"
+                  className="w-full px-5 py-3 grid grid-cols-1 sm:grid-cols-[6rem_1fr_1fr_8rem_7rem_3rem] gap-2 sm:gap-4 items-center text-left hover:bg-secondary/30 transition-colors active:scale-[0.998]"
                 >
                   <span className="text-sm text-muted-foreground" style={{ fontFamily: "'Inter', sans-serif" }}>
                     {formattedDate}
@@ -162,6 +164,16 @@ export function AgentPoliciesTable({ policies, isLoading }: AgentPoliciesTablePr
                     {policy.company}
                   </span>
                   <span className="text-sm text-card-foreground">{policy.client_name}</span>
+                  <span className="text-xs tabular-nums">
+                    {policy.policy_number ? (
+                      <span className="text-secondary-foreground">{policy.policy_number}</span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-500/15 text-amber-500">
+                        <AlertTriangle className="h-3 w-3" />
+                        <span className="text-[10px] font-medium uppercase tracking-wide">Sin Nº</span>
+                      </span>
+                    )}
+                  </span>
                   <StatusBadge status={policy.status} />
                   <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform duration-200 justify-self-end ${isOpen ? 'rotate-180' : ''}`} />
                 </button>
