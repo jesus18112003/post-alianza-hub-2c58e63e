@@ -23,6 +23,7 @@ export function RecentPoliciesTable({
 }: RecentPoliciesTableProps) {
   const [statusFilters, setStatusFilters] = useState<Set<PolicyStatus>>(new Set());
   const [phoneFilter, setPhoneFilter] = useState<'all' | 'with' | 'without'>('all');
+  const [commissionFilter, setCommissionFilter] = useState<'all' | 'with' | 'without'>('all');
   const [showAll, setShowAll] = useState(false);
 
   const allStatuses = Object.keys(STATUS_CONFIG) as PolicyStatus[];
@@ -41,9 +42,13 @@ export function RecentPoliciesTable({
       const matchPhone =
         phoneFilter === 'all' ||
         (phoneFilter === 'with' ? !!p.phone_number : !p.phone_number);
-      return matchSearch && matchStatus && matchAgent && matchCompany && matchPhone;
+      const hasCommission = (p.total_commission ?? 0) > 0;
+      const matchCommission =
+        commissionFilter === 'all' ||
+        (commissionFilter === 'with' ? hasCommission : !hasCommission);
+      return matchSearch && matchStatus && matchAgent && matchCompany && matchPhone && matchCommission;
     });
-  }, [policies, search, statusFilters, agentFilter, companyFilter, agentMap, phoneFilter]);
+  }, [policies, search, statusFilters, agentFilter, companyFilter, agentMap, phoneFilter, commissionFilter]);
 
   const displayed = showAll ? filtered : filtered.slice(0, 20);
 
@@ -118,6 +123,28 @@ export function RecentPoliciesTable({
           }`}
         >
           Sin Teléfono
+        </button>
+
+        <span className="w-px h-4 bg-border mx-1" />
+        <button
+          onClick={() => setCommissionFilter(commissionFilter === 'with' ? 'all' : 'with')}
+          className={`text-[11px] px-2.5 py-1 rounded-full border transition-all whitespace-nowrap active:scale-95 ${
+            commissionFilter === 'with'
+              ? 'border-primary/40 bg-primary/10 text-primary'
+              : 'border-border text-muted-foreground hover:text-foreground'
+          }`}
+        >
+          Con Comisión
+        </button>
+        <button
+          onClick={() => setCommissionFilter(commissionFilter === 'without' ? 'all' : 'without')}
+          className={`text-[11px] px-2.5 py-1 rounded-full border transition-all whitespace-nowrap active:scale-95 ${
+            commissionFilter === 'without'
+              ? 'border-primary/40 bg-primary/10 text-primary'
+              : 'border-border text-muted-foreground hover:text-foreground'
+          }`}
+        >
+          Sin Comisión
         </button>
       </div>
 
