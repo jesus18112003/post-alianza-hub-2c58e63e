@@ -91,24 +91,28 @@ export function AdminDashboard() {
         <AdminTopBar search={search} onSearchChange={setSearch} />
 
         <main className="flex-1 px-6 py-6 space-y-6 overflow-y-auto">
-          {/* Title row */}
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-2xl text-accent tracking-tight" style={{ fontFamily: "'Georgia', serif" }}>
-                Panel de Control
-              </h2>
-              <p className="text-sm text-muted-foreground mt-0.5">
-                Resumen administrativo y financiero del día
-              </p>
-            </div>
-          </div>
+          {/* Title + Priority requirements (top, side by side) */}
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-6 items-start">
+            <div className="space-y-6">
+              <div>
+                <h2 className="text-2xl text-accent tracking-tight" style={{ fontFamily: "'Georgia', serif" }}>
+                  Panel de Control
+                </h2>
+                <p className="text-sm text-muted-foreground mt-0.5">
+                  Resumen administrativo y financiero del día
+                </p>
+              </div>
 
-          {/* Metric cards */}
-          <AdminMetricCards
-            totalBankAmount={totalBankAmount}
-            policiesEmitted={policiesEmitted}
-            pendingCases={pendingCases}
-          />
+              {/* Metric cards */}
+              <AdminMetricCards
+                totalBankAmount={totalBankAmount}
+                policiesEmitted={policiesEmitted}
+                pendingCases={pendingCases}
+              />
+            </div>
+
+            <PriorityRequirements policies={policies ?? []} agentMap={agentMap} />
+          </div>
 
           {/* Agents section (collapsible, moved up) */}
           {agents && agents.length > 0 && (
