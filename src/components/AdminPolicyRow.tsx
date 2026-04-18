@@ -14,7 +14,7 @@ import { FollowupBadge } from '@/components/FollowupBadge';
 import { RequirementDialog } from '@/components/RequirementDialog';
 import { usePolicyRequirement } from '@/hooks/usePolicyRequirements';
 import { AssigneeBadges } from '@/components/AssigneeBadges';
-import { useToggleCallFollowup } from '@/hooks/useCallFollowups';
+import { useToggleCallFollowup, usePolicyCallLogs } from '@/hooks/useCallFollowups';
 import { toast } from 'sonner';
 
 interface AdminPolicyRowProps {
