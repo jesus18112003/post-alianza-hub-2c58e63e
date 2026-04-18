@@ -22,6 +22,7 @@ export interface Policy {
   phone_number: string | null;
   collection_date: string | null;
   folder_sent_date: string | null;
+  assignees: string[];
   created_at: string;
   updated_at: string;
 }

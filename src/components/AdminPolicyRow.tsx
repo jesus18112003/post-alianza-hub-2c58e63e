@@ -13,6 +13,7 @@ import { FollowupManagerDialog } from '@/components/FollowupManagerDialog';
 import { FollowupBadge } from '@/components/FollowupBadge';
 import { RequirementDialog } from '@/components/RequirementDialog';
 import { usePolicyRequirement } from '@/hooks/usePolicyRequirements';
+import { AssigneeBadges } from '@/components/AssigneeBadges';
 import { toast } from 'sonner';
 
 interface AdminPolicyRowProps {
@@ -103,6 +104,9 @@ export function AdminPolicyRow({ policy, agentName }: AdminPolicyRowProps) {
         </span>
         {policy.phone_number && (
           <Phone className="h-3.5 w-3.5 text-green-500 shrink-0" />
+        )}
+        {policy.assignees && policy.assignees.length > 0 && (
+          <AssigneeBadges codes={policy.assignees} size="sm" />
         )}
         {activeFollowup && <FollowupBadge followup={activeFollowup} />}
         {collectionCountdown && collectionCountdown.days <= 5 && (
