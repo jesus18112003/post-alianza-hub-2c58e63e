@@ -110,7 +110,13 @@ export function EditPolicyDialog({ policy, open, onOpenChange }: EditPolicyDialo
         },
       },
       {
-        onSuccess: () => {
+        onSuccess: async () => {
+          try {
+            await setInternal.mutateAsync({ policyId: policy.id, notes: internalNotes });
+          } catch (e: any) {
+            // Non-fatal — admin-only field, surface error but keep dialog state
+            toast.error('No se pudo guardar la nota interna');
+          }
           toast.success('Póliza actualizada');
           onOpenChange(false);
         },
