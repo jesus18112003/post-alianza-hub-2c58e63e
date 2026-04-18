@@ -192,6 +192,15 @@ export function EditPolicyDialog({ policy, open, onOpenChange }: EditPolicyDialo
                 {previewAssignees.length > 0 && <AssigneeBadges codes={previewAssignees} size="md" />}
               </div>
             </div>
+            <label className="flex items-center gap-2 text-xs text-muted-foreground cursor-pointer select-none rounded-md border border-border bg-secondary/40 px-3 py-2.5">
+              <input
+                type="checkbox"
+                checked={form.needs_call_followup}
+                onChange={(e) => setForm((f) => ({ ...f, needs_call_followup: e.target.checked }))}
+                className="h-4 w-4 rounded border-border accent-primary"
+              />
+              <span className="text-foreground">Marcar para Seguimiento de Llamadas</span>
+            </label>
           </div>
 
           <div className="space-y-3">
