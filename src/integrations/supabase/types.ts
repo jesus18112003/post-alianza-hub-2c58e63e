@@ -338,6 +338,7 @@ export type Database = {
           date: string
           folder_sent_date: string | null
           id: string
+          internal_notes: string | null
           location: string | null
           needs_call_followup: boolean
           notes: string | null
@@ -368,6 +369,7 @@ export type Database = {
           date?: string
           folder_sent_date?: string | null
           id?: string
+          internal_notes?: string | null
           location?: string | null
           needs_call_followup?: boolean
           notes?: string | null
@@ -398,6 +400,7 @@ export type Database = {
           date?: string
           folder_sent_date?: string | null
           id?: string
+          internal_notes?: string | null
           location?: string | null
           needs_call_followup?: boolean
           notes?: string | null
@@ -598,12 +601,20 @@ export type Database = {
     }
     Functions: {
       check_followup_notifications: { Args: never; Returns: undefined }
+      get_policy_internal_notes: {
+        Args: { _policy_id: string }
+        Returns: string
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
         Returns: boolean
+      }
+      set_policy_internal_notes: {
+        Args: { _notes: string; _policy_id: string }
+        Returns: undefined
       }
     }
     Enums: {
