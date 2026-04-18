@@ -74,6 +74,8 @@ export function EditPolicyDialog({ policy, open, onOpenChange }: EditPolicyDialo
         updates: {
           date: form.date,
           company: form.company.trim(),
+          client_first_name: form.client_first_name.trim() || null,
+          client_last_name: form.client_last_name.trim() || null,
           client_name: `${form.client_first_name.trim()} ${form.client_last_name.trim()}`.trim(),
           status: form.status,
           policy_number: form.policy_number.trim() || null,
