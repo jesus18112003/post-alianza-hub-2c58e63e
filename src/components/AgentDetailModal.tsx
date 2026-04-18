@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
-import { Eye, EyeOff, Plus, Trash2, Save, Shield, Hash, KeyRound, Mail, Calendar } from 'lucide-react';
+import { Eye, EyeOff, Plus, Trash2, Save, Shield, Hash, KeyRound, Mail, Calendar, Lock } from 'lucide-react';
 import {
   useAgentDetails,
   useProducerNumbers,
