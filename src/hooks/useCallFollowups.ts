@@ -91,7 +91,8 @@ export function useLogCall() {
       if (!trimmed) throw new Error('La nota no puede estar vacía');
 
       const today = format(new Date(), 'yyyy-MM-dd');
-      const taskContent = `#D Llamada · ${policy.client_name} (${policy.company}${
+      const displayDate = format(new Date(), 'dd/MM/yyyy');
+      const taskContent = `#D 📞 Llamada ${displayDate} · ${policy.client_name} (${policy.company}${
         policy.phone_number ? ` · ${policy.phone_number}` : ''
       }) — ${trimmed}`;
 
