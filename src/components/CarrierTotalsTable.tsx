@@ -276,7 +276,7 @@ export function CarrierTotalsTable({ agentId, agentName, editable }: Props) {
                 <tbody>
                   {allDates.length === 0 ? (
                     <tr>
-                      <td colSpan={carriers.length + 2} className="text-center py-8 text-muted-foreground">
+                      <td colSpan={carriers.length + 1} className="text-center py-8 text-muted-foreground">
                         {editable ? 'Agrega un día para comenzar a registrar comisiones.' : 'Sin registros aún.'}
                       </td>
                     </tr>
