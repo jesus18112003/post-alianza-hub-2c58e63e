@@ -151,6 +151,7 @@ function AgentDashboard() {
           {activeSection === 'commission' && (
             <AgentCommissionLedger policies={policies ?? []} isLoading={isLoading} />
           )}
+
         </main>
       </div>
     </div>
