@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Policy } from '@/types/policy';
 import { useUpdatePolicy } from '@/hooks/useAdminData';
 import { STATUS_CONFIG, PolicyStatus } from '@/components/StatusBadge';
@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
+import { AssigneeBadges, extractMentions, MENTION_MAP } from '@/components/AssigneeBadges';
 import { toast } from 'sonner';
 
 interface EditPolicyDialogProps {
@@ -39,10 +40,13 @@ export function EditPolicyDialog({ policy, open, onOpenChange }: EditPolicyDialo
     phone_number: policy.phone_number ?? '',
     collection_date: policy.collection_date ?? '',
     folder_sent_date: policy.folder_sent_date ?? '',
+    assignee_text: (policy.assignees ?? []).map((c) => `#${c}`).join(' '),
     commission_rate: ((policy.target_premium && policy.total_commission)
       ? ((policy.total_commission / policy.target_premium) * 100).toFixed(0)
       : (DEFAULT_COMMISSION_RATE * 100).toString()),
   });
+
+  const previewAssignees = useMemo(() => extractMentions(form.assignee_text), [form.assignee_text]);
 
   const set = (key: string, value: string) => {
     setForm((f) => {
@@ -91,6 +95,7 @@ export function EditPolicyDialog({ policy, open, onOpenChange }: EditPolicyDialo
           phone_number: form.phone_number.trim() || null,
           collection_date: form.collection_date || null,
           folder_sent_date: form.folder_sent_date || null,
+          assignees: extractMentions(form.assignee_text),
         },
       },
       {
