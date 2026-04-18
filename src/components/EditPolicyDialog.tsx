@@ -175,6 +175,21 @@ export function EditPolicyDialog({ policy, open, onOpenChange }: EditPolicyDialo
               <Input type="date" value={form.folder_sent_date} onChange={(e) => set('folder_sent_date', e.target.value)}
                 className="bg-secondary border-border text-foreground text-sm" />
             </div>
+            <div className="space-y-1.5">
+              <Label className="text-xs text-muted-foreground">Encargado</Label>
+              <Input
+                value={form.assignee_text}
+                onChange={(e) => set('assignee_text', e.target.value)}
+                placeholder="Usa #D #J #A #M"
+                className="bg-secondary border-border text-foreground text-sm"
+              />
+              <div className="flex items-center justify-between gap-2">
+                <p className="text-[10px] text-muted-foreground/60">
+                  #D Diana · #J Jesus · #A Ariadna · #M Melody
+                </p>
+                {previewAssignees.length > 0 && <AssigneeBadges codes={previewAssignees} size="md" />}
+              </div>
+            </div>
           </div>
 
           <div className="space-y-3">

@@ -13,6 +13,7 @@ import { FollowupManagerDialog } from '@/components/FollowupManagerDialog';
 import { FollowupBadge } from '@/components/FollowupBadge';
 import { RequirementDialog } from '@/components/RequirementDialog';
 import { usePolicyRequirement } from '@/hooks/usePolicyRequirements';
+import { AssigneeBadges } from '@/components/AssigneeBadges';
 import { toast } from 'sonner';
 
 interface AdminPolicyRowProps {
