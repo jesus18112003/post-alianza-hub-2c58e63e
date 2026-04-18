@@ -7,7 +7,8 @@ import { useLedgerNotes } from '@/hooks/useLedgerNotes';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import { StickyNote, CheckCircle2 } from 'lucide-react';
+import { StickyNote, CheckCircle2, CalendarDays, X } from 'lucide-react';
+import { Input } from '@/components/ui/input';
 
 interface Props {
   policies: Policy[];
