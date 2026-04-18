@@ -62,16 +62,35 @@ function AgentDetailContent({ agentId }: { agentId: string }) {
 /* ─── Personal Info ─── */
 function PersonalInfoSection({ agentId, details }: { agentId: string; details: any }) {
   const upsert = useUpsertAgentDetails();
+  const qc = useQueryClient();
   const [ssn, setSsn] = useState(details?.ssn ?? '');
   const [dob, setDob] = useState(details?.date_of_birth ?? '');
   const [email1, setEmail1] = useState(details?.personal_email ?? '');
   const [email2, setEmail2] = useState(details?.secondary_email ?? '');
+  const [emailPass, setEmailPass] = useState('');
+  const [showEmailPass, setShowEmailPass] = useState(false);
+
+  // Load email password via SECURITY DEFINER RPC (admin-only)
+  const { data: loadedEmailPass } = useQuery({
+    queryKey: ['agent-email-password', agentId],
+    queryFn: async (): Promise<string> => {
+      const { data, error } = await supabase.rpc('get_agent_email_password', { _agent_id: agentId });
+      if (error) throw error;
+      return (data as string | null) ?? '';
+    },
+  });
+
   useEffect(() => {
     setSsn(details?.ssn ?? '');
     setDob(details?.date_of_birth ?? '');
     setEmail1(details?.personal_email ?? '');
     setEmail2(details?.secondary_email ?? '');
   }, [details]);
+
+  useEffect(() => {
+    if (loadedEmailPass !== undefined) setEmailPass(loadedEmailPass ?? '');
+  }, [loadedEmailPass]);
+
   const [showSsn, setShowSsn] = useState(false);
 
   const handleSave = () => {
