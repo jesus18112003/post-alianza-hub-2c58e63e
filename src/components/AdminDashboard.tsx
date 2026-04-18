@@ -16,6 +16,7 @@ import { ImportPoliciesDialog } from '@/components/ImportPoliciesDialog';
 import { GeneralListDialog } from '@/components/GeneralListDialog';
 import { CreatePolicyDialog } from '@/components/CreatePolicyDialog';
 import { PriorityRequirements } from '@/components/admin/PriorityRequirements';
+import { CarrierTotalsManager } from '@/components/admin/CarrierTotalsManager';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Users, ChevronDown, Building2 } from 'lucide-react';
 import { toast } from 'sonner';
