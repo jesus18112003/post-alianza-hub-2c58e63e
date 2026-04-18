@@ -339,6 +339,7 @@ export type Database = {
           folder_sent_date: string | null
           id: string
           location: string | null
+          needs_call_followup: boolean
           notes: string | null
           notes_updated_at: string | null
           payment_method: string | null
@@ -367,6 +368,7 @@ export type Database = {
           folder_sent_date?: string | null
           id?: string
           location?: string | null
+          needs_call_followup?: boolean
           notes?: string | null
           notes_updated_at?: string | null
           payment_method?: string | null
@@ -395,6 +397,7 @@ export type Database = {
           folder_sent_date?: string | null
           id?: string
           location?: string | null
+          needs_call_followup?: boolean
           notes?: string | null
           notes_updated_at?: string | null
           payment_method?: string | null
