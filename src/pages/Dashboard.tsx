@@ -44,10 +44,7 @@ function AgentDashboard() {
   }, [policies, dateFrom, dateTo]);
 
   const totalCommission = useMemo(
-    () =>
-      dateFiltered
-        .filter((p) => p.status === 'emitido' || p.status === 'cobrado')
-        .reduce((sum, p) => sum + (p.total_commission ?? 0), 0),
+    () => dateFiltered.reduce((sum, p) => sum + (p.total_commission ?? 0), 0),
     [dateFiltered]
   );
 
