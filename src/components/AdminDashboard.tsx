@@ -92,6 +92,10 @@ export function AdminDashboard() {
         <AdminTopBar search={search} onSearchChange={setSearch} />
 
         <main className="flex-1 px-6 py-6 space-y-6 overflow-y-auto">
+          {activeSection === 'carrier-totals' ? (
+            <CarrierTotalsManager />
+          ) : (
+            <>
           {/* Title + Priority requirements (top, side by side) */}
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-6 items-start">
             <div className="space-y-6">
