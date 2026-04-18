@@ -182,6 +182,30 @@ function PersonalInfoSection({ agentId, details }: { agentId: string; details: a
         </div>
       </div>
 
+      <div className="space-y-1.5 rounded-lg border border-amber-500/30 bg-amber-500/5 p-3">
+        <Label className="text-xs text-amber-400 flex items-center gap-1.5">
+          <Lock className="h-3 w-3" />
+          Contraseña del Correo
+          <span className="text-[10px] text-amber-400/70 font-normal">(solo admins)</span>
+        </Label>
+        <div className="relative">
+          <Input
+            type={showEmailPass ? 'text' : 'password'}
+            value={emailPass}
+            onChange={(e) => setEmailPass(e.target.value)}
+            placeholder="Contraseña del correo del agente"
+            className="bg-background border-amber-500/20 text-foreground text-sm pr-9"
+          />
+          <button
+            type="button"
+            onClick={() => setShowEmailPass(!showEmailPass)}
+            className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+          >
+            {showEmailPass ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
+          </button>
+        </div>
+      </div>
+
       <div className="flex justify-end">
         <Button size="sm" onClick={handleSave} disabled={upsert.isPending} className="gap-1.5">
           <Save className="h-3.5 w-3.5" />
