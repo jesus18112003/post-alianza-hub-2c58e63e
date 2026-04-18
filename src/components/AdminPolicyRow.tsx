@@ -14,7 +14,7 @@ import { FollowupBadge } from '@/components/FollowupBadge';
 import { RequirementDialog } from '@/components/RequirementDialog';
 import { usePolicyRequirement } from '@/hooks/usePolicyRequirements';
 import { AssigneeBadges } from '@/components/AssigneeBadges';
-import { useToggleCallFollowup, usePolicyCallLogs } from '@/hooks/useCallFollowups';
+import { useToggleCallFollowup, usePolicyCallLogs, useDeleteCallLog } from '@/hooks/useCallFollowups';
 import { toast } from 'sonner';
 
 interface AdminPolicyRowProps {
@@ -39,6 +39,8 @@ export function AdminPolicyRow({ policy, agentName }: AdminPolicyRowProps) {
   const { data: requirement } = usePolicyRequirement(policy.id);
   const hasRequirement = !!requirement && !requirement.resolved;
   const { data: callLogs = [] } = usePolicyCallLogs(open ? policy.id : null);
+  const deleteCallLog = useDeleteCallLog();
+  const [confirmDeleteLogId, setConfirmDeleteLogId] = useState<string | null>(null);
 
   const formattedDate = format(new Date(policy.date + 'T12:00:00'), 'dd MMM yyyy', { locale: es });
   const allStatuses = Object.keys(STATUS_CONFIG) as PolicyStatus[];
@@ -380,13 +382,65 @@ export function AdminPolicyRow({ policy, agentName }: AdminPolicyRowProps) {
                     key={log.id}
                     className="rounded-md border border-border/50 bg-secondary/30 px-3 py-2"
                   >
-                    <div className="flex items-center justify-between mb-1">
+                    <div className="flex items-center justify-between mb-1 gap-2">
                       <span className="text-[10px] uppercase tracking-wide text-primary/80 font-semibold tabular-nums">
                         {format(parseISO(log.call_date), "dd MMM yyyy", { locale: es })}
                       </span>
-                      <span className="text-[10px] text-muted-foreground/60">
-                        {format(new Date(log.created_at), "HH:mm", { locale: es })}
-                      </span>
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-[10px] text-muted-foreground/60">
+                          {format(new Date(log.created_at), "HH:mm", { locale: es })}
+                        </span>
+                        {confirmDeleteLogId === log.id ? (
+                          <>
+                            <span className="text-[10px] text-destructive">¿Eliminar?</span>
+                            <Button
+                              variant="destructive"
+                              size="icon"
+                              className="h-5 w-5"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                deleteCallLog.mutate(
+                                  { logId: log.id, policyId: policy.id },
+                                  {
+                                    onSuccess: () => {
+                                      toast.success('Registro eliminado');
+                                      setConfirmDeleteLogId(null);
+                                    },
+                                    onError: () => toast.error('Error al eliminar'),
+                                  }
+                                );
+                              }}
+                              disabled={deleteCallLog.isPending}
+                            >
+                              <Check className="h-3 w-3" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-5 w-5"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setConfirmDeleteLogId(null);
+                              }}
+                            >
+                              <X className="h-3 w-3" />
+                            </Button>
+                          </>
+                        ) : (
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-5 w-5 text-muted-foreground hover:text-destructive"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setConfirmDeleteLogId(log.id);
+                            }}
+                            title="Eliminar registro"
+                          >
+                            <Trash2 className="h-3 w-3" />
+                          </Button>
+                        )}
+                      </div>
                     </div>
                     <p className="text-xs text-secondary-foreground leading-relaxed whitespace-pre-wrap">
                       {log.note}

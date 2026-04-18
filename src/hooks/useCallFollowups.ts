@@ -138,3 +138,17 @@ export function usePolicyCallLogs(policyId: string | null) {
     },
   });
 }
+
+/** Delete a single call log entry. Admins only (enforced by RLS). */
+export function useDeleteCallLog() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ logId }: { logId: string; policyId: string }) => {
+      const { error } = await supabase.from('policy_call_logs').delete().eq('id', logId);
+      if (error) throw error;
+    },
+    onSuccess: (_d, vars) => {
+      qc.invalidateQueries({ queryKey: ['policy-call-logs', vars.policyId] });
+    },
+  });
+}
