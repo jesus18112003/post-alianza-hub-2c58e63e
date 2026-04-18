@@ -17,6 +17,7 @@ import { GeneralListDialog } from '@/components/GeneralListDialog';
 import { CreatePolicyDialog } from '@/components/CreatePolicyDialog';
 import { PriorityRequirements } from '@/components/admin/PriorityRequirements';
 import { CarrierTotalsManager } from '@/components/admin/CarrierTotalsManager';
+import { InternalTasksWidget } from '@/components/admin/InternalTasksWidget';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Users, ChevronDown, Building2 } from 'lucide-react';
 import { toast } from 'sonner';
@@ -212,6 +213,7 @@ export function AdminDashboard() {
               companyFilter={effectiveCompanyFilter}
             />
             <div className="space-y-6">
+              <InternalTasksWidget />
               <AddClosingByMessage />
               <WelcomeTemplateManager />
             </div>
