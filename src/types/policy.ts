@@ -6,7 +6,7 @@ export interface Policy {
   client_name: string;
   client_first_name: string | null;
   client_last_name: string | null;
-  status: 'emitido' | 'cobrado' | 'pendiente' | 'fondo_insuficiente' | 'descalificado' | 'cancelado' | 'chargeback' | 'aprobado';
+  status: 'emitido' | 'cobrado' | 'pendiente' | 'fondo_insuficiente' | 'descalificado' | 'cancelado' | 'chargeback' | 'aprobado' | 'no_seguimiento';
   policy_number: string | null;
   location: string | null;
   policy_type: string | null;
