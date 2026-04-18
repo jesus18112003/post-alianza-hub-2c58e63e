@@ -47,7 +47,7 @@ export function LogCallDialog({ policy, open, onOpenChange }: LogCallDialogProps
               // not fatal
             }
           }
-          toast.success('Llamada registrada y guardada en notas');
+          toast.success('Nota de llamada guardada en la tarjeta del cliente');
           setNote('');
           setResolveAfter(false);
           onOpenChange(false);
