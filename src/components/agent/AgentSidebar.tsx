@@ -1,22 +1,28 @@
-import { LayoutDashboard, DollarSign, HelpCircle, LogOut, PanelLeftClose, PanelLeft } from 'lucide-react';
+import { LayoutDashboard, DollarSign, HelpCircle, LogOut, PanelLeftClose, PanelLeft, Building2 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useState } from 'react';
+import { useCarrierTotalsAccess } from '@/hooks/useCarrierTotals';
 
-export type AgentSection = 'overview' | 'commission';
+export type AgentSection = 'overview' | 'commission' | 'carrier-totals';
 
 interface AgentSidebarProps {
   activeSection: AgentSection;
   onSectionChange: (section: AgentSection) => void;
 }
 
-const NAV_ITEMS: { id: AgentSection; label: string; icon: React.ElementType }[] = [
+const BASE_NAV: { id: AgentSection; label: string; icon: React.ElementType }[] = [
   { id: 'overview', label: 'OVERVIEW', icon: LayoutDashboard },
   { id: 'commission', label: 'COMMISSION', icon: DollarSign },
 ];
 
 export function AgentSidebar({ activeSection, onSectionChange }: AgentSidebarProps) {
-  const { signOut } = useAuth();
+  const { signOut, user } = useAuth();
   const [collapsed, setCollapsed] = useState(false);
+  const { data: access } = useCarrierTotalsAccess(user?.id);
+
+  const navItems = access?.enabled
+    ? [...BASE_NAV, { id: 'carrier-totals' as AgentSection, label: 'TOTAL DE CARRIER', icon: Building2 }]
+    : BASE_NAV;
 
   return (
     <aside className={`${collapsed ? 'w-14' : 'w-56'} border-r border-border bg-sidebar-background flex flex-col h-screen sticky top-0 transition-all duration-200`}>
@@ -41,7 +47,7 @@ export function AgentSidebar({ activeSection, onSectionChange }: AgentSidebarPro
       </div>
 
       <nav className="flex-1 px-2 space-y-1">
-        {NAV_ITEMS.map((item) => {
+        {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = activeSection === item.id;
           return (

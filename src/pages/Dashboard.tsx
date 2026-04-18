@@ -7,6 +7,7 @@ import { AgentSidebar } from '@/components/agent/AgentSidebar';
 import { AgentMetricCards } from '@/components/agent/AgentMetricCards';
 import { AgentPoliciesTable } from '@/components/agent/AgentPoliciesTable';
 import { AgentCommissionLedger } from '@/components/agent/AgentCommissionLedger';
+import { CarrierTotalsTable } from '@/components/CarrierTotalsTable';
 import { ThemeToggleButton } from '@/components/ThemeToggleButton';
 import { CalendarDays, X } from 'lucide-react';
 import { NotificationBell } from '@/components/agent/NotificationBell';
@@ -25,7 +26,7 @@ export default function Dashboard() {
 }
 
 function AgentDashboard() {
-  const { profile } = useAuth();
+  const { profile, user } = useAuth();
   const { data: policies, isLoading } = usePolicies();
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
@@ -150,6 +151,14 @@ function AgentDashboard() {
 
           {activeSection === 'commission' && (
             <AgentCommissionLedger policies={policies ?? []} isLoading={isLoading} />
+          )}
+
+          {activeSection === 'carrier-totals' && user && (
+            <CarrierTotalsTable
+              agentId={user.id}
+              agentName={profile?.full_name || 'Agente'}
+              editable={false}
+            />
           )}
 
         </main>
