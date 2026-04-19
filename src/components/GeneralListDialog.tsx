@@ -104,7 +104,6 @@ export function GeneralListDialog({ open, onOpenChange, agentPolicies, agentName
     const existingPolicyIds = new Set(items.filter((i) => i.policyId).map((i) => i.policyId));
     return agentPolicies
       .filter((p) => !existingPolicyIds.has(p.id))
-      .filter((p) => p.status !== 'cancelado' && p.status !== 'descalificado' && p.status !== 'no_seguimiento')
       .filter((p) =>
         addSearch === '' ||
         p.client_name.toLowerCase().includes(addSearch.toLowerCase()) ||
