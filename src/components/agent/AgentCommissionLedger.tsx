@@ -30,7 +30,9 @@ export function AgentCommissionLedger({ policies, isLoading }: Props) {
         (p) =>
           p.status === 'cobrado' ||
           p.status === 'chargeback' ||
-          ((p.status === 'cancelado' || p.status === 'fondo_insuficiente') &&
+          ((p.status === 'cancelado' ||
+            p.status === 'fondo_insuficiente' ||
+            p.status === 'no_seguimiento') &&
             (p.chargeback_amount ?? 0) > 0)
       )
       .filter((p) => {
