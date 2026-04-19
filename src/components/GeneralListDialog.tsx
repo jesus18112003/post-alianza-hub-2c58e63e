@@ -7,7 +7,7 @@ import { Policy } from '@/types/policy';
 import { Copy, Plus, Trash2, Check, Search } from 'lucide-react';
 import { toast } from 'sonner';
 
-type ListColor = 'green' | 'orange' | 'red';
+type ListColor = 'green' | 'orange' | 'red' | 'blue';
 
 interface ListItem {
   id: string;
@@ -22,12 +22,14 @@ const COLOR_EMOJI: Record<ListColor, string> = {
   green: '🟢',
   orange: '🟠',
   red: '🔴',
+  blue: '🔵',
 };
 
 const COLOR_LABELS: Record<ListColor, string> = {
   green: 'En revisión / Sin pendientes',
   orange: 'Requerimientos pendientes',
   red: 'Cancelado / Descalificado',
+  blue: 'Otro / Especial',
 };
 
 // Map policy status to default list color
@@ -165,7 +167,7 @@ export function GeneralListDialog({ open, onOpenChange, agentPolicies, agentName
   };
 
   const cycleColor = (current: ListColor): ListColor => {
-    const order: ListColor[] = ['green', 'orange', 'red'];
+    const order: ListColor[] = ['green', 'orange', 'red', 'blue'];
     const idx = order.indexOf(current);
     return order[(idx + 1) % order.length];
   };
