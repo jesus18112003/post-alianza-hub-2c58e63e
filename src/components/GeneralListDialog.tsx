@@ -167,7 +167,7 @@ export function GeneralListDialog({ open, onOpenChange, agentPolicies, agentName
   };
 
   const cycleColor = (current: ListColor): ListColor => {
-    const order: ListColor[] = ['green', 'orange', 'red'];
+    const order: ListColor[] = ['green', 'orange', 'red', 'blue'];
     const idx = order.indexOf(current);
     return order[(idx + 1) % order.length];
   };
